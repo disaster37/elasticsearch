@@ -25,7 +25,7 @@ func integrationClient(t *testing.T) elasticsearch.Client {
 	password := os.Getenv("ELASTICSEARCH_PASSWORD")
 	logger := logrus.NewEntry(logrus.StandardLogger())
 	c, err := elasticsearch.New(&elasticsearch.Config{
-		URL:               url,
+		Addresses:         []string{url},
 		Username:          username,
 		Password:          password,
 		TLSSkipVerify:     true,

@@ -25,50 +25,50 @@ func traceLogger() *logrus.Entry {
 }
 
 func TestNewBasicAuth(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", Username: "elastic", Password: "pw"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, Username: "elastic", Password: "pw"}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	assert.NotNil(t, c.RestyClient())
 }
 
 func TestNewAPIKey(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", APIKey: "abc:123"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, APIKey: "abc:123"}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
 func TestNewBearerToken(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", BearerToken: "tok"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, BearerToken: "tok"}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
 func TestNewAuthConflict(t *testing.T) {
-	_, err := New(&Config{URL: "https://localhost:9200", Username: "u", Password: "p", APIKey: "k"}, testLogger())
+	_, err := New(&Config{Addresses: []string{"https://localhost:9200"}, Username: "u", Password: "p", APIKey: "k"}, testLogger())
 	assert.Error(t, err)
 	var esErr *types.ElasticsearchError
 	assert.ErrorAs(t, err, &esErr)
 }
 
 func TestNewCACertParseError(t *testing.T) {
-	_, err := New(&Config{URL: "https://localhost:9200", CACert: []byte("not a cert")}, testLogger())
+	_, err := New(&Config{Addresses: []string{"https://localhost:9200"}, CACert: []byte("not a cert")}, testLogger())
 	assert.Error(t, err)
 }
 
 func TestNewNoAuth(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
 func TestNewDisableHTTP2(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", DisableHTTP2: true}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, DisableHTTP2: true}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
 func TestNewAllServices(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c.Info())
 	assert.NotNil(t, c.Document())
@@ -86,7 +86,7 @@ func TestNewAllServices(t *testing.T) {
 // TestNewAllServicesComplete verifies every accessor method on DefaultClient
 // returns a non-nil service.
 func TestNewAllServicesComplete(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, testLogger())
 	require.NoError(t, err)
 
 	assert.NotNil(t, c.Info())
@@ -133,10 +133,10 @@ func TestNewAllServicesComplete(t *testing.T) {
 }
 
 // TestNewInsecureHTTPWithCredentials verifies that combining credentials
-// with an http:// URL is rejected unless AllowInsecureHTTP is set.
+// with an http:// address is rejected unless AllowInsecureHTTP is set.
 func TestNewInsecureHTTPWithCredentials(t *testing.T) {
 	// http:// with credentials and no opt-in → error.
-	_, err := New(&Config{URL: "http://localhost:9200", Username: "u", Password: "p"}, testLogger())
+	_, err := New(&Config{Addresses: []string{"http://localhost:9200"}, Username: "u", Password: "p"}, testLogger())
 	assert.Error(t, err)
 	var esErr *types.ElasticsearchError
 	assert.ErrorAs(t, err, &esErr)
@@ -146,7 +146,7 @@ func TestNewInsecureHTTPWithCredentials(t *testing.T) {
 // TestNewInsecureHTTPWithCredentialsOptIn verifies that http:// with
 // credentials is allowed when AllowInsecureHTTP is explicitly set.
 func TestNewInsecureHTTPWithCredentialsOptIn(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200", Username: "u", Password: "p", AllowInsecureHTTP: true}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}, Username: "u", Password: "p", AllowInsecureHTTP: true}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
@@ -154,7 +154,7 @@ func TestNewInsecureHTTPWithCredentialsOptIn(t *testing.T) {
 // TestNewHTTPSWithCredentials verifies that https:// with credentials is
 // always allowed.
 func TestNewHTTPSWithCredentials(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", Username: "u", Password: "p"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, Username: "u", Password: "p"}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
@@ -162,41 +162,41 @@ func TestNewHTTPSWithCredentials(t *testing.T) {
 // TestNewHTTPWithoutCredentials verifies that http:// without credentials
 // is allowed (no cleartext secret to protect).
 func TestNewHTTPWithoutCredentials(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
-// TestNewInvalidURLNoScheme verifies that a URL without a scheme is rejected.
-func TestNewInvalidURLNoScheme(t *testing.T) {
-	_, err := New(&Config{URL: "google.com"}, testLogger())
+// TestNewInvalidAddressNoScheme verifies that an address without a scheme is rejected.
+func TestNewInvalidAddressNoScheme(t *testing.T) {
+	_, err := New(&Config{Addresses: []string{"google.com"}}, testLogger())
 	assert.Error(t, err)
 	var esErr *types.ElasticsearchError
 	assert.ErrorAs(t, err, &esErr)
 	assert.Equal(t, 400, esErr.Status)
 }
 
-// TestNewInvalidURL verifies that a malformed URL is rejected.
-func TestNewInvalidURL(t *testing.T) {
-	_, err := New(&Config{URL: "://bad"}, testLogger())
+// TestNewInvalidAddress verifies that a malformed address is rejected.
+func TestNewInvalidAddress(t *testing.T) {
+	_, err := New(&Config{Addresses: []string{"://bad"}}, testLogger())
 	assert.Error(t, err)
 	var esErr *types.ElasticsearchError
 	assert.ErrorAs(t, err, &esErr)
 	assert.Equal(t, 400, esErr.Status)
 }
 
-// TestNewFTPURLRejected verifies that a non-http(s) scheme is rejected.
-func TestNewFTPURLRejected(t *testing.T) {
-	_, err := New(&Config{URL: "ftp://localhost:9200"}, testLogger())
+// TestNewFTPAddressRejected verifies that a non-http(s) scheme is rejected.
+func TestNewFTPAddressRejected(t *testing.T) {
+	_, err := New(&Config{Addresses: []string{"ftp://localhost:9200"}}, testLogger())
 	assert.Error(t, err)
 	var esErr *types.ElasticsearchError
 	assert.ErrorAs(t, err, &esErr)
 	assert.Equal(t, 400, esErr.Status)
 }
 
-// TestNewEmptyURL verifies that an empty URL is allowed (resty uses a
-// per-request URL in that case).
-func TestNewEmptyURL(t *testing.T) {
+// TestNewEmptyAddresses verifies that an empty address list is allowed (resty
+// uses a per-request URL in that case).
+func TestNewEmptyAddresses(t *testing.T) {
 	c, err := New(&Config{}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
@@ -204,7 +204,7 @@ func TestNewEmptyURL(t *testing.T) {
 
 // TestNewAPIKeyAndBearerConflict verifies that APIKey + BearerToken is rejected.
 func TestNewAPIKeyAndBearerConflict(t *testing.T) {
-	_, err := New(&Config{URL: "https://localhost:9200", APIKey: "k", BearerToken: "t"}, testLogger())
+	_, err := New(&Config{Addresses: []string{"https://localhost:9200"}, APIKey: "k", BearerToken: "t"}, testLogger())
 	assert.Error(t, err)
 	var esErr *types.ElasticsearchError
 	assert.ErrorAs(t, err, &esErr)
@@ -212,28 +212,28 @@ func TestNewAPIKeyAndBearerConflict(t *testing.T) {
 
 // TestNewBasicAuthAndBearerConflict verifies that basic auth + BearerToken is rejected.
 func TestNewBasicAuthAndBearerConflict(t *testing.T) {
-	_, err := New(&Config{URL: "https://localhost:9200", Username: "u", Password: "p", BearerToken: "t"}, testLogger())
+	_, err := New(&Config{Addresses: []string{"https://localhost:9200"}, Username: "u", Password: "p", BearerToken: "t"}, testLogger())
 	assert.Error(t, err)
 }
 
 // TestNewTLSSkipVerifyWithCreds verifies TLSSkipVerify + credentials logs a
 // warning but still succeeds.
 func TestNewTLSSkipVerifyWithCreds(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", Username: "u", Password: "p", TLSSkipVerify: true}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, Username: "u", Password: "p", TLSSkipVerify: true}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
 // TestNewTLSSkipVerifyNoCreds verifies TLSSkipVerify without credentials is fine.
 func TestNewTLSSkipVerifyNoCreds(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", TLSSkipVerify: true}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, TLSSkipVerify: true}, testLogger())
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
 // TestNewTimeout verifies the request timeout is applied to the resty client.
 func TestNewTimeout(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200", Timeout: 5 * time.Second}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}, Timeout: 5 * time.Second}, testLogger())
 	require.NoError(t, err)
 	// No direct accessor for timeout; just ensure client built.
 	assert.NotNil(t, c.RestyClient())
@@ -242,7 +242,7 @@ func TestNewTimeout(t *testing.T) {
 // TestNewIdleConnTimeoutDefault verifies the default IdleConnTimeout (60s) is
 // applied to the transport when not specified.
 func TestNewIdleConnTimeoutDefault(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, testLogger())
 	require.NoError(t, err)
 	tr, err := c.RestyClient().Transport()
 	require.NoError(t, err)
@@ -251,7 +251,7 @@ func TestNewIdleConnTimeoutDefault(t *testing.T) {
 
 // TestNewIdleConnTimeoutCustom verifies a custom IdleConnTimeout is honored.
 func TestNewIdleConnTimeoutCustom(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200", IdleConnTimeout: 5 * time.Second}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}, IdleConnTimeout: 5 * time.Second}, testLogger())
 	require.NoError(t, err)
 	tr, err := c.RestyClient().Transport()
 	require.NoError(t, err)
@@ -261,7 +261,7 @@ func TestNewIdleConnTimeoutCustom(t *testing.T) {
 // TestNewDisableHTTP2Transport verifies that DisableHTTP2 forces HTTP/1.1 on
 // the transport.
 func TestNewDisableHTTP2Transport(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", DisableHTTP2: true}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, DisableHTTP2: true}, testLogger())
 	require.NoError(t, err)
 	tr, err := c.RestyClient().Transport()
 	require.NoError(t, err)
@@ -273,7 +273,7 @@ func TestNewDisableHTTP2Transport(t *testing.T) {
 
 // TestNewHTTP2Default verifies HTTP/2 is attempted by default.
 func TestNewHTTP2Default(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}}, testLogger())
 	require.NoError(t, err)
 	tr, err := c.RestyClient().Transport()
 	require.NoError(t, err)
@@ -283,7 +283,7 @@ func TestNewHTTP2Default(t *testing.T) {
 // TestNewTLSSkipVerifyTransport verifies TLSSkipVerify propagates to the
 // transport's TLS config.
 func TestNewTLSSkipVerifyTransport(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200", TLSSkipVerify: true}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, TLSSkipVerify: true}, testLogger())
 	require.NoError(t, err)
 	tr, err := c.RestyClient().Transport()
 	require.NoError(t, err)
@@ -295,16 +295,16 @@ func TestNewTLSSkipVerifyTransport(t *testing.T) {
 // TestNewRestyClientBaseURL verifies RestyClient returns a non-nil client with
 // the configured base URL.
 func TestNewRestyClientBaseURL(t *testing.T) {
-	c, err := New(&Config{URL: "https://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}}, testLogger())
 	require.NoError(t, err)
 	rc := c.RestyClient()
 	require.NotNil(t, rc)
 	assert.Equal(t, "https://localhost:9200", rc.BaseURL)
 }
 
-// TestNewRestyClientEmptyURL verifies that an empty URL leaves the base URL
-// unset (resty uses per-request URLs).
-func TestNewRestyClientEmptyURL(t *testing.T) {
+// TestNewRestyClientEmptyAddresses verifies that an empty address list leaves
+// the base URL unset (resty uses per-request URLs).
+func TestNewRestyClientEmptyAddresses(t *testing.T) {
 	c, err := New(&Config{}, testLogger())
 	require.NoError(t, err)
 	rc := c.RestyClient()
@@ -315,7 +315,7 @@ func TestNewRestyClientEmptyURL(t *testing.T) {
 // TestNewTraceLevelDebug verifies that a trace-level logger enables resty
 // debug mode.
 func TestNewTraceLevelDebug(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, traceLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, traceLogger())
 	require.NoError(t, err)
 	rc := c.RestyClient()
 	assert.True(t, rc.Debug)
@@ -326,7 +326,7 @@ func TestNewRetryConfigured(t *testing.T) {
 	called := false
 	cond := func(*resty.Response, error) bool { called = true; return false }
 	c, err := New(&Config{
-		URL:              "http://localhost:9200",
+		Addresses:        []string{"http://localhost:9200"},
 		RetryCount:       2,
 		RetryWaitTime:    10 * time.Millisecond,
 		RetryMaxWaitTime: 100 * time.Millisecond,
@@ -342,7 +342,7 @@ func TestNewRetryConfigured(t *testing.T) {
 
 // TestNewContentTypeHeader verifies the default Content-Type header is set.
 func TestNewContentTypeHeader(t *testing.T) {
-	c, err := New(&Config{URL: "http://localhost:9200"}, testLogger())
+	c, err := New(&Config{Addresses: []string{"http://localhost:9200"}}, testLogger())
 	require.NoError(t, err)
 	assert.Equal(t, "application/json", c.RestyClient().Header.Get("Content-Type"))
 }

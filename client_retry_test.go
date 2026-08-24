@@ -147,7 +147,7 @@ func TestRetryOn503(t *testing.T) {
 	defer srv.Close()
 
 	client, err := New(&Config{
-		URL:              srv.URL,
+		Addresses:        []string{srv.URL},
 		RetryCount:       3,
 		RetryWaitTime:    1 * time.Millisecond,
 		RetryMaxWaitTime: 1 * time.Millisecond,
@@ -177,7 +177,7 @@ func TestRetryOn429(t *testing.T) {
 	defer srv.Close()
 
 	client, err := New(&Config{
-		URL:              srv.URL,
+		Addresses:        []string{srv.URL},
 		RetryCount:       2,
 		RetryWaitTime:    1 * time.Millisecond,
 		RetryMaxWaitTime: 1 * time.Millisecond,
@@ -208,7 +208,7 @@ func TestRetryOnSearchPhaseException(t *testing.T) {
 	defer srv.Close()
 
 	client, err := New(&Config{
-		URL:              srv.URL,
+		Addresses:        []string{srv.URL},
 		RetryCount:       2,
 		RetryWaitTime:    1 * time.Millisecond,
 		RetryMaxWaitTime: 1 * time.Millisecond,
@@ -239,7 +239,7 @@ func TestRetryOnTooManyBuckets(t *testing.T) {
 	defer srv.Close()
 
 	client, err := New(&Config{
-		URL:              srv.URL,
+		Addresses:        []string{srv.URL},
 		RetryCount:       2,
 		RetryWaitTime:    1 * time.Millisecond,
 		RetryMaxWaitTime: 1 * time.Millisecond,
@@ -270,7 +270,7 @@ func TestRetryOnCircuitBreaking(t *testing.T) {
 	defer srv.Close()
 
 	client, err := New(&Config{
-		URL:              srv.URL,
+		Addresses:        []string{srv.URL},
 		RetryCount:       2,
 		RetryWaitTime:    1 * time.Millisecond,
 		RetryMaxWaitTime: 1 * time.Millisecond,

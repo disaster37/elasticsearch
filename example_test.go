@@ -12,7 +12,7 @@ import (
 func ExampleNew() {
 	logger := logrus.NewEntry(logrus.StandardLogger())
 	client, err := elasticsearch.New(&elasticsearch.Config{
-		URL:           "https://localhost:9200",
+		Addresses:     []string{"https://localhost:9200"},
 		Username:      "elastic",
 		Password:      "changeme",
 		TLSSkipVerify: true,
@@ -32,8 +32,8 @@ func ExampleNew() {
 func ExampleNew_apiKey() {
 	logger := logrus.NewEntry(logrus.StandardLogger())
 	client, err := elasticsearch.New(&elasticsearch.Config{
-		URL:    "https://localhost:9200",
-		APIKey: "ZpGaRk1BQlJhc0hKQ3h6QjB4Z0I6cXhLZjJ3U0tqYzVfXzZJNjJ3Zw==",
+		Addresses: []string{"https://localhost:9200"},
+		APIKey:    "ZpGaRk1BQlJhc0hKQ3h6QjB4Z0I6cXhLZjJ3U0tqYzVfXzZJNjJ3Zw==",
 	}, logger)
 	if err != nil {
 		log.Fatal(err)

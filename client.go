@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -197,9 +196,20 @@ type Client interface {
 
 // Config holds configuration for the Elasticsearch client.
 type Config struct {
-	// URL is the Elasticsearch cluster address. Required.
-	// Example: "https://localhost:9200"
-	URL string
+	// Addresses is a list of Elasticsearch node URLs to connect to. Requests
+	// are distributed across the addresses in round-robin order. When
+	// RetryCount > 0, a request that fails against one address is retried
+	// against the next address (see DefaultRetryConditions).
+	//
+	// The maximum number of addresses is maxAddresses (1000). Exceeding this
+	// limit returns an error from New.
+	//
+	// Example:
+	//   Addresses: []string{"https://node1:9200", "https://node2:9200"}
+	//
+	// An empty (nil or zero-length) slice is allowed: in that case the client
+	// has no base URL and every request must supply an absolute URL.
+	Addresses []string
 
 	// Username for HTTP basic authentication.
 	Username string
@@ -224,9 +234,9 @@ type Config struct {
 	TLSSkipVerify bool
 
 	// AllowInsecureHTTP explicitly opts in to sending credentials over a
-	// plaintext http:// URL. By default New rejects any configuration that
+	// plaintext http:// address. By default New rejects any configuration that
 	// combines credentials (Username/Password, APIKey, or BearerToken) with
-	// an http:// URL, because the credentials would travel in cleartext.
+	// an http:// address, because the credentials would travel in cleartext.
 	// Set this to true only for local development against a non-TLS
 	// Elasticsearch; never enable it in production.
 	AllowInsecureHTTP bool
@@ -323,9 +333,27 @@ func New(cfg *Config, logger *logrus.Entry) (Client, error) {
 	// with the resty default of "text/plain; charset=utf-8".
 	c.SetHeader("Content-Type", "application/json")
 
-	if cfg.URL != "" {
-		c.SetBaseURL(cfg.URL)
+	// Parse and validate the configured addresses. An empty list is allowed
+	// (resty then uses per-request absolute URLs). normalizeAddresses enforces
+	// the http/https scheme.
+	parsedAddrs, err := normalizeAddresses(cfg.Addresses)
+	if err != nil {
+		return nil, err
 	}
+	pool := newConnectionPool(parsedAddrs)
+
+	// SetBaseURL makes RestyClient().BaseURL reflect the first address and
+	// remains the fallback for single-address and absolute-URL requests.
+	if len(parsedAddrs) > 0 {
+		c.SetBaseURL(parsedAddrs[0].String())
+	}
+
+	// Round-robin across addresses. No-op for 0 or 1 address. Registered before
+	// the logging hook below so the logged URL is the actual node.
+	c.OnBeforeRequest(func(_ *resty.Client, req *resty.Request) error {
+		pool.rewrite(req)
+		return nil
+	})
 
 	// Auth: exactly one mechanism may be set.
 	authSet := 0
@@ -355,20 +383,17 @@ func New(cfg *Config, logger *logrus.Entry) (Client, error) {
 		c.SetHeader("Authorization", "Bearer "+cfg.BearerToken)
 	}
 
-	// Validate the URL scheme and guard against sending credentials in
-	// cleartext over http://. An empty URL is allowed (resty uses a
-	// per-request URL in that case).
-	u, err := url.Parse(cfg.URL)
-	if cfg.URL != "" && (err != nil || (u.Scheme != "http" && u.Scheme != "https")) {
-		return nil, &types.ElasticsearchError{Status: 400, Details: &types.ElasticsearchErrorDetails{
-			Reason: fmt.Sprintf("invalid URL: %s must be http(s)", cfg.URL),
-		}}
-	}
+	// Guard against sending credentials in cleartext over any http:// address.
+	// An empty address list is allowed (resty uses a per-request URL).
 	credsConfigured := cfg.Username != "" || cfg.Password != "" || cfg.APIKey != "" || cfg.BearerToken != ""
-	if credsConfigured && u.Scheme == "http" && !cfg.AllowInsecureHTTP {
-		return nil, &types.ElasticsearchError{Status: 400, Details: &types.ElasticsearchErrorDetails{
-			Reason: "credentials configured over insecure http:// URL; use https:// or set Config.AllowInsecureHTTP=true",
-		}}
+	if credsConfigured {
+		for _, u := range parsedAddrs {
+			if u.Scheme == "http" && !cfg.AllowInsecureHTTP {
+				return nil, &types.ElasticsearchError{Status: 400, Details: &types.ElasticsearchErrorDetails{
+					Reason: "credentials configured over insecure http:// URL; use https:// or set Config.AllowInsecureHTTP=true",
+				}}
+			}
+		}
 	}
 	if cfg.TLSSkipVerify && credsConfigured {
 		logger.Warn("TLSSkipVerify is enabled while credentials are configured; credentials are protected only by the (unverified) TLS layer")

@@ -18,7 +18,7 @@
 //	    logger := logrus.NewEntry(logrus.StandardLogger())
 //
 //	    client, err := elasticsearch.New(&elasticsearch.Config{
-//	        URL:           "https://localhost:9200",
+//	        Addresses:     []string{"https://localhost:9200"},
 //	        Username:      "elastic",
 //	        Password:      "changeme",
 //	        TLSSkipVerify: true, // For development only
@@ -30,6 +30,11 @@
 //	    // Use the client to interact with Elasticsearch
 //	    // ...
 //	}
+//
+// Config.Addresses accepts a list of node URLs; requests are distributed across
+// them in round-robin order, and with RetryCount > 0 a failed request is
+// retried against the next address. The maximum number of addresses is 1000
+// (maxAddresses); exceeding this limit returns an error.
 //
 // # Authentication
 //

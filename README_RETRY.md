@@ -33,7 +33,7 @@ When `RetryCount > 0`, the client automatically retries on:
 
 ```go
 client, err := elasticsearch.New(&elasticsearch.Config{
-    URL:      "https://localhost:9200",
+    Addresses: []string{"https://localhost:9200"},
     Username: "admin",
     Password: "admin",
     RetryCount: 3,
@@ -46,7 +46,7 @@ client, err := elasticsearch.New(&elasticsearch.Config{
 
 ```go
 client, err := elasticsearch.New(&elasticsearch.Config{
-    URL:      "https://localhost:9200",
+    Addresses: []string{"https://localhost:9200"},
     Username: "admin",
     Password: "admin",
     RetryCount: 3,
@@ -71,11 +71,29 @@ customConditions := []resty.RetryConditionFunc{
 }
 
 client, err := elasticsearch.New(&elasticsearch.Config{
-    URL:              "https://localhost:9200",
+    Addresses:       []string{"https://localhost:9200"},
     RetryCount:       2,
     RetryConditions:  customConditions,
 }, logger)
 ```
+
+## Failover across multiple addresses
+
+When `Config.Addresses` contains more than one node URL, requests are distributed
+across the addresses in round-robin order. With `RetryCount > 0`, each retry
+attempt targets the next address in the round-robin cycle, so a request that
+fails against one node automatically fails over to the next:
+
+```go
+client, err := elasticsearch.New(&elasticsearch.Config{
+    Addresses:       []string{"https://node1:9200", "https://node2:9200"},
+    RetryCount:       1,
+    RetryConditions:  elasticsearch.DefaultRetryConditions(),
+}, logger)
+```
+
+With `RetryCount == 0` (the default) requests still round-robin for load
+balancing but do not fail over: a failed request is returned immediately.
 
 ## Handling Your Specific Error
 

@@ -21,7 +21,7 @@ func main() {
     logger := logrus.NewEntry(logrus.StandardLogger())
 
     client, err := elasticsearch.New(&elasticsearch.Config{
-        URL:           "https://localhost:9200",
+        Addresses:     []string{"https://localhost:9200"},
         Username:      "elastic",
         Password:      "changeme",
         TLSSkipVerify: true, // development only
@@ -33,6 +33,24 @@ func main() {
     info, err := client.Info().Info(ctx)
     // ...
 }
+```
+
+## Connecting to multiple nodes
+
+`Config.Addresses` accepts a list of node URLs. Requests are distributed across
+the addresses in round-robin order. When `RetryCount > 0`, a request that fails
+against one address is retried against the next address (see
+[README_RETRY.md](README_RETRY.md)). The maximum number of addresses is 1000
+(`maxAddresses`); exceeding this limit returns an error.
+
+```go
+client, err := elasticsearch.New(&elasticsearch.Config{
+    Addresses: []string{
+        "https://node1:9200",
+        "https://node2:9200",
+    },
+    RetryCount: 3,
+}, logger)
 ```
 
 ## Authentication
