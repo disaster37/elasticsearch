@@ -1,3 +1,7 @@
+// client_retry_test.go contains unit tests for retry configuration and
+// behavior: DefaultRetryConditions, ESSearchRetryConditions, retry execution
+// against httptest servers, and the automatic retry defaults applied by New()
+// when multiple addresses are configured. No Elasticsearch cluster is required.
 package elasticsearch
 
 import (
@@ -281,6 +285,75 @@ func TestRetryOnCircuitBreaking(t *testing.T) {
 	_, err = client.RestyClient().R().Get("/_search")
 	require.NoError(t, err)
 	assert.Equal(t, int32(2), atomic.LoadInt32(&attempts))
+}
+
+// TestNewAutoRetryCountMultipleAddresses verifies that New auto-enables retry
+// with a count equal to the number of configured addresses and installs the
+// default retry conditions when no retry configuration is given.
+func TestNewAutoRetryCountMultipleAddresses(t *testing.T) {
+	c, err := New(&Config{
+		Addresses: []string{"http://n1:9200", "http://n2:9200", "http://n3:9200"},
+	}, testLogger())
+	require.NoError(t, err)
+
+	rc := c.RestyClient()
+	assert.Equal(t, 3, rc.RetryCount)
+	assert.NotEmpty(t, rc.RetryConditions)
+}
+
+// TestNewSingleAddressDefaultRetryDisabled verifies that a single address with
+// the zero-value RetryCount keeps retries disabled and registers no conditions.
+func TestNewSingleAddressDefaultRetryDisabled(t *testing.T) {
+	c, err := New(&Config{Addresses: []string{"http://n1:9200"}}, testLogger())
+	require.NoError(t, err)
+
+	rc := c.RestyClient()
+	assert.Equal(t, 0, rc.RetryCount)
+	assert.Empty(t, rc.RetryConditions)
+}
+
+// TestNewExplicitRetryCountNotOverwritten verifies that an explicitly set
+// RetryCount is preserved when multiple addresses are configured and that
+// caller-provided conditions are not replaced by the defaults.
+func TestNewExplicitRetryCountNotOverwritten(t *testing.T) {
+	called := false
+	cond := func(*resty.Response, error) bool {
+		called = true
+		return false
+	}
+
+	c, err := New(&Config{
+		Addresses:       []string{"http://n1:9200", "http://n2:9200", "http://n3:9200"},
+		RetryCount:      2,
+		RetryConditions: []resty.RetryConditionFunc{cond},
+	}, testLogger())
+	require.NoError(t, err)
+
+	rc := c.RestyClient()
+	assert.Equal(t, 2, rc.RetryCount)
+	require.Len(t, rc.RetryConditions, 1)
+	rc.RetryConditions[0](nil, nil)
+	assert.True(t, called)
+}
+
+// TestNewExplicitRetryCountInstallsDefaultConditions verifies that enabling
+// retries without custom conditions installs the documented defaults.
+func TestNewExplicitRetryCountInstallsDefaultConditions(t *testing.T) {
+	c, err := New(&Config{
+		Addresses:  []string{"http://n1:9200"},
+		RetryCount: 2,
+	}, testLogger())
+	require.NoError(t, err)
+
+	rc := c.RestyClient()
+	assert.Equal(t, 2, rc.RetryCount)
+	require.NotEmpty(t, rc.RetryConditions)
+
+	// The installed condition is the default one: network errors, 429, 5xx.
+	cond := rc.RetryConditions[0]
+	assert.True(t, cond(nil, errors.New("connection reset by peer")))
+	resp := &resty.Response{RawResponse: &http.Response{StatusCode: http.StatusServiceUnavailable}}
+	assert.True(t, cond(resp, nil))
 }
 
 // ensure types import is used.

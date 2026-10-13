@@ -1,3 +1,7 @@
+// connectionpool_test.go contains unit tests for address normalization, the
+// round-robin connection pool, and the multi-address failover behavior enabled
+// by New(). Tests use httptest.NewServer for HTTP mocking and require no
+// Elasticsearch cluster.
 package elasticsearch
 
 import (
@@ -108,6 +112,7 @@ func TestJoinURL(t *testing.T) {
 		{"https://h:9200/es/", "/_search", "https://h:9200/es/_search"},
 		{"https://h:9200/", "/", "https://h:9200/"},
 		{"https://h:9200", "", "https://h:9200/"},
+		{"https://h:9200", "search", "https://h:9200/search"},
 	}
 	for _, tc := range cases {
 		u, err := url.Parse(tc.addr)
@@ -219,7 +224,11 @@ func TestNewMultipleAddressesFailover(t *testing.T) {
 	assert.Equal(t, int32(1), atomic.LoadInt32(&bHits))
 }
 
-func TestNewMultipleAddressesNoFailoverWithoutRetry(t *testing.T) {
+// TestNewMultipleAddressesAutoFailover verifies that configuring more than one
+// address without any explicit retry configuration automatically enables retry
+// and default conditions, so a request that fails against the first node fails
+// over to the next one.
+func TestNewMultipleAddressesAutoFailover(t *testing.T) {
 	var aHits, bHits int32
 	srvA := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddInt32(&aHits, 1)
@@ -234,6 +243,7 @@ func TestNewMultipleAddressesNoFailoverWithoutRetry(t *testing.T) {
 	}))
 	defer srvB.Close()
 
+	// No RetryCount/RetryConditions: the multi-address default must fail over.
 	client, err := New(&Config{
 		Addresses: []string{srvA.URL, srvB.URL},
 	}, testLogger())
@@ -241,9 +251,9 @@ func TestNewMultipleAddressesNoFailoverWithoutRetry(t *testing.T) {
 
 	resp, err := client.RestyClient().R().Get("/_test")
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode())
+	assert.Equal(t, http.StatusOK, resp.StatusCode())
 	assert.Equal(t, int32(1), atomic.LoadInt32(&aHits))
-	assert.Equal(t, int32(0), atomic.LoadInt32(&bHits))
+	assert.Equal(t, int32(1), atomic.LoadInt32(&bHits))
 }
 
 func TestNewAddressesBaseURL(t *testing.T) {

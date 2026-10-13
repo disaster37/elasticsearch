@@ -1,6 +1,16 @@
+// client_test.go contains unit tests for New() and DefaultClient: auth
+// selection, address/TLS/transport configuration, retry defaults, service
+// accessors, and the redacting logger. No Elasticsearch cluster is required.
 package elasticsearch
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
 	"net/http"
 	"testing"
 	"time"
@@ -50,9 +60,37 @@ func TestNewAuthConflict(t *testing.T) {
 	assert.ErrorAs(t, err, &esErr)
 }
 
+// TestNewCACertParseError verifies that an unparseable CA certificate is
+// rejected.
 func TestNewCACertParseError(t *testing.T) {
 	_, err := New(&Config{Addresses: []string{"https://localhost:9200"}, CACert: []byte("not a cert")}, testLogger())
 	assert.Error(t, err)
+}
+
+// TestNewValidCACert verifies that a parseable CA certificate is loaded into
+// the transport's TLS root pool.
+func TestNewValidCACert(t *testing.T) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	require.NoError(t, err)
+	tmpl := &x509.Certificate{
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: "test-ca"},
+		NotBefore:             time.Now().Add(-time.Hour),
+		NotAfter:              time.Now().Add(time.Hour),
+		IsCA:                  true,
+		BasicConstraintsValid: true,
+		KeyUsage:              x509.KeyUsageCertSign,
+	}
+	der, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
+	require.NoError(t, err)
+	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
+
+	c, err := New(&Config{Addresses: []string{"https://localhost:9200"}, CACert: caPEM}, testLogger())
+	require.NoError(t, err)
+	tr, err := c.RestyClient().Transport()
+	require.NoError(t, err)
+	require.NotNil(t, tr.TLSClientConfig)
+	assert.NotNil(t, tr.TLSClientConfig.RootCAs)
 }
 
 func TestNewNoAuth(t *testing.T) {
