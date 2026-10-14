@@ -1,101 +1,67 @@
-// Command speccheck verifies that the Elasticsearch Go client covers every
-// endpoint in the Elasticsearch 9.x REST API spec (excluding _internal.* and
-// private-visibility endpoints).
+// Command speccheck verifies that the Elasticsearch Go client covers the
+// endpoints, query parameters, and path selectors of a pinned Elasticsearch
+// REST API spec directory.
 //
-// The registry maps each spec endpoint name to its implementation: the service
-// interface method and the Params struct that carries its query parameters.
-// A unit test uses reflection to assert that every listed Params field actually
-// exists on the named struct, giving compile-time-ish safety.
+// The registry is generated from hand-reviewed bindings (bindings.json) plus a
+// static scan of the api package; see internal/speccheck/README.md. Generated
+// resolver tables live in types_generated.go and the registry literal lives in
+// registry_generated.go.
 package main
 
-// EndpointImpl describes the client implementation of a single spec endpoint.
+import (
+	"reflect"
+	"strings"
+
+	"github.com/disaster37/elasticsearch/v9/internal/speccheck/generator"
+)
+
+//go:generate go run generate.go -api ../../api -bindings bindings.json -out .
+
+// ValueSource identifies where a method reads a query value or path selector.
+type ValueSource = generator.ValueSource
+
+// EndpointBinding is one reviewed endpoint-to-code binding.
+type EndpointBinding = generator.EndpointBinding
+
+// EndpointImpl is the resolved implementation of a single spec endpoint.
 type EndpointImpl struct {
-	// Service is the service interface name (e.g. "DocumentService").
+	// Service is the api service interface name, including an extension
+	// interface when the new API lives there.
 	Service string
-	// Method is the method name on the service interface (e.g. "Index").
+	// Method is the method name on the service interface.
 	Method string
-	// ParamsStruct is the fully-qualified Params struct type name, or "" when
-	// the endpoint takes no query parameters.
+	// ParamsStruct is the qualified api params type, or "" when the endpoint
+	// has no carrier.
 	ParamsStruct string
-	// ParamsFields lists the spec query-parameter names the struct must expose
-	// (as Go fields, in CamelCase after snake_case conversion). Empty when the
-	// endpoint has no params.
+	// ParamsFields is every accessible exported field of the carrier, sorted.
 	ParamsFields []string
-	// PathParts lists the path-part names the endpoint requires.
+	// ParamsSource is the argument or request field that carries the params.
+	ParamsSource *ValueSource
+	// QueryArgs maps exact wire names supplied positionally as arguments.
+	QueryArgs map[string]ValueSource
+	// QueryFields overrides the default snake_case-to-Go field mapping for
+	// genuine initialism mismatches.
+	QueryFields map[string]string
+	// PathParts is the sorted list of spec path parts mapped by PathSources.
 	PathParts []string
+	// PathSources maps exact spec part names to caller-supplied data.
+	PathSources map[string]ValueSource
+	// Evidence records the source method/helper backing nontrivial aliases.
+	Evidence string
+	// Conditional marks supported APIs absent from the pinned catalog.
+	Conditional bool
 }
 
-// Registry maps spec endpoint names to their implementation. It is
-// hand-maintained alongside the services and verified by TestRegistryFields.
-var Registry = map[string]EndpointImpl{
-	"index": {
-		Service:      "DocumentService",
-		Method:       "Index",
-		ParamsStruct: "api.IndexParams",
-		ParamsFields: []string{"IfPrimaryTerm", "IfSeqNo", "OpType", "Pipeline", "Refresh", "RequireAlias", "Timeout", "Version", "VersionType", "WaitForActiveShards"},
-		PathParts:    []string{"index", "id"},
-	},
-	"create": {
-		Service:      "DocumentService",
-		Method:       "Create",
-		ParamsStruct: "api.CreateParams",
-		ParamsFields: []string{"IfPrimaryTerm", "IfSeqNo", "Pipeline", "Refresh", "RequireAlias", "Timeout", "Version", "VersionType", "WaitForActiveShards"},
-		PathParts:    []string{"index", "id"},
-	},
-	"get": {
-		Service:      "DocumentService",
-		Method:       "Get",
-		ParamsStruct: "api.GetParams",
-		ParamsFields: []string{"ForceSyntheticSource", "Preference", "Realtime", "Refresh", "Routing", "Source", "SourceExcludes", "SourceIncludes", "StoredFields", "Version", "VersionType"},
-		PathParts:    []string{"index", "id"},
-	},
-	"delete": {
-		Service:      "DocumentService",
-		Method:       "Delete",
-		ParamsStruct: "api.DeleteParams",
-		ParamsFields: []string{"IfPrimaryTerm", "IfSeqNo", "Refresh", "Routing", "Timeout", "Version", "VersionType"},
-		PathParts:    []string{"index", "id"},
-	},
-	"info": {
-		Service: "InfoService",
-		Method:  "Info",
-	},
-	"ping": {
-		Service: "InfoService",
-		Method:  "Ping",
-	},
-	"search": {
-		Service:      "SearchService",
-		Method:       "Search",
-		ParamsStruct: "api.SearchParams",
-		PathParts:    []string{"index"},
-	},
-	"count": {
-		Service:      "SearchService",
-		Method:       "Count",
-		ParamsStruct: "api.CountParams",
-		PathParts:    []string{"index"},
-	},
-	"cluster.health": {
-		Service:      "ClusterService",
-		Method:       "Health",
-		ParamsStruct: "api.ClusterHealthParams",
-		PathParts:    []string{"index"},
-	},
-	"indices.create": {
-		Service:      "IndicesService",
-		Method:       "Create",
-		ParamsStruct: "api.IndicesCreateParams",
-		PathParts:    []string{"index"},
-	},
-	"indices.delete": {
-		Service:      "IndicesService",
-		Method:       "Delete",
-		ParamsStruct: "api.IndicesDeleteParams",
-		PathParts:    []string{"index"},
-	},
-	// The registry is intentionally non-exhaustive in this scaffold; the CI
-	// speccheck step reports any spec endpoint missing from the registry so it
-	// can be filled in. Endpoints removed in ES 9 (rollup, _knn_search) are
-	// documented as N/A in the README and excluded here.
+// resolveType returns the api params type for a qualified name, or nil.
+func resolveType(qualified string) reflect.Type {
+	return paramsTypes[qualified]
+}
+
+// resolveService returns the api service interface type for a name, or nil.
+// The name may be given qualified ("api.FooService") or bare.
+func resolveService(name string) reflect.Type {
+	if !strings.Contains(name, ".") {
+		name = "api." + name
+	}
+	return serviceTypes[name]
 }

@@ -4,181 +4,139 @@
 // Usage:
 //
 //	go run ./internal/speccheck -spec /path/to/rest-api-spec/api
+//	go run ./internal/speccheck -spec /path/to/rest-api-spec/api -inventory
 //
-// It parses each spec JSON file (skipping _internal.* and visibility != public
-// unless feature-flag-allowlisted), and reports:
-//   - any endpoint missing from the registry (no service method),
-//   - any spec query parameter missing a field on the registered Params struct,
-//   - any path part missing from the registered PathParts.
-//
-// Exit code is non-zero when any gap is found.
+// Exit codes: 0 when a valid catalog has no unexpected drift, 1 on coverage,
+// registry-integrity, or policy drift, and 2 on missing/bad arguments or
+// unreadable/malformed input.
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"sort"
 	"strings"
+
+	"github.com/disaster37/elasticsearch/v9/internal/speccheck/spec"
 )
 
-// specEndpoint is the subset of the REST spec JSON we care about.
-type specEndpoint struct {
-	Paths []struct {
-		Path  string   `json:"path"`
-		Parts []string `json:"parts"`
-	} `json:"paths"`
-	Params map[string]struct {
-		Type string `json:"type"`
-	} `json:"params"`
-	Visibility string `json:"visibility"`
-}
-
-// featureFlagAllowlist lists feature-flag endpoints that are still checked
-// even when visibility != public.
-var featureFlagAllowlist = map[string]bool{
-	"streams.logs_enable":  true,
-	"streams.logs_disable": true,
-	"streams.status":       true,
-}
-
 func main() {
-	specDir := flag.String("spec", "", "path to the rest-api-spec/api directory")
-	flag.Parse()
-	os.Exit(run(*specDir, os.Stdout, os.Stderr))
+	os.Exit(execute(os.Args[1:], os.Stdout, os.Stderr))
 }
 
-// run executes the speccheck logic against specDir and returns the process
-// exit code: 0 when no gaps are found, 1 when gaps are found, 2 when the
-// arguments or spec directory are invalid. It is extracted from main so the
-// core logic is unit-testable without os.Exit.
-func run(specDir string, stdout, stderr io.Writer) int {
-	if specDir == "" {
+// execute parses arguments and dispatches to the audit or inventory command.
+func execute(args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("speccheck", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	specDir := fs.String("spec", "", "path to the rest-api-spec/api directory")
+	inventoryFlag := fs.Bool("inventory", false, "print the machine-readable endpoint inventory")
+	if err := fs.Parse(args); err != nil {
+		return 2
+	}
+	if strings.TrimSpace(*specDir) == "" {
 		_, _ = fmt.Fprintln(stderr, "speccheck: -spec is required")
 		return 2
 	}
+	if *inventoryFlag {
+		return runInventory(*specDir, stdout, stderr)
+	}
+	return run(*specDir, stdout, stderr)
+}
 
-	files, err := filepath.Glob(filepath.Join(specDir, "*.json"))
+// run audits specDir against the production registry and policy.
+func run(specDir string, stdout, stderr io.Writer) int {
+	return runWithPolicy(specDir, Registry, defaultPolicy(), stdout, stderr)
+}
+
+// runWithPolicy audits specDir against an explicit registry and policy so tests
+// can exercise fixtures without mutating globals.
+func runWithPolicy(specDir string, registry map[string]EndpointImpl, policy Policy, stdout, stderr io.Writer) int {
+	catalog, err := spec.LoadDir(specDir)
 	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "glob spec dir: %v\n", err)
+		_, _ = fmt.Fprintf(stderr, "speccheck: %v\n", err)
 		return 2
 	}
-	sort.Strings(files)
+	result := audit(catalog, registry, policy)
+	printResult(catalog, result, stdout)
+	return exitCode(result)
+}
 
-	var missing []string
-	var paramGaps []string
-	var pathGaps []string
-	count := 0
-
-	for _, f := range files {
-		name := strings.TrimSuffix(filepath.Base(f), ".json")
-		if strings.HasPrefix(name, "_internal") {
-			continue
-		}
-		raw, err := os.ReadFile(f)
-		if err != nil {
-			_, _ = fmt.Fprintf(stderr, "read %s: %v\n", f, err)
-			continue
-		}
-		var ep specEndpoint
-		if err := json.Unmarshal(raw, &ep); err != nil {
-			_, _ = fmt.Fprintf(stderr, "parse %s: %v\n", f, err)
-			continue
-		}
-		if ep.Visibility != "" && ep.Visibility != "public" && !featureFlagAllowlist[name] {
-			continue
-		}
-		count++
-
-		impl, ok := Registry[name]
-		if !ok {
-			missing = append(missing, name)
-			continue
-		}
-		// Check params.
-		for p := range ep.Params {
-			if !contains(impl.ParamsFields, snakeToCamel(p)) && impl.ParamsStruct != "" {
-				paramGaps = append(paramGaps, fmt.Sprintf("%s: param %q missing from %s", name, p, impl.ParamsStruct))
-			}
-		}
-		// Check path parts.
-		parts := collectParts(ep.Paths)
-		for _, part := range parts {
-			if !contains(impl.PathParts, part) {
-				pathGaps = append(pathGaps, fmt.Sprintf("%s: path part %q missing from %s.%s", name, part, impl.Service, impl.Method))
-			}
-		}
+// runInventory loads specDir and prints the inventory.
+func runInventory(specDir string, stdout, stderr io.Writer) int {
+	catalog, err := spec.LoadDir(specDir)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "speccheck: %v\n", err)
+		return 2
 	}
+	rows, err := inventory(catalog, Registry)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "speccheck: inventory: %v\n", err)
+		return 2
+	}
+	printInventory(rows, stdout)
+	return 0
+}
 
-	_, _ = fmt.Fprintf(stdout, "speccheck: scanned %d endpoints\n", count)
-	if len(missing) > 0 {
-		_, _ = fmt.Fprintf(stdout, "MISSING ENDPOINTS (%d):\n", len(missing))
-		for _, m := range missing {
+func exitCode(result AuditResult) int {
+	if len(result.MissingEndpoints) > 0 || len(result.ParamGaps) > 0 || len(result.PathGaps) > 0 ||
+		len(result.PolicyErrors) > 0 || len(result.IntegrityErrors) > 0 {
+		return 1
+	}
+	return 0
+}
+
+func printResult(catalog spec.Catalog, result AuditResult, stdout io.Writer) {
+	_, _ = fmt.Fprintf(stdout, "speccheck: files=%d auxiliary=%d parsed=%d checked=%d implemented=%d known-missing=%d ignored-params=%d\n",
+		catalog.Files, catalog.AuxiliaryFiles, len(catalog.Endpoints), result.Checked, result.Implemented, result.KnownMissing, result.Ignored)
+	if len(result.MissingEndpoints) > 0 {
+		_, _ = fmt.Fprintf(stdout, "MISSING ENDPOINTS (%d):\n", len(result.MissingEndpoints))
+		for _, m := range result.MissingEndpoints {
 			_, _ = fmt.Fprintf(stdout, "  - %s\n", m)
 		}
 	}
-	if len(paramGaps) > 0 {
-		_, _ = fmt.Fprintf(stdout, "PARAM GAPS (%d):\n", len(paramGaps))
-		for _, g := range paramGaps {
+	if len(result.ParamGaps) > 0 {
+		_, _ = fmt.Fprintf(stdout, "PARAM GAPS (%d):\n", len(result.ParamGaps))
+		for _, g := range result.ParamGaps {
 			_, _ = fmt.Fprintf(stdout, "  - %s\n", g)
 		}
 	}
-	if len(pathGaps) > 0 {
-		_, _ = fmt.Fprintf(stdout, "PATH PART GAPS (%d):\n", len(pathGaps))
-		for _, g := range pathGaps {
+	if len(result.PathGaps) > 0 {
+		_, _ = fmt.Fprintf(stdout, "PATH PART GAPS (%d):\n", len(result.PathGaps))
+		for _, g := range result.PathGaps {
 			_, _ = fmt.Fprintf(stdout, "  - %s\n", g)
 		}
 	}
-	if len(missing)+len(paramGaps)+len(pathGaps) == 0 {
-		_, _ = fmt.Fprintln(stdout, "speccheck: OK - no gaps found")
-		return 0
+	if len(result.PolicyErrors) > 0 {
+		_, _ = fmt.Fprintf(stdout, "POLICY ERRORS (%d):\n", len(result.PolicyErrors))
+		for _, g := range result.PolicyErrors {
+			_, _ = fmt.Fprintf(stdout, "  - %s\n", g)
+		}
 	}
-	return 1
+	if len(result.IntegrityErrors) > 0 {
+		_, _ = fmt.Fprintf(stdout, "REGISTRY ERRORS (%d):\n", len(result.IntegrityErrors))
+		for _, g := range result.IntegrityErrors {
+			_, _ = fmt.Fprintf(stdout, "  - %s\n", g)
+		}
+	}
+	switch exitCode(result) {
+	case 0:
+		if result.KnownMissing > 0 {
+			_, _ = fmt.Fprintf(stdout, "speccheck: OK - no unexpected drift (%d known missing endpoints, %d controlled-ignored params)\n", result.KnownMissing, result.Ignored)
+		} else {
+			_, _ = fmt.Fprintln(stdout, "speccheck: OK - no drift and no known debt")
+		}
+	default:
+		_, _ = fmt.Fprintf(stdout, "speccheck: FAILED - unexpected drift detected\n")
+	}
 }
 
-func collectParts(paths []struct {
-	Path  string   `json:"path"`
-	Parts []string `json:"parts"`
-}) []string {
-	seen := map[string]bool{}
-	for _, p := range paths {
-		for _, part := range p.Parts {
-			seen[part] = true
-		}
+func printInventory(rows []InventoryRow, stdout io.Writer) {
+	for _, row := range rows {
+		_, _ = fmt.Fprintf(stdout, "%s\t%s\t%s\t%s\t%s\t%s\t%s\tparams=%s\tparts=%s\tmissingFields=%s\tunsupportedParts=%s\tevidence=%s\n",
+			row.Name, row.Classification, row.Source, row.Visibility, row.Stability,
+			row.CandidateService, row.CandidateMethod, strings.Join(row.Params, ","),
+			strings.Join(row.PathParts, ","), strings.Join(row.MissingFields, ","),
+			strings.Join(row.UnsupportedParts, ","), row.Evidence)
 	}
-	out := make([]string, 0, len(seen))
-	for k := range seen {
-		out = append(out, k)
-	}
-	sort.Strings(out)
-	return out
-}
-
-func contains(s []string, v string) bool {
-	for _, x := range s {
-		if x == v {
-			return true
-		}
-	}
-	return false
-}
-
-// snakeToCamel converts a snake_case spec param name to CamelCase (the Go field
-// naming convention used by the Params structs).
-func snakeToCamel(s string) string {
-	parts := strings.Split(s, "_")
-	var b strings.Builder
-	for _, p := range parts {
-		if p == "" {
-			continue
-		}
-		b.WriteString(strings.ToUpper(p[:1]))
-		if len(p) > 1 {
-			b.WriteString(p[1:])
-		}
-	}
-	return b.String()
 }
