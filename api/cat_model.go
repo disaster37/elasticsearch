@@ -3,12 +3,14 @@ package api
 // catCommonParams embeds the cat-common query parameters shared by every cat
 // endpoint (h, help, s, v, format, local) plus CommonParams.
 type catCommonParams struct {
-	Common *CommonParams
-	H      []string
-	Help   *bool
-	S      []string
-	V      *bool
-	Local  *bool
+	Common        *CommonParams
+	H             []string
+	Help          *bool
+	Local         *bool
+	MasterTimeout string
+	S             []string
+	Time          string
+	V             *bool
 }
 
 func (p *catCommonParams) toMap() map[string]string {
@@ -20,9 +22,15 @@ func (p *catCommonParams) toMap() map[string]string {
 	m["format"] = "json"
 	setListParam(m, "h", p.H)
 	setBoolParam(m, "help", p.Help)
-	setListParam(m, "s", p.S)
-	setBoolParam(m, "v", p.V)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	setListParam(m, "s", p.S)
+	if p.Time != "" {
+		m["time"] = p.Time
+	}
+	setBoolParam(m, "v", p.V)
 	return mergeParams(m, p.Common)
 }
 

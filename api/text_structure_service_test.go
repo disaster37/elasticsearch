@@ -183,3 +183,15 @@ func TestUnitTextStructureTestGrokPatternNetworkError(t *testing.T) {
 	_, err := svc.TestGrokPattern(context.Background(), map[string]any{"x": 1}, nil)
 	assert.Error(t, err)
 }
+
+func TestUnitTextStructureFindParamsToMap(t *testing.T) {
+	p := &TextStructureFindParams{
+		DocumentsToSample: ptrInt(500),
+		EcsCompatibility:  "v1",
+		Timeout:           "25s",
+	}
+	m := p.ToMap()
+	assert.Equal(t, "500", m["documents_to_sample"])
+	assert.Equal(t, "v1", m["ecs_compatibility"])
+	assert.Equal(t, "25s", m["timeout"])
+}

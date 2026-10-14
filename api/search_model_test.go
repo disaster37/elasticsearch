@@ -22,9 +22,11 @@ func TestUnitSearchParamsToMap(t *testing.T) {
 		DocvalueFields:             []string{"d1", "d2"},
 		ExpandWildcards:            ExpandWildcardOpen,
 		Explain:                    ptrBool(true),
+		ForceSyntheticSource:       ptrBool(true),
 		From:                       ptrInt(10),
 		IgnoreThrottled:            ptrBool(true),
 		IgnoreUnavailable:          ptrBool(true),
+		IncludeNamedQueriesScore:   ptrBool(false),
 		Lenient:                    ptrBool(true),
 		MaxConcurrentShardRequests: ptrInt(5),
 		MinCompatibleShardNode:     "7.10.0",
@@ -68,9 +70,11 @@ func TestUnitSearchParamsToMap(t *testing.T) {
 	assert.Equal(t, "d1,d2", m["docvalue_fields"])
 	assert.Equal(t, "open", m["expand_wildcards"])
 	assert.Equal(t, "true", m["explain"])
+	assert.Equal(t, "true", m["force_synthetic_source"])
 	assert.Equal(t, "10", m["from"])
 	assert.Equal(t, "true", m["ignore_throttled"])
 	assert.Equal(t, "true", m["ignore_unavailable"])
+	assert.Equal(t, "false", m["include_named_queries_score"])
 	assert.Equal(t, "true", m["lenient"])
 	assert.Equal(t, "5", m["max_concurrent_shard_requests"])
 	assert.Equal(t, "7.10.0", m["min_compatible_shard_node"])

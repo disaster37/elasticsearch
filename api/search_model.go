@@ -38,9 +38,11 @@ type SearchParams struct {
 	DocvalueFields             []string
 	ExpandWildcards            ExpandWildcards
 	Explain                    *bool
+	ForceSyntheticSource       *bool
 	From                       *int
 	IgnoreThrottled            *bool
 	IgnoreUnavailable          *bool
+	IncludeNamedQueriesScore   *bool
 	Lenient                    *bool
 	MaxConcurrentShardRequests *int
 	MinCompatibleShardNode     string
@@ -99,11 +101,13 @@ func (p *SearchParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "explain", p.Explain)
+	setBoolParam(m, "force_synthetic_source", p.ForceSyntheticSource)
 	if p.From != nil {
 		m["from"] = intStr(*p.From)
 	}
 	setBoolParam(m, "ignore_throttled", p.IgnoreThrottled)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	setBoolParam(m, "include_named_queries_score", p.IncludeNamedQueriesScore)
 	setBoolParam(m, "lenient", p.Lenient)
 	if p.MaxConcurrentShardRequests != nil {
 		m["max_concurrent_shard_requests"] = intStr(*p.MaxConcurrentShardRequests)
