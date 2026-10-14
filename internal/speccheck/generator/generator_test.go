@@ -145,6 +145,18 @@ func TestCommittedGeneratedMatches(t *testing.T) {
 
 func TestWriteGeneratedRejectsEmpty(t *testing.T) {
 	assert.Error(t, WriteGenerated(t.TempDir(), nil, []byte("x")))
+	assert.Error(t, WriteGenerated(t.TempDir(), []byte("x"), nil))
+}
+
+func TestWriteGeneratedWritesBothFiles(t *testing.T) {
+	dir := t.TempDir()
+	require.NoError(t, WriteGenerated(dir, []byte("// registry\n"), []byte("// types\n")))
+	reg, err := os.ReadFile(filepath.Join(dir, "registry_generated.go"))
+	require.NoError(t, err)
+	assert.Equal(t, "// registry\n", string(reg))
+	typ, err := os.ReadFile(filepath.Join(dir, "types_generated.go"))
+	require.NoError(t, err)
+	assert.Equal(t, "// types\n", string(typ))
 }
 
 func TestGenerateRegistryQueryFields(t *testing.T) {

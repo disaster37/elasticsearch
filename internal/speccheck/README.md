@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 160 |
-| Known-missing (baselined) endpoints | 352 |
+| Registered implementations | 158 |
+| Known-missing (baselined) endpoints | 354 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -66,6 +66,14 @@ number, not a claim of full REST implementation equivalence.
 | `api.catCommonParams` | added `MasterTimeout string`, `Time string` (promoted, not duplicated) | `master_timeout`, `time` |
 | `api.TextStructureFindParams` | added `DocumentsToSample *int`, `EcsCompatibility string`, `Timeout string` | `documents_to_sample`, `ecs_compatibility`, `timeout` |
 | `AsyncSearchServiceSpecExtensions` | new opt-in `StatusWithParams` carrier | `keep_alive` |
+
+Note: `find_structure` and `test_grok_pattern` are registered and use the added
+`ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
+`text_structure.find_message_structure` are baselined as missing (see the
+backlog): the client sends the legacy `/{index}/_text_structure/...` routes,
+which do not match the v9 `/_text_structure/find_*` spec paths, so their
+`index`/`field` transport is not verified coverage. `documents_to_sample` was
+added for `find_field_structure` and remains as extra carrier capability.
 
 The Cat `format` parameter is a controlled exception for typed JSON decoding
 (see below). All other Cat promoted fields (`h`, `help`, `s`, `v`, `local`)
@@ -663,6 +671,15 @@ with its exact reason. The authoritative map is `baseline.go`.
 | `synonyms.delete_synonym_rule` | not-implemented | stable | public | SynonymsService.DeleteSynonymRule exists but binding is incomplete (unmapped parts: set_id) |
 | `synonyms.get_synonym_rule` | not-implemented | stable | public | SynonymsService.GetSynonymRule exists but binding is incomplete (unmapped parts: set_id) |
 | `synonyms.put_synonym_rule` | not-implemented | stable | public | SynonymsService.PutSynonymRule exists but binding is incomplete (unmapped parts: set_id) |
+
+### text_structure
+
+<a id="backlog-text_structure"></a>
+
+| Endpoint | Status | Stability | Visibility | Reason |
+| --- | --- | --- | --- | --- |
+| `text_structure.find_field_structure` | not-implemented | stable | public | TextStructureService.FindFieldStructure uses legacy route /{index}/_text_structure/field_structure; v9 spec requires /_text_structure/find_field_structure with index/field as query params |
+| `text_structure.find_message_structure` | not-implemented | stable | public | TextStructureService.FindMessageStructure uses legacy route /{index}/_text_structure/message_structure; v9 spec requires /_text_structure/find_message_structure with index in the body |
 
 ### transform
 

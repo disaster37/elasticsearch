@@ -149,6 +149,28 @@ func TestCheckFieldSerializationUnsupported(t *testing.T) {
 	assert.Error(t, validateParamSerialization(impl, "common", "Common"))
 }
 
+func TestFieldSamplesCoverage(t *testing.T) {
+	cases := []struct {
+		typ  reflect.Type
+		want []string
+	}{
+		{reflect.TypeOf((*int64)(nil)), []string{"0", "9"}},
+		{reflect.TypeOf((*float64)(nil)), []string{"1.5"}},
+		{reflect.TypeOf(false), []string{"true", "false"}},
+	}
+	for _, c := range cases {
+		samples := fieldSamples(c.typ)
+		require.Len(t, samples, len(c.want))
+		for i, s := range samples {
+			assert.Equal(t, c.want[i], s.value)
+		}
+	}
+	// Unsupported shapes return no samples (fail-closed, never invented).
+	assert.Nil(t, fieldSamples(reflect.TypeOf(struct{}{})))
+	assert.Nil(t, fieldSamples(reflect.TypeOf([]int{})))
+	assert.Nil(t, fieldSamples(reflect.TypeOf(map[string]string{})))
+}
+
 func join(errs []string) string {
 	out := ""
 	for _, e := range errs {

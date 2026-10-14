@@ -138,3 +138,18 @@ func TestInventoryMissingFields(t *testing.T) {
 	require.Len(t, rows, 1)
 	assert.Equal(t, []string{"brand_new"}, rows[0].MissingFields)
 }
+
+// TestMissingRegisteredFieldsQueryFieldsOverride proves a QueryFields override
+// never provides imaginary coverage: an override pointing at a non-existent
+// field must still be reported missing (matching the audit's behavior).
+func TestMissingRegisteredFieldsQueryFieldsOverride(t *testing.T) {
+	dir := t.TempDir()
+	writeSpec(t, dir, "search.json", `{"search":{"url":{"paths":[{"path":"/{index}/_search","methods":["GET"],"parts":{"index":{"type":"list"}}}]},"params":{"q":{"type":"string"}},"visibility":"public"}}`)
+	cat := loadCatalog(t, dir)
+	impl := Registry["search"]
+	impl.QueryFields = map[string]string{"q": "DoesNotExist"}
+	assert.Equal(t, []string{"q"}, missingRegisteredFields(impl, cat.Endpoints["search"]))
+	// A valid override to a real field is recognized as coverage.
+	impl.QueryFields = map[string]string{"q": "Q"}
+	assert.Empty(t, missingRegisteredFields(impl, cat.Endpoints["search"]))
+}

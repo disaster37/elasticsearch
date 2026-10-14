@@ -2009,38 +2009,6 @@
     "evidence": "DefaultDocumentService.TermVectors route /%s/_termvectors/%s"
   },
   {
-    "name": "text_structure.find_field_structure",
-    "service": "TextStructureService",
-    "method": "FindFieldStructure",
-    "paramsStruct": "api.TextStructureFindParams",
-    "paramsSource": {
-      "argument": 3,
-      "field": ""
-    },
-    "queryArgs": {
-      "field": {
-        "argument": 2,
-        "field": ""
-      },
-      "index": {
-        "argument": 1,
-        "field": ""
-      }
-    },
-    "evidence": "DefaultTextStructureService.FindFieldStructure route /%s/_text_structure/field_structure"
-  },
-  {
-    "name": "text_structure.find_message_structure",
-    "service": "TextStructureService",
-    "method": "FindMessageStructure",
-    "paramsStruct": "api.TextStructureFindParams",
-    "paramsSource": {
-      "argument": 2,
-      "field": ""
-    },
-    "evidence": "DefaultTextStructureService.FindMessageStructure route /%s/_text_structure/message_structure"
-  },
-  {
     "name": "text_structure.find_structure",
     "service": "TextStructureService",
     "method": "FindStructure",

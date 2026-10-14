@@ -81,9 +81,6 @@ func missingRegisteredFields(impl EndpointImpl, ep spec.NamedEndpoint) []string 
 		if _, ok := impl.QueryArgs[param]; ok {
 			continue
 		}
-		if _, ok := impl.QueryFields[param]; ok {
-			continue
-		}
 		if contains(impl.ParamsFields, queryField(impl, param)) {
 			continue
 		}

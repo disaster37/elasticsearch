@@ -1423,26 +1423,6 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultDocumentService.TermVectors route /%s/_termvectors/%s",
 	},
-	"text_structure.find_field_structure": {
-		Service:      "TextStructureService",
-		Method:       "FindFieldStructure",
-		ParamsStruct: "api.TextStructureFindParams",
-		ParamsFields: []string{"Charset", "ColumnNames", "Common", "Delimiter", "DocumentsToSample", "EcsCompatibility", "Explain", "Format", "GrokPattern", "HasHeaderRow", "LineMergeSizeLimit", "LinesToSample", "Quote", "ShouldTrimFields", "Timeout", "TimestampField", "TimestampFormat"},
-		ParamsSource: &ValueSource{Argument: 3},
-		QueryArgs: map[string]ValueSource{
-			"field": ValueSource{Argument: 2},
-			"index": ValueSource{Argument: 1},
-		},
-		Evidence: "DefaultTextStructureService.FindFieldStructure route /%s/_text_structure/field_structure",
-	},
-	"text_structure.find_message_structure": {
-		Service:      "TextStructureService",
-		Method:       "FindMessageStructure",
-		ParamsStruct: "api.TextStructureFindParams",
-		ParamsFields: []string{"Charset", "ColumnNames", "Common", "Delimiter", "DocumentsToSample", "EcsCompatibility", "Explain", "Format", "GrokPattern", "HasHeaderRow", "LineMergeSizeLimit", "LinesToSample", "Quote", "ShouldTrimFields", "Timeout", "TimestampField", "TimestampFormat"},
-		ParamsSource: &ValueSource{Argument: 2},
-		Evidence:     "DefaultTextStructureService.FindMessageStructure route /%s/_text_structure/message_structure",
-	},
 	"text_structure.find_structure": {
 		Service:      "TextStructureService",
 		Method:       "FindStructure",
