@@ -23,9 +23,9 @@ func TestUnitFleetGlobalCheckpoints(t *testing.T) {
 	svc := NewFleetService(restyClient(srv), testLogger())
 	resp, err := svc.GlobalCheckpoints(context.Background(), "my-index", &FleetGlobalCheckpointsParams{
 		Checkpoints:    []string{"0", "100"},
-		WaitForAdvance:  ptrBool(true),
-		WaitForIndex:    ptrBool(false),
-		Timeout:         "10s",
+		WaitForAdvance: ptrBool(true),
+		WaitForIndex:   ptrBool(false),
+		Timeout:        "10s",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "GET", gotMethod)

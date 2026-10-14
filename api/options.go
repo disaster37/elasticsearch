@@ -74,7 +74,7 @@ func normalizeBody(body any) (any, error) {
 func isNilValue(v any) bool {
 	rv := reflect.ValueOf(v)
 	switch rv.Kind() {
-	case reflect.Ptr, reflect.Interface:
+	case reflect.Pointer, reflect.Interface:
 		return rv.IsNil()
 	}
 	return false

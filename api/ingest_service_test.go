@@ -75,8 +75,8 @@ func TestUnitIngestPutPipeline(t *testing.T) {
 	defer srv.Close()
 	svc := NewIngestService(restyClient(srv), testLogger())
 	resp, err := svc.PutPipeline(context.Background(), &IngestPutPipelineRequest{
-		Id:   "my-pipeline",
-		Body: map[string]any{"description": "d", "processors": []map[string]any{{"set": map[string]any{"field": "f", "value": "v"}}}},
+		Id:     "my-pipeline",
+		Body:   map[string]any{"description": "d", "processors": []map[string]any{{"set": map[string]any{"field": "f", "value": "v"}}}},
 		Params: &IngestPutPipelineParams{IfVersion: ptrInt(2), Timeout: "10s"},
 	})
 	require.NoError(t, err)
@@ -164,8 +164,8 @@ func TestUnitIngestSimulate(t *testing.T) {
 	defer srv.Close()
 	svc := NewIngestService(restyClient(srv), testLogger())
 	resp, err := svc.Simulate(context.Background(), &IngestSimulatePipelineRequest{
-		Id:   "my-pipeline",
-		Body: map[string]any{"docs": []map[string]any{{"_source": map[string]any{"f": "v"}}}},
+		Id:     "my-pipeline",
+		Body:   map[string]any{"docs": []map[string]any{{"_source": map[string]any{"f": "v"}}}},
 		Params: &IngestSimulatePipelineParams{Verbose: ptrBool(true)},
 	})
 	require.NoError(t, err)

@@ -849,7 +849,7 @@ func TestUnitSecurityGetAPIKey(t *testing.T) {
 		ID:                    "k1",
 		Name:                  "n",
 		RealmName:             "r",
-		Username:             "u1",
+		Username:              "u1",
 		Owner:                 ptrBool(true),
 		ActiveOnly:            ptrBool(false),
 		WithLimitedPrivileges: ptrBool(true),

@@ -841,11 +841,11 @@ func TestUnitCatCommonParamsSerialization(t *testing.T) {
 	svc := NewCatService(restyClient(srv), testLogger())
 	_, err := svc.Aliases(context.Background(), nil, &CatAliasesParams{
 		catCommonParams: catCommonParams{
-			H:     []string{"alias", "index"},
-			Help:  ptrBool(false),
-			S:     []string{"index"},
-			V:     ptrBool(true),
-			Local: ptrBool(true),
+			H:      []string{"alias", "index"},
+			Help:   ptrBool(false),
+			S:      []string{"index"},
+			V:      ptrBool(true),
+			Local:  ptrBool(true),
 			Common: &CommonParams{Pretty: ptrBool(true)},
 		},
 	})

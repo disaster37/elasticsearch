@@ -11,10 +11,10 @@ import (
 // TestCommonParamsToMapAllFields verifies ToMap emits every configured field.
 func TestCommonParamsToMapAllFields(t *testing.T) {
 	p := &CommonParams{
-		Pretty:      ptrBool(true),
-		Human:       ptrBool(false),
-		ErrorTrace:  ptrBool(true),
-		FilterPath:  []string{"hits", "_shards", "_index"},
+		Pretty:     ptrBool(true),
+		Human:      ptrBool(false),
+		ErrorTrace: ptrBool(true),
+		FilterPath: []string{"hits", "_shards", "_index"},
 	}
 	m := p.ToMap()
 	assert.Equal(t, "true", m["pretty"])

@@ -23,7 +23,7 @@ func TestUnitTextStructureFindStructure(t *testing.T) {
 	defer srv.Close()
 	svc := NewTextStructureService(restyClient(srv), testLogger())
 	resp, err := svc.FindStructure(context.Background(), map[string]any{"text": "sample"}, &TextStructureFindParams{
-		Format:       "ndjson",
+		Format:        "ndjson",
 		Charset:       "UTF-8",
 		HasHeaderRow:  ptrBool(true),
 		LinesToSample: ptrInt(10),

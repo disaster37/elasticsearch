@@ -23,7 +23,7 @@ func TestUnitTasksList(t *testing.T) {
 	svc := NewTasksService(restyClient(srv), testLogger())
 	resp, err := svc.List(context.Background(), &TasksListParams{
 		Actions:           []string{"action1", "action2"},
-		Detailed:           ptrBool(true),
+		Detailed:          ptrBool(true),
 		GroupBy:           GroupByNodes,
 		Nodes:             []string{"node1"},
 		ParentTaskId:      "parent1",
