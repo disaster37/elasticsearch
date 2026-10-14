@@ -89,13 +89,13 @@ Do **not** add new runtime dependencies without justification. `encoding/json`, 
 
 | Branch | Target |
 |---|---|
-| `release-branch.v9` | Elasticsearch 3.x (active development) |
+| `v9` | Elasticsearch 3.x (active development) |
 | `release-branch.v2` | Elasticsearch 2.x (maintenance only) |
 
-**Always branch from `release-branch.v9`:**
+**Always branch from `v9`:**
 
 ```bash
-git checkout release-branch.v9 && git pull origin release-branch.v9
+git checkout v9 && git pull origin v9
 git checkout -b feature/my-feature
 # or
 git checkout -b fix/my-fix
@@ -915,7 +915,7 @@ Starts Delve on port 4000. Connect via VS Code:
 
 ## Pull Request Checklist
 
-- [ ] Branch is based on `release-branch.v9`
+- [ ] Branch is based on `v9`
 - [ ] One feature or fix per PR
 - [ ] New code is in the correct package (see Architecture Overview)
 - [ ] Code is formatted: `go fmt ./...`

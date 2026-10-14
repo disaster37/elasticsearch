@@ -5,12 +5,14 @@ on:
     branches:
       - main
       - release-branch.v9
+      - v9
     tags:
       - "*"
   pull_request:
     branches:
       - main
       - release-branch.v9
+      - v9
 
 jobs:
   build:
