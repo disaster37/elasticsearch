@@ -30,4 +30,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
-speccheck
+
+# Compiled speccheck binary at the repo root (source lives in internal/speccheck)
+/speccheck
