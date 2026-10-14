@@ -153,9 +153,16 @@ build, vet, lint, format, speccheck, unit tests, acceptance tests against a
 containerized Elasticsearch 9 with security enabled, CodeCov upload, and git
 push-back of `coverage.out`.
 
-The `internal/speccheck` audit verifies that every endpoint in the pinned 9.x
-REST spec (excluding `_internal.*`) has a service method and that every spec
-query parameter has a field on the corresponding `*Params` struct.
+The `internal/speccheck` audit ratchets the pinned 9.x REST spec against the
+client. Endpoints are either verified registered implementations or exact,
+individually reviewed missing-endpoint debt entries, so newly added endpoints
+always fail the audit. Every query parameter and path selector on a registered
+endpoint must be covered by a real carrier field, a positional query argument,
+or a narrowly controlled exception; the audit performs live `ToMap()`
+serialization checks to catch removed wire keys. See
+[internal/speccheck/README.md](internal/speccheck/README.md) for the pinned
+revision, the inventory and edit matrix, generator commands, and the
+opt-in extension APIs (`As<Group>ServiceSpecExtensions`).
 
 ## License
 
