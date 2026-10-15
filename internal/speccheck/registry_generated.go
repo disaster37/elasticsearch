@@ -37,6 +37,30 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultAsyncSearchService.StatusWithParams GET /_async_search/status/{id} (extension carries keep_alive)",
 	},
+	"async_search.submit": {
+		Service:      "AsyncSearchService",
+		Method:       "Submit",
+		ParamsStruct: "api.AsyncSearchSubmitParams",
+		ParamsFields: []string{"AllowNoIndices", "AllowPartialSearchResults", "AnalyzeWildcard", "Analyzer", "BatchedReduceSize", "CcsMinimizeRoundtrips", "Common", "DefaultOperator", "Df", "DocvalueFields", "ExpandWildcards", "Explain", "From", "IgnoreThrottled", "IgnoreUnavailable", "KeepAlive", "KeepOnCompletion", "Lenient", "MaxConcurrentShardRequests", "Preference", "Q", "RequestCache", "RestTotalHitsAsInt", "Routing", "SearchType", "SeqNoPrimaryTerm", "Size", "Sort", "Source", "SourceExcludes", "SourceIncludes", "Stats", "StoredFields", "SuggestField", "SuggestMode", "SuggestSize", "SuggestText", "TerminateAfter", "Timeout", "TrackScores", "TrackTotalHits", "TypedKeys", "Version", "WaitForCompletionTimeout"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultAsyncSearchService.Submit POST /{index}/_async_search",
+	},
+	"bulk": {
+		Service:      "DocumentService",
+		Method:       "Bulk",
+		ParamsStruct: "api.BulkParams",
+		ParamsFields: []string{"Common", "IncludeSourceOnError", "ListExecutedPipelines", "Pipeline", "Refresh", "RequireAlias", "RequireDataStream", "Routing", "Source", "SourceExcludes", "SourceIncludes", "Timeout", "WaitForActiveShards"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultDocumentService.Bulk POST /{index}/_bulk",
+	},
 	"cat.aliases": {
 		Service:      "CatService",
 		Method:       "Aliases",
@@ -613,6 +637,19 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultSearchService.Count route /%s/_count",
 	},
+	"create": {
+		Service:      "DocumentService",
+		Method:       "Create",
+		ParamsStruct: "api.CreateParams",
+		ParamsFields: []string{"Common", "IfPrimaryTerm", "IfSeqNo", "IncludeSourceOnError", "OpType", "Pipeline", "Refresh", "RequireAlias", "RequireDataStream", "Routing", "Timeout", "Version", "VersionType", "WaitForActiveShards"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"id", "index"},
+		PathSources: map[string]ValueSource{
+			"id":    ValueSource{Argument: 1, Field: "Id"},
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultDocumentService.Create PUT /{index}/_create/{id}",
+	},
 	"dangling_indices.delete_dangling_index": {
 		Service:      "DanglingIndicesService",
 		Method:       "Delete",
@@ -641,6 +678,31 @@ var Registry = map[string]EndpointImpl{
 		Service:  "DanglingIndicesService",
 		Method:   "List",
 		Evidence: "DefaultDanglingIndicesService.List route /_dangling",
+	},
+	"delete": {
+		Service:      "DocumentService",
+		Method:       "Delete",
+		ParamsStruct: "api.DeleteParams",
+		ParamsFields: []string{"Common", "IfPrimaryTerm", "IfSeqNo", "Refresh", "Routing", "Timeout", "Version", "VersionType", "WaitForActiveShards"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"id", "index"},
+		PathSources: map[string]ValueSource{
+			"id":    ValueSource{Argument: 1, Field: "Id"},
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultDocumentService.Delete DELETE /{index}/_doc/{id}",
+	},
+	"delete_by_query": {
+		Service:      "DocumentService",
+		Method:       "DeleteByQuery",
+		ParamsStruct: "api.DeleteByQueryParams",
+		ParamsFields: []string{"AllowNoIndices", "AnalyzeWildcard", "Analyzer", "Common", "Conflicts", "DefaultOperator", "Df", "ExpandWildcards", "From", "IgnoreUnavailable", "Lenient", "MaxDocs", "Preference", "Q", "Refresh", "RequestCache", "RequestsPerSecond", "Routing", "Scroll", "ScrollSize", "SearchTimeout", "SearchType", "SliceId", "SliceMax", "Slices", "Sort", "Stats", "TerminateAfter", "Timeout", "Version", "WaitForActiveShards", "WaitForCompletion"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultDocumentService.DeleteByQuery POST /{index}/_delete_by_query",
 	},
 	"delete_by_query_rethrottle": {
 		Service:      "DocumentService",
@@ -719,6 +781,18 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultEqlService.Delete route /_eql/search/%s",
 	},
+	"eql.get": {
+		Service:      "EqlServiceSpecExtensions",
+		Method:       "GetWithParams",
+		ParamsStruct: "api.EqlGetSpecParams",
+		ParamsFields: []string{"Common", "KeepAlive", "WaitForCompletionTimeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultEqlService.GetWithParams GET /_eql/search/{id}",
+	},
 	"eql.get_status": {
 		Service:   "EqlService",
 		Method:    "GetStatus",
@@ -727,6 +801,18 @@ var Registry = map[string]EndpointImpl{
 			"id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultEqlService.GetStatus route /_eql/search/status/%s",
+	},
+	"eql.search": {
+		Service:      "EqlService",
+		Method:       "Search",
+		ParamsStruct: "api.EqlSearchParams",
+		ParamsFields: []string{"AllowPartialSearchResults", "AllowPartialSequenceResults", "Common", "KeepAlive", "KeepOnCompletion", "WaitForCompletionTimeout"},
+		ParamsSource: &ValueSource{Argument: 3},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultEqlService.Search POST /{index}/_eql/search",
 	},
 	"exists": {
 		Service:      "DocumentService",
@@ -782,6 +868,18 @@ var Registry = map[string]EndpointImpl{
 		ParamsFields: []string{"Common", "MasterTimeout"},
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultFeaturesService.ResetFeaturesWithParams POST /_features/_reset",
+	},
+	"field_caps": {
+		Service:      "SearchService",
+		Method:       "FieldCaps",
+		ParamsStruct: "api.FieldCapsParams",
+		ParamsFields: []string{"AllowNoIndices", "Common", "ExpandWildcards", "Fields", "Filters", "IgnoreUnavailable", "IncludeEmptyFields", "IncludeUnmapped", "Types"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultSearchService.FieldCaps POST /{index}/_field_caps",
 	},
 	"fleet.global_checkpoints": {
 		Service:      "FleetService",
@@ -949,6 +1047,19 @@ var Registry = map[string]EndpointImpl{
 		ParamsFields: []string{"Common", "MasterTimeout", "Timeout"},
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultIlmService.StopWithParams POST /_ilm/stop",
+	},
+	"index": {
+		Service:      "DocumentService",
+		Method:       "Index",
+		ParamsStruct: "api.IndexParams",
+		ParamsFields: []string{"Common", "IfPrimaryTerm", "IfSeqNo", "IncludeSourceOnError", "OpType", "Pipeline", "Refresh", "RequireAlias", "RequireDataStream", "Routing", "Timeout", "Version", "VersionType", "WaitForActiveShards"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"id", "index"},
+		PathSources: map[string]ValueSource{
+			"id":    ValueSource{Argument: 1, Field: "Id"},
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultDocumentService.Index PUT /{index}/_doc/{id}",
 	},
 	"indices.add_block": {
 		Service:      "IndicesService",
@@ -1889,6 +2000,18 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultSearchService.MultiSearchTemplate route /%s/_msearch/template",
 	},
+	"mtermvectors": {
+		Service:      "DocumentServiceSpecExtensions",
+		Method:       "MultiTermVectorsWithRequest",
+		ParamsStruct: "api.MtermvectorsSpecParams",
+		ParamsFields: []string{"Common", "FieldStatistics", "Fields", "Ids", "Offsets", "Payloads", "Positions", "Preference", "Realtime", "Routing", "TermStatistics", "TermVectorsParams", "Version", "VersionType"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultDocumentService.MultiTermVectorsWithRequest POST /{index}/_mtermvectors (dedicated carrier)",
+	},
 	"nodes.hot_threads": {
 		Service:      "NodesService",
 		Method:       "HotThreads",
@@ -1938,6 +2061,18 @@ var Registry = map[string]EndpointImpl{
 			"node_id": ValueSource{Argument: -1, Field: "NodeIds"},
 		},
 		Evidence: "DefaultNodesService.Usage route /_nodes/usage",
+	},
+	"open_point_in_time": {
+		Service:      "SearchService",
+		Method:       "OpenPointInTime",
+		ParamsStruct: "api.OpenPITParams",
+		ParamsFields: []string{"AllowNoIndices", "AllowPartialSearchResults", "Common", "ExpandWildcards", "IgnoreUnavailable", "KeepAlive", "Preference", "Routing"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultSearchService.OpenPointInTime POST /{index}/_pit",
 	},
 	"ping": {
 		Service:  "InfoService",
@@ -2133,6 +2268,30 @@ var Registry = map[string]EndpointImpl{
 			"zoom":  ValueSource{Argument: -1, Field: "Zoom"},
 		},
 		Evidence: "DefaultSearchService.SearchMVT route /%s/_mvt/%s/%d/%d/%d",
+	},
+	"search_shards": {
+		Service:      "SearchService",
+		Method:       "SearchShards",
+		ParamsStruct: "api.SearchShardsParams",
+		ParamsFields: []string{"AllowNoIndices", "Common", "ExpandWildcards", "IgnoreUnavailable", "Local", "MasterTimeout", "Preference", "Routing"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultSearchService.SearchShards POST /{index}/_search_shards",
+	},
+	"search_template": {
+		Service:      "SearchService",
+		Method:       "SearchTemplate",
+		ParamsStruct: "api.SearchTemplateParams",
+		ParamsFields: []string{"AllowNoIndices", "CcsMinimizeRoundtrips", "Common", "ExpandWildcards", "Explain", "IgnoreThrottled", "IgnoreUnavailable", "Preference", "Profile", "RestTotalHitsAsInt", "Routing", "Scroll", "SearchType", "TypedKeys"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultSearchService.SearchTemplate POST /{index}/_search/template",
 	},
 	"searchable_snapshots.cache_stats": {
 		Service:   "SearchableSnapshotsService",
@@ -2885,6 +3044,31 @@ var Registry = map[string]EndpointImpl{
 		ParamsFields: []string{"Common", "DryRun", "Timeout"},
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultTransformService.Upgrade route /_transform/_upgrade",
+	},
+	"update": {
+		Service:      "DocumentService",
+		Method:       "Update",
+		ParamsStruct: "api.UpdateParams",
+		ParamsFields: []string{"Common", "IfPrimaryTerm", "IfSeqNo", "IncludeSourceOnError", "Lang", "Refresh", "RequireAlias", "RetryOnConflict", "Routing", "Source", "SourceExcludes", "SourceIncludes", "Timeout", "WaitForActiveShards"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"id", "index"},
+		PathSources: map[string]ValueSource{
+			"id":    ValueSource{Argument: 1, Field: "Id"},
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultDocumentService.Update POST /{index}/_update/{id}",
+	},
+	"update_by_query": {
+		Service:      "DocumentService",
+		Method:       "UpdateByQuery",
+		ParamsStruct: "api.UpdateByQueryParams",
+		ParamsFields: []string{"AllowNoIndices", "AnalyzeWildcard", "Analyzer", "Common", "Conflicts", "DefaultOperator", "Df", "ExpandWildcards", "From", "IgnoreUnavailable", "Lenient", "MaxDocs", "Pipeline", "Preference", "Q", "Refresh", "RequestCache", "RequestsPerSecond", "Routing", "Scroll", "ScrollSize", "SearchTimeout", "SearchType", "SliceId", "SliceMax", "Slices", "Sort", "Stats", "TerminateAfter", "Timeout", "Version", "VersionType", "WaitForActiveShards", "WaitForCompletion"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1, Field: "Indices"},
+		},
+		Evidence: "DefaultDocumentService.UpdateByQuery POST /{index}/_update_by_query",
 	},
 	"update_by_query_rethrottle": {
 		Service:      "DocumentService",

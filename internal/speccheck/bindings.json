@@ -46,6 +46,40 @@
     "evidence": "DefaultAsyncSearchService.StatusWithParams GET /_async_search/status/{id} (extension carries keep_alive)"
   },
   {
+    "name": "async_search.submit",
+    "service": "AsyncSearchService",
+    "method": "Submit",
+    "paramsStruct": "api.AsyncSearchSubmitParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultAsyncSearchService.Submit POST /{index}/_async_search"
+  },
+  {
+    "name": "bulk",
+    "service": "DocumentService",
+    "method": "Bulk",
+    "paramsStruct": "api.BulkParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.Bulk POST /{index}/_bulk"
+  },
+  {
     "name": "cat.aliases",
     "service": "CatService",
     "method": "Aliases",
@@ -859,6 +893,27 @@
     "evidence": "DefaultSearchService.Count route /%s/_count"
   },
   {
+    "name": "create",
+    "service": "DocumentService",
+    "method": "Create",
+    "paramsStruct": "api.CreateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Create PUT /{index}/_create/{id}"
+  },
+  {
     "name": "dangling_indices.delete_dangling_index",
     "service": "DanglingIndicesService",
     "method": "Delete",
@@ -897,6 +952,44 @@
     "service": "DanglingIndicesService",
     "method": "List",
     "evidence": "DefaultDanglingIndicesService.List route /_dangling"
+  },
+  {
+    "name": "delete",
+    "service": "DocumentService",
+    "method": "Delete",
+    "paramsStruct": "api.DeleteParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Delete DELETE /{index}/_doc/{id}"
+  },
+  {
+    "name": "delete_by_query",
+    "service": "DocumentService",
+    "method": "DeleteByQuery",
+    "paramsStruct": "api.DeleteByQueryParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultDocumentService.DeleteByQuery POST /{index}/_delete_by_query"
   },
   {
     "name": "delete_by_query_rethrottle",
@@ -1007,6 +1100,23 @@
     "evidence": "DefaultEqlService.Delete route /_eql/search/%s"
   },
   {
+    "name": "eql.get",
+    "service": "EqlServiceSpecExtensions",
+    "method": "GetWithParams",
+    "paramsStruct": "api.EqlGetSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEqlService.GetWithParams GET /_eql/search/{id}"
+  },
+  {
     "name": "eql.get_status",
     "service": "EqlService",
     "method": "GetStatus",
@@ -1017,6 +1127,23 @@
       }
     },
     "evidence": "DefaultEqlService.GetStatus route /_eql/search/status/%s"
+  },
+  {
+    "name": "eql.search",
+    "service": "EqlService",
+    "method": "Search",
+    "paramsStruct": "api.EqlSearchParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEqlService.Search POST /{index}/_eql/search"
   },
   {
     "name": "exists",
@@ -1102,6 +1229,23 @@
       "field": ""
     },
     "evidence": "DefaultFeaturesService.ResetFeaturesWithParams POST /_features/_reset"
+  },
+  {
+    "name": "field_caps",
+    "service": "SearchService",
+    "method": "FieldCaps",
+    "paramsStruct": "api.FieldCapsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.FieldCaps POST /{index}/_field_caps"
   },
   {
     "name": "fleet.global_checkpoints",
@@ -1339,6 +1483,27 @@
       "field": ""
     },
     "evidence": "DefaultIlmService.StopWithParams POST /_ilm/stop"
+  },
+  {
+    "name": "index",
+    "service": "DocumentService",
+    "method": "Index",
+    "paramsStruct": "api.IndexParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Index PUT /{index}/_doc/{id}"
   },
   {
     "name": "indices.add_block",
@@ -2700,6 +2865,23 @@
     "evidence": "DefaultSearchService.MultiSearchTemplate route /%s/_msearch/template"
   },
   {
+    "name": "mtermvectors",
+    "service": "DocumentServiceSpecExtensions",
+    "method": "MultiTermVectorsWithRequest",
+    "paramsStruct": "api.MtermvectorsSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.MultiTermVectorsWithRequest POST /{index}/_mtermvectors (dedicated carrier)"
+  },
+  {
     "name": "nodes.hot_threads",
     "service": "NodesService",
     "method": "HotThreads",
@@ -2774,6 +2956,23 @@
       }
     },
     "evidence": "DefaultNodesService.Usage route /_nodes/usage"
+  },
+  {
+    "name": "open_point_in_time",
+    "service": "SearchService",
+    "method": "OpenPointInTime",
+    "paramsStruct": "api.OpenPITParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.OpenPointInTime POST /{index}/_pit"
   },
   {
     "name": "ping",
@@ -3051,6 +3250,40 @@
       }
     },
     "evidence": "DefaultSearchService.SearchMVT route /%s/_mvt/%s/%d/%d/%d"
+  },
+  {
+    "name": "search_shards",
+    "service": "SearchService",
+    "method": "SearchShards",
+    "paramsStruct": "api.SearchShardsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.SearchShards POST /{index}/_search_shards"
+  },
+  {
+    "name": "search_template",
+    "service": "SearchService",
+    "method": "SearchTemplate",
+    "paramsStruct": "api.SearchTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.SearchTemplate POST /{index}/_search/template"
   },
   {
     "name": "searchable_snapshots.cache_stats",
@@ -4119,6 +4352,44 @@
       "field": ""
     },
     "evidence": "DefaultTransformService.Upgrade route /_transform/_upgrade"
+  },
+  {
+    "name": "update",
+    "service": "DocumentService",
+    "method": "Update",
+    "paramsStruct": "api.UpdateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Update POST /{index}/_update/{id}"
+  },
+  {
+    "name": "update_by_query",
+    "service": "DocumentService",
+    "method": "UpdateByQuery",
+    "paramsStruct": "api.UpdateByQueryParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultDocumentService.UpdateByQuery POST /{index}/_update_by_query"
   },
   {
     "name": "update_by_query_rethrottle",

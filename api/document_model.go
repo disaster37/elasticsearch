@@ -52,17 +52,20 @@ func (r *IndexRequest) Validate() error {
 
 // IndexParams are the query parameters for the index endpoint.
 type IndexParams struct {
-	Common              *CommonParams
-	IfPrimaryTerm       *int64
-	IfSeqNo             *int64
-	OpType              OpType
-	Pipeline            string
-	Refresh             Refresh
-	RequireAlias        *bool
-	Timeout             string
-	Version             *int64
-	VersionType         VersionType
-	WaitForActiveShards string
+	Common               *CommonParams
+	IfPrimaryTerm        *int64
+	IfSeqNo              *int64
+	IncludeSourceOnError *bool
+	OpType               OpType
+	Pipeline             string
+	Refresh              Refresh
+	RequireAlias         *bool
+	RequireDataStream    *bool
+	Routing              string
+	Timeout              string
+	Version              *int64
+	VersionType          VersionType
+	WaitForActiveShards  string
 }
 
 // ToMap converts IndexParams to a query-parameter map.
@@ -77,6 +80,7 @@ func (p *IndexParams) ToMap() map[string]string {
 	if p.IfSeqNo != nil {
 		m["if_seq_no"] = int64Str(*p.IfSeqNo)
 	}
+	setBoolParam(m, "include_source_on_error", p.IncludeSourceOnError)
 	if p.OpType != "" {
 		m["op_type"] = string(p.OpType)
 	}
@@ -87,6 +91,10 @@ func (p *IndexParams) ToMap() map[string]string {
 		m["refresh"] = string(p.Refresh)
 	}
 	setBoolParam(m, "require_alias", p.RequireAlias)
+	setBoolParam(m, "require_data_stream", p.RequireDataStream)
+	if p.Routing != "" {
+		m["routing"] = p.Routing
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -214,14 +222,15 @@ func (r *DeleteRequest) Validate() error {
 
 // DeleteParams are the query parameters for the delete endpoint.
 type DeleteParams struct {
-	Common        *CommonParams
-	IfPrimaryTerm *int64
-	IfSeqNo       *int64
-	Refresh       Refresh
-	Routing       string
-	Timeout       string
-	Version       *int64
-	VersionType   VersionType
+	Common              *CommonParams
+	IfPrimaryTerm       *int64
+	IfSeqNo             *int64
+	Refresh             Refresh
+	Routing             string
+	Timeout             string
+	Version             *int64
+	VersionType         VersionType
+	WaitForActiveShards string
 }
 
 // ToMap converts DeleteParams to a query-parameter map.
@@ -251,6 +260,9 @@ func (p *DeleteParams) ToMap() map[string]string {
 	if p.VersionType != "" {
 		m["version_type"] = string(p.VersionType)
 	}
+	if p.WaitForActiveShards != "" {
+		m["wait_for_active_shards"] = p.WaitForActiveShards
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -275,19 +287,20 @@ func (r *UpdateRequest) Validate() error {
 
 // UpdateParams are the query parameters for the update endpoint.
 type UpdateParams struct {
-	Common              *CommonParams
-	IfPrimaryTerm       *int64
-	IfSeqNo             *int64
-	Lang                string
-	Refresh             Refresh
-	RequireAlias        *bool
-	RetryOnConflict     *int
-	Routing             string
-	Source              string
-	SourceExcludes      []string
-	SourceIncludes      []string
-	Timeout             string
-	WaitForActiveShards string
+	Common               *CommonParams
+	IfPrimaryTerm        *int64
+	IfSeqNo              *int64
+	IncludeSourceOnError *bool
+	Lang                 string
+	Refresh              Refresh
+	RequireAlias         *bool
+	RetryOnConflict      *int
+	Routing              string
+	Source               string
+	SourceExcludes       []string
+	SourceIncludes       []string
+	Timeout              string
+	WaitForActiveShards  string
 }
 
 // ToMap converts UpdateParams to a query-parameter map.
@@ -302,6 +315,7 @@ func (p *UpdateParams) ToMap() map[string]string {
 	if p.IfSeqNo != nil {
 		m["if_seq_no"] = int64Str(*p.IfSeqNo)
 	}
+	setBoolParam(m, "include_source_on_error", p.IncludeSourceOnError)
 	if p.Lang != "" {
 		m["lang"] = p.Lang
 	}
@@ -390,10 +404,12 @@ func (r *BulkRequest) Validate() error { return validationError(validate.Struct(
 // BulkParams are the query parameters for the bulk endpoint.
 type BulkParams struct {
 	Common                *CommonParams
+	IncludeSourceOnError  *bool
 	ListExecutedPipelines []string
 	Pipeline              string
 	Refresh               Refresh
 	RequireAlias          *bool
+	RequireDataStream     *bool
 	Routing               string
 	Source                string
 	SourceExcludes        []string
@@ -408,6 +424,7 @@ func (p *BulkParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "include_source_on_error", p.IncludeSourceOnError)
 	setListParam(m, "list_executed_pipelines", p.ListExecutedPipelines)
 	if p.Pipeline != "" {
 		m["pipeline"] = p.Pipeline
@@ -416,6 +433,7 @@ func (p *BulkParams) ToMap() map[string]string {
 		m["refresh"] = string(p.Refresh)
 	}
 	setBoolParam(m, "require_alias", p.RequireAlias)
+	setBoolParam(m, "require_data_stream", p.RequireDataStream)
 	if p.Routing != "" {
 		m["routing"] = p.Routing
 	}
@@ -446,6 +464,7 @@ func (r *DeleteByQueryRequest) Validate() error { return validationError(validat
 // DeleteByQueryParams are the query parameters for delete_by_query.
 type DeleteByQueryParams struct {
 	Common              *CommonParams
+	AllowNoIndices      *bool
 	Analyzer            string
 	AnalyzeWildcard     *bool
 	Conflicts           Conflicts
@@ -484,6 +503,7 @@ func (p *DeleteByQueryParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "allow_no_indices", p.AllowNoIndices)
 	if p.Analyzer != "" {
 		m["analyzer"] = p.Analyzer
 	}
@@ -574,6 +594,7 @@ func (r *UpdateByQueryRequest) Validate() error { return validationError(validat
 // version_type parameters.
 type UpdateByQueryParams struct {
 	Common              *CommonParams
+	AllowNoIndices      *bool
 	Analyzer            string
 	AnalyzeWildcard     *bool
 	Conflicts           Conflicts
@@ -614,6 +635,7 @@ func (p *UpdateByQueryParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "allow_no_indices", p.AllowNoIndices)
 	if p.Analyzer != "" {
 		m["analyzer"] = p.Analyzer
 	}

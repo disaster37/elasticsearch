@@ -313,3 +313,24 @@ func TestUnitAsyncSearchGetParamsNil(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "x", resp.Id)
 }
+
+func TestUnitAsyncSearchSubmitB7Carrier(t *testing.T) {
+	var gotQuery map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotQuery = queryMap(r)
+		jsonResponse(w, 200, `{"id":"a1","is_running":true,"is_partial":false}`)
+	}))
+	defer srv.Close()
+	svc := NewAsyncSearchService(restyClient(srv), testLogger())
+	_, err := svc.Submit(context.Background(), &AsyncSearchSubmitRequest{Indices: []string{"idx"}, Params: &AsyncSearchSubmitParams{
+		RestTotalHitsAsInt: ptrBool(true), SeqNoPrimaryTerm: ptrBool(true), Version: ptrBool(true),
+		CcsMinimizeRoundtrips: ptrBool(false), MaxConcurrentShardRequests: ptrInt(5), DocvalueFields: []string{"f1", "f2"},
+	}})
+	assert.NoError(t, err)
+	assert.Equal(t, "true", gotQuery["rest_total_hits_as_int"])
+	assert.Equal(t, "true", gotQuery["seq_no_primary_term"])
+	assert.Equal(t, "true", gotQuery["version"])
+	assert.Equal(t, "false", gotQuery["ccs_minimize_roundtrips"])
+	assert.Equal(t, "5", gotQuery["max_concurrent_shard_requests"])
+	assert.Equal(t, "f1,f2", gotQuery["docvalue_fields"])
+}

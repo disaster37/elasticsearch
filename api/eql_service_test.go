@@ -170,3 +170,45 @@ func TestUnitEqlDeleteNetworkError(t *testing.T) {
 	_, err := svc.Delete(context.Background(), "eql-id")
 	assert.Error(t, err)
 }
+
+type customEql struct{ EqlService }
+
+func TestEqlSpecExtensionAdapters(t *testing.T) {
+	svc := NewEqlService(nil, testLogger())
+	if _, err := AsEqlServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("eql default: %v", err)
+	}
+	if _, err := AsEqlServiceSpecExtensions(nil); err == nil {
+		t.Error("eql nil: want error")
+	}
+	var typedNil EqlService = (*DefaultEqlService)(nil)
+	if _, err := AsEqlServiceSpecExtensions(typedNil); err == nil {
+		t.Error("eql typed-nil: want error")
+	}
+	if _, err := AsEqlServiceSpecExtensions(customEql{svc}); err == nil {
+		t.Error("eql custom: want error")
+	}
+}
+
+func TestUnitEqlB7CarrierTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewEqlService(restyClient(srv), testLogger())
+	ext, err := AsEqlServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+	body := map[string]any{"query": "x"}
+
+	_, err = svc.Search(ctx, "idx", body, &EqlSearchParams{AllowPartialSearchResults: ptrBool(true), AllowPartialSequenceResults: ptrBool(false)})
+	assert.NoError(t, err)
+	assert.Equal(t, "/idx/_eql/search", got.path)
+	assert.Equal(t, "true", got.query["allow_partial_search_results"])
+	assert.Equal(t, "false", got.query["allow_partial_sequence_results"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.GetWithParams(ctx, "id1", &EqlGetSpecParams{KeepAlive: "1m", WaitForCompletionTimeout: "2s"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_eql/search/id1", got.path)
+	assert.Equal(t, "1m", got.query["keep_alive"])
+	assert.Equal(t, "2s", got.query["wait_for_completion_timeout"])
+}

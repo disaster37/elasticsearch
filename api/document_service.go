@@ -81,7 +81,7 @@ func (s *DefaultDocumentService) Create(ctx context.Context, req *CreateRequest)
 		return nil, err
 	}
 	var result IndexResponse
-	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/%s/_doc/%s/_create", pathSegment(req.Index), pathSegment(req.Id)), req.Body, req.Params, &result)
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/%s/_create/%s", pathSegment(req.Index), pathSegment(req.Id)), req.Body, req.Params, &result)
 }
 
 func (s *DefaultDocumentService) Get(ctx context.Context, req *GetRequest) (*GetResult, error) {
@@ -349,14 +349,11 @@ func (s *DefaultDocumentService) TermVectors(ctx context.Context, req *TermVecto
 }
 
 func (s *DefaultDocumentService) MultiTermVectors(ctx context.Context, req *MtermvectorsRequest) (*MultiTermvectorResponse, error) {
-	var path string
-	if req.Index != "" {
-		path = fmt.Sprintf("/%s/_mtermvectors", pathSegment(req.Index))
-	} else {
-		path = "/_mtermvectors"
+	var params *MtermvectorsSpecParams
+	if req.Params != nil {
+		params = &MtermvectorsSpecParams{TermVectorsParams: *req.Params}
 	}
-	var result MultiTermvectorResponse
-	return &result, doReq(s.logger, ctx, s.client, "POST", path, req.Body, req.Params, &result)
+	return s.MultiTermVectorsWithRequest(ctx, &MtermvectorsSpecRequest{Index: req.Index, Body: req.Body, Params: params})
 }
 
 func (s *DefaultDocumentService) TermsEnum(ctx context.Context, req *TermsEnumRequest) (*TermsEnumResponse, error) {

@@ -711,3 +711,50 @@ func (s *DefaultClusterService) ExistsComponentTemplateWithParams(ctx context.Co
 	}
 	return headReq(s.logger, ctx, s.client, fmt.Sprintf("/_component_template/%s", pathSegment(name)), params)
 }
+
+// DocumentServiceSpecExtensions exposes the opt-in mtermvectors carrier.
+// Obtain it with [AsDocumentServiceSpecExtensions].
+type DocumentServiceSpecExtensions interface {
+	MultiTermVectorsWithRequest(ctx context.Context, req *MtermvectorsSpecRequest) (*MultiTermvectorResponse, error)
+}
+
+var _ DocumentServiceSpecExtensions = (*DefaultDocumentService)(nil)
+
+// AsDocumentServiceSpecExtensions adapts a DocumentService to its extension
+// interface.
+func AsDocumentServiceSpecExtensions(service DocumentService) (DocumentServiceSpecExtensions, error) {
+	return asSpecExtensions[DocumentServiceSpecExtensions]("document", service)
+}
+
+func (s *DefaultDocumentService) MultiTermVectorsWithRequest(ctx context.Context, req *MtermvectorsSpecRequest) (*MultiTermvectorResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("request is required")
+	}
+	path := "/_mtermvectors"
+	if req.Index != "" {
+		path = fmt.Sprintf("/%s/_mtermvectors", pathSegment(req.Index))
+	}
+	var result MultiTermvectorResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", path, req.Body, req.Params, &result)
+}
+
+// EqlServiceSpecExtensions exposes the opt-in EQL query carriers. Obtain it
+// with [AsEqlServiceSpecExtensions].
+type EqlServiceSpecExtensions interface {
+	GetWithParams(ctx context.Context, id string, params *EqlGetSpecParams) (*EqlSearchResponse, error)
+}
+
+var _ EqlServiceSpecExtensions = (*DefaultEqlService)(nil)
+
+// AsEqlServiceSpecExtensions adapts an EqlService to its extension interface.
+func AsEqlServiceSpecExtensions(service EqlService) (EqlServiceSpecExtensions, error) {
+	return asSpecExtensions[EqlServiceSpecExtensions]("eql", service)
+}
+
+func (s *DefaultEqlService) GetWithParams(ctx context.Context, id string, params *EqlGetSpecParams) (*EqlSearchResponse, error) {
+	if id == "" {
+		return nil, fmt.Errorf("id is required")
+	}
+	var result EqlSearchResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", fmt.Sprintf("/_eql/search/%s", pathSegment(id)), nil, params, &result)
+}

@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 281 |
-| Known-missing (baselined) endpoints | 231 |
+| Registered implementations | 296 |
+| Known-missing (baselined) endpoints | 216 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -76,6 +76,7 @@ number, not a claim of full REST implementation equivalence.
 | `api.ClusterServiceSpecExtensions` | new opt-in `ExistsComponentTemplateWithParams` (B5) | `master_timeout`, `local` |
 | cluster carriers + `ClusterService.Info` | direct `MasterTimeout`/`ExpandWildcards`/`IncludeDefaults`/`IncludeRemotes` additions; Info route corrected to `GET /_info/{target}` with `_all` default | `master_timeout`, `include_defaults`, `include_remotes` |
 | snapshot carriers + `SnapshotService.Get` | direct `MasterTimeout`/paging additions; `snapshot.get` empty selector now routes to `/_snapshot/{repository}/_all` (B6) | `master_timeout`, `order`, `sort`, `size`, `offset`, `after`, `from_sort_value`, `verbose`, `index_names`, `slm_policy_filter` |
+| document/search/async/eql carriers; `DocumentService.Create` | direct fields added; `Create` route corrected to `PUT /{index}/_create/{id}`; new `DocumentServiceSpecExtensions.MultiTermVectorsWithRequest` and `EqlServiceSpecExtensions.GetWithParams` (B7) | `routing`, `require_data_stream`, `include_source_on_error`, `wait_for_active_shards`, `allow_no_indices`, `ids`, `docvalue_fields`, etc. |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -154,7 +155,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `async_search.submit` | not-implemented | stable | public | AsyncSearchService.Submit exists but binding is incomplete (missing params: rest_total_hits_as_int,seq_no_primary_term,version,max_concurrent_shard_requests,ccs_minimize_roundtrips,docvalue_fields) |
 
 ### cat
 
@@ -238,8 +238,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `eql.get` | not-implemented | stable | public | EqlService.Get exists but binding is incomplete (missing params: wait_for_completion_timeout,keep_alive) |
-| `eql.search` | not-implemented | stable | public | EqlService.Search exists but binding is incomplete (missing params: allow_partial_search_results,allow_partial_sequence_results) |
 
 ### esql
 
@@ -453,23 +451,11 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `bulk` | not-implemented | stable | public | DocumentService.Bulk exists but binding is incomplete (missing params: require_data_stream,include_source_on_error) |
-| `create` | not-implemented | stable | public | DocumentService.Create exists but binding is incomplete (missing params: include_source_on_error,routing) |
-| `delete` | not-implemented | stable | public | DocumentService.Delete exists but binding is incomplete (missing params: wait_for_active_shards) |
-| `delete_by_query` | not-implemented | stable | public | DocumentService.DeleteByQuery exists but binding is incomplete (missing params: allow_no_indices) |
 | `delete_script` | not-implemented | stable | public | ScriptService.Delete exists but binding is incomplete (missing params: master_timeout) |
-| `field_caps` | not-implemented | stable | public | SearchService.FieldCaps exists but binding is incomplete (missing params: filters,types,include_empty_fields) |
 | `get_script` | not-implemented | stable | public | ScriptService.Get exists but binding is incomplete (missing params: master_timeout) |
 | `health_report` | not-implemented | stable | public | HealthReportService.Get exists but binding is incomplete (missing params: timeout) |
-| `index` | not-implemented | stable | public | DocumentService.Index exists but binding is incomplete (missing params: routing,require_data_stream,include_source_on_error) |
 | `knn_search` | not-implemented | experimental | public | no service in client for namespace  |
-| `mtermvectors` | not-implemented | stable | public | DocumentService.MultiTermVectors exists but binding is incomplete (missing params: ids) |
-| `open_point_in_time` | not-implemented | stable | public | SearchService.OpenPointInTime exists but binding is incomplete (missing params: allow_partial_search_results) |
 | `put_script` | not-implemented | stable | public | ScriptService.Put exists but binding is incomplete (missing params: master_timeout; unmapped parts: context) |
-| `search_shards` | not-implemented | stable | public | SearchService.SearchShards exists but binding is incomplete (missing params: master_timeout) |
-| `search_template` | not-implemented | stable | public | SearchService.SearchTemplate exists but binding is incomplete (missing params: expand_wildcards) |
-| `update` | not-implemented | stable | public | DocumentService.Update exists but binding is incomplete (missing params: include_source_on_error) |
-| `update_by_query` | not-implemented | stable | public | DocumentService.UpdateByQuery exists but binding is incomplete (missing params: allow_no_indices) |
 
 ### search_application
 

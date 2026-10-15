@@ -219,3 +219,28 @@ type IndicesForceMergeSpecResponse struct {
 	types.BroadcastResponse
 	Task string `json:"task,omitempty"`
 }
+
+// MtermvectorsSpecParams are the opt-in query parameters for mtermvectors. It
+// embeds the termvectors carrier by value and adds the ids list so that ids
+// never leak into the termvectors endpoint.
+type MtermvectorsSpecParams struct {
+	TermVectorsParams
+	Ids []string
+}
+
+// ToMap converts MtermvectorsSpecParams to a query-parameter map.
+func (p *MtermvectorsSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := p.TermVectorsParams.ToMap()
+	setListParam(m, "ids", p.Ids)
+	return m
+}
+
+// MtermvectorsSpecRequest is the opt-in request for mtermvectors.
+type MtermvectorsSpecRequest struct {
+	Index  string
+	Body   any
+	Params *MtermvectorsSpecParams
+}

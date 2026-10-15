@@ -11,44 +11,50 @@ type AsyncSearchSubmitRequest struct {
 
 // AsyncSearchSubmitParams are the query parameters for async_search.submit.
 type AsyncSearchSubmitParams struct {
-	Common                    *CommonParams
-	AllowNoIndices            *bool
-	AllowPartialSearchResults *bool
-	Analyzer                  string
-	AnalyzeWildcard           *bool
-	BatchedReduceSize         *int
-	DefaultOperator           DefaultOperator
-	Df                        string
-	ExpandWildcards           ExpandWildcards
-	Explain                   *bool
-	From                      *int
-	IgnoreThrottled           *bool
-	IgnoreUnavailable         *bool
-	KeepAlive                 string
-	KeepOnCompletion          *bool
-	Lenient                   *bool
-	Preference                string
-	Q                         string
-	RequestCache              *bool
-	Routing                   string
-	SearchType                SearchType
-	Size                      *int
-	Sort                      []string
-	Source                    string
-	SourceExcludes            []string
-	SourceIncludes            []string
-	Stats                     []string
-	StoredFields              []string
-	SuggestField              string
-	SuggestMode               SuggestMode
-	SuggestSize               *int
-	SuggestText               string
-	TerminateAfter            *int
-	Timeout                   string
-	TrackScores               *bool
-	TrackTotalHits            string
-	TypedKeys                 *bool
-	WaitForCompletionTimeout  string
+	Common                     *CommonParams
+	AllowNoIndices             *bool
+	AllowPartialSearchResults  *bool
+	Analyzer                   string
+	AnalyzeWildcard            *bool
+	BatchedReduceSize          *int
+	CcsMinimizeRoundtrips      *bool
+	DefaultOperator            DefaultOperator
+	Df                         string
+	DocvalueFields             []string
+	ExpandWildcards            ExpandWildcards
+	Explain                    *bool
+	From                       *int
+	IgnoreThrottled            *bool
+	IgnoreUnavailable          *bool
+	KeepAlive                  string
+	KeepOnCompletion           *bool
+	Lenient                    *bool
+	MaxConcurrentShardRequests *int
+	Preference                 string
+	Q                          string
+	RequestCache               *bool
+	RestTotalHitsAsInt         *bool
+	Routing                    string
+	SearchType                 SearchType
+	SeqNoPrimaryTerm           *bool
+	Size                       *int
+	Sort                       []string
+	Source                     string
+	SourceExcludes             []string
+	SourceIncludes             []string
+	Stats                      []string
+	StoredFields               []string
+	SuggestField               string
+	SuggestMode                SuggestMode
+	SuggestSize                *int
+	SuggestText                string
+	TerminateAfter             *int
+	Timeout                    string
+	TrackScores                *bool
+	TrackTotalHits             string
+	TypedKeys                  *bool
+	Version                    *bool
+	WaitForCompletionTimeout   string
 }
 
 // ToMap converts AsyncSearchSubmitParams to a query-parameter map.
@@ -66,12 +72,14 @@ func (p *AsyncSearchSubmitParams) ToMap() map[string]string {
 	if p.BatchedReduceSize != nil {
 		m["batched_reduce_size"] = intStr(*p.BatchedReduceSize)
 	}
+	setBoolParam(m, "ccs_minimize_roundtrips", p.CcsMinimizeRoundtrips)
 	if p.DefaultOperator != "" {
 		m["default_operator"] = string(p.DefaultOperator)
 	}
 	if p.Df != "" {
 		m["df"] = p.Df
 	}
+	setListParam(m, "docvalue_fields", p.DocvalueFields)
 	if p.ExpandWildcards != "" {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
@@ -86,6 +94,9 @@ func (p *AsyncSearchSubmitParams) ToMap() map[string]string {
 	}
 	setBoolParam(m, "keep_on_completion", p.KeepOnCompletion)
 	setBoolParam(m, "lenient", p.Lenient)
+	if p.MaxConcurrentShardRequests != nil {
+		m["max_concurrent_shard_requests"] = intStr(*p.MaxConcurrentShardRequests)
+	}
 	if p.Preference != "" {
 		m["preference"] = p.Preference
 	}
@@ -93,12 +104,14 @@ func (p *AsyncSearchSubmitParams) ToMap() map[string]string {
 		m["q"] = p.Q
 	}
 	setBoolParam(m, "request_cache", p.RequestCache)
+	setBoolParam(m, "rest_total_hits_as_int", p.RestTotalHitsAsInt)
 	if p.Routing != "" {
 		m["routing"] = p.Routing
 	}
 	if p.SearchType != "" {
 		m["search_type"] = string(p.SearchType)
 	}
+	setBoolParam(m, "seq_no_primary_term", p.SeqNoPrimaryTerm)
 	if p.Size != nil {
 		m["size"] = intStr(*p.Size)
 	}
@@ -133,6 +146,7 @@ func (p *AsyncSearchSubmitParams) ToMap() map[string]string {
 		m["track_total_hits"] = p.TrackTotalHits
 	}
 	setBoolParam(m, "typed_keys", p.TypedKeys)
+	setBoolParam(m, "version", p.Version)
 	if p.WaitForCompletionTimeout != "" {
 		m["wait_for_completion_timeout"] = p.WaitForCompletionTimeout
 	}
