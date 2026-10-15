@@ -586,3 +586,154 @@ func TestFeaturesWatcherXpackSpecExtensionsTransport(t *testing.T) {
 		})
 	}
 }
+
+type customSecurity struct{ SecurityService }
+
+func TestSecuritySpecExtensionAdapters(t *testing.T) {
+	svc := NewSecurityService(nil, testLogger())
+	if _, err := AsSecurityServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("security default: %v", err)
+	}
+	if _, err := AsSecurityServiceSpecExtensions(nil); err == nil {
+		t.Error("security nil: want error")
+	}
+	var typedNil SecurityService = (*DefaultSecurityService)(nil)
+	if _, err := AsSecurityServiceSpecExtensions(typedNil); err == nil {
+		t.Error("security typed-nil: want error")
+	}
+	if _, err := AsSecurityServiceSpecExtensions(customSecurity{svc}); err == nil {
+		t.Error("security custom: want error")
+	}
+}
+
+func TestSecurityRefreshSpecParamsToMap(t *testing.T) {
+	assert.Nil(t, (*SecurityRefreshSpecParams)(nil).ToMap())
+	assert.Empty(t, (&SecurityRefreshSpecParams{}).ToMap())
+	assert.Equal(t, "wait_for", (&SecurityRefreshSpecParams{Refresh: RefreshWaitFor}).ToMap()["refresh"])
+	assert.Equal(t, "true", (&SecurityRefreshSpecParams{Refresh: RefreshTrue}).ToMap()["refresh"])
+	assert.Equal(t, "false", (&SecurityRefreshSpecParams{Refresh: RefreshFalse}).ToMap()["refresh"])
+}
+
+func TestSecurityGetUserSpecParamsToMap(t *testing.T) {
+	assert.Nil(t, (*SecurityGetUserSpecParams)(nil).ToMap())
+	assert.Empty(t, (&SecurityGetUserSpecParams{}).ToMap())
+	assert.Equal(t, "true", (&SecurityGetUserSpecParams{WithProfileUid: ptrBool(true)}).ToMap()["with_profile_uid"])
+	assert.Equal(t, "false", (&SecurityGetUserSpecParams{WithProfileUid: ptrBool(false)}).ToMap()["with_profile_uid"])
+}
+
+func TestSecuritySpecExtensionsTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	base := NewSecurityService(restyClient(srv), testLogger())
+	ext, err := AsSecurityServiceSpecExtensions(base)
+	require.NoError(t, err)
+	ctx := context.Background()
+	body := map[string]any{"username": "u1"}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"change_password_user", func() error {
+			_, err := ext.ChangePasswordWithRequest(ctx, &SecurityChangePasswordRequest{Username: "u1", Body: body, Params: &SecurityRefreshSpecParams{Refresh: RefreshWaitFor}})
+			return err
+		}, "POST", "/_security/user/u1/_password", map[string]string{"refresh": "wait_for"}},
+		{"change_password_self", func() error {
+			_, err := ext.ChangePasswordWithRequest(ctx, &SecurityChangePasswordRequest{Body: body, Params: &SecurityRefreshSpecParams{Refresh: RefreshTrue}})
+			return err
+		}, "POST", "/_security/user/_password", map[string]string{"refresh": "true"}},
+		{"create_api_key", func() error {
+			_, err := ext.CreateAPIKeyWithParams(ctx, body, &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "POST", "/_security/api_key", map[string]string{"refresh": "true"}},
+		{"delete_privileges", func() error {
+			_, err := ext.DeletePrivilegesWithRequest(ctx, &SecurityDeletePrivilegesRequest{Application: "app1", Name: "name1", Params: &SecurityRefreshSpecParams{Refresh: RefreshFalse}})
+			return err
+		}, "DELETE", "/_security/privilege/app1/name1", map[string]string{"refresh": "false"}},
+		{"delete_role", func() error {
+			_, err := ext.DeleteRoleWithParams(ctx, "r1", &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "DELETE", "/_security/role/r1", map[string]string{"refresh": "true"}},
+		{"delete_role_mapping", func() error {
+			_, err := ext.DeleteRoleMappingWithParams(ctx, "rm1", &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "DELETE", "/_security/role_mapping/rm1", map[string]string{"refresh": "true"}},
+		{"delete_user", func() error {
+			_, err := ext.DeleteUserWithParams(ctx, "u1", &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "DELETE", "/_security/user/u1", map[string]string{"refresh": "true"}},
+		{"disable_user", func() error {
+			_, err := ext.DisableUserWithParams(ctx, "u1", &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "PUT", "/_security/user/u1/_disable", map[string]string{"refresh": "true"}},
+		{"enable_user", func() error {
+			_, err := ext.EnableUserWithParams(ctx, "u1", &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "PUT", "/_security/user/u1/_enable", map[string]string{"refresh": "true"}},
+		{"put_privileges", func() error {
+			_, err := ext.PutPrivilegesWithParams(ctx, body, &SecurityRefreshSpecParams{Refresh: RefreshTrue})
+			return err
+		}, "PUT", "/_security/privilege", map[string]string{"refresh": "true"}},
+		{"put_role", func() error {
+			_, err := ext.PutRoleWithRequest(ctx, &SecurityPutRoleRequest{Name: "r1", Body: body, Params: &SecurityRefreshSpecParams{Refresh: RefreshTrue}})
+			return err
+		}, "PUT", "/_security/role/r1", map[string]string{"refresh": "true"}},
+		{"put_role_mapping", func() error {
+			_, err := ext.PutRoleMappingWithRequest(ctx, &SecurityPutRoleMappingRequest{Name: "rm1", Body: body, Params: &SecurityRefreshSpecParams{Refresh: RefreshTrue}})
+			return err
+		}, "PUT", "/_security/role_mapping/rm1", map[string]string{"refresh": "true"}},
+		{"put_user", func() error {
+			_, err := ext.PutUserWithRequest(ctx, &SecurityPutUserRequest{Username: "u1", Body: body, Params: &SecurityRefreshSpecParams{Refresh: RefreshTrue}})
+			return err
+		}, "PUT", "/_security/user/u1", map[string]string{"refresh": "true"}},
+		{"get_api_key", func() error {
+			_, err := base.GetAPIKey(ctx, &SecurityGetAPIKeyParams{ID: "id1", WithLimitedBy: ptrBool(true), WithLimitedPrivileges: ptrBool(false)})
+			return err
+		}, "GET", "/_security/api_key", map[string]string{"id": "id1", "with_limited_by": "true", "with_limited_privileges": "false"}},
+		{"get_user", func() error {
+			_, err := ext.GetUserWithParams(ctx, []string{"u1"}, &SecurityGetUserSpecParams{WithProfileUid: ptrBool(true)})
+			return err
+		}, "GET", "/_security/user/u1", map[string]string{"with_profile_uid": "true"}},
+		{"get_user_all", func() error {
+			_, err := ext.GetUserWithParams(ctx, nil, &SecurityGetUserSpecParams{})
+			return err
+		}, "GET", "/_security/user", map[string]string{}},
+		{"has_privileges_user", func() error {
+			_, err := ext.HasPrivilegesWithRequest(ctx, &SecurityHasPrivilegesSpecRequest{User: "u1", Body: body})
+			return err
+		}, "POST", "/_security/user/u1/_has_privileges", map[string]string{}},
+		{"has_privileges_self", func() error {
+			_, err := ext.HasPrivilegesWithRequest(ctx, &SecurityHasPrivilegesSpecRequest{Body: body})
+			return err
+		}, "POST", "/_security/user/_has_privileges", map[string]string{}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			require.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}
+
+func TestSecurityHasPrivilegesValidation(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	ext, err := AsSecurityServiceSpecExtensions(NewSecurityService(restyClient(srv), testLogger()))
+	require.NoError(t, err)
+
+	_, err = ext.HasPrivilegesWithRequest(context.Background(), &SecurityHasPrivilegesSpecRequest{User: "u1"})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "validation")
+	assert.Empty(t, got.method, "no network call for invalid request")
+
+	_, err = ext.HasPrivilegesWithRequest(context.Background(), nil)
+	require.Error(t, err)
+}

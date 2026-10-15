@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 197 |
-| Known-missing (baselined) endpoints | 315 |
+| Registered implementations | 212 |
+| Known-missing (baselined) endpoints | 300 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -68,6 +68,8 @@ number, not a claim of full REST implementation equivalence.
 | `api.AsyncSearchStatusParams` | new opt-in `StatusWithParams` carrier | `keep_alive` |
 | `api.MasterTimeoutSpecParams` / `TimeoutSpecParams` / `MasterTimeoutAndTimeoutSpecParams` | new shared opt-in extension carriers (B1) | `master_timeout`, `timeout` |
 | `api.CcrFollowParams`, `api.IlmExplainParams`, `api.EnrichWaitForCompletionParams` | added `MasterTimeout string` | `master_timeout` |
+| `api.SecurityGetAPIKeyParams` | added `WithLimitedBy *bool`; `id` field override to `ID` (B2) | `with_limited_by` |
+| `api.SecurityRefreshSpecParams`, `api.SecurityGetUserSpecParams` | new opt-in extension carriers (B2) | `refresh`, `with_profile_uid` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -549,39 +551,24 @@ with its exact reason. The authoritative map is `baseline.go`.
 | `security.bulk_delete_role` | not-implemented | stable | public | no SecurityService.BulkDeleteRole method |
 | `security.bulk_put_role` | not-implemented | stable | public | no SecurityService.BulkPutRole method |
 | `security.bulk_update_api_keys` | not-implemented | stable | public | no SecurityService.BulkUpdateApiKeys method |
-| `security.change_password` | not-implemented | stable | public | SecurityService.ChangePassword exists but binding is incomplete (missing params: refresh) |
 | `security.clear_api_key_cache` | not-implemented | stable | public | no SecurityService.ClearApiKeyCache method |
 | `security.clear_cached_privileges` | not-implemented | stable | public | no SecurityService.ClearCachedPrivileges method |
 | `security.clear_cached_roles` | not-implemented | stable | public | no SecurityService.ClearCachedRoles method |
 | `security.clear_cached_service_tokens` | not-implemented | stable | public | no SecurityService.ClearCachedServiceTokens method |
-| `security.create_api_key` | not-implemented | stable | public | SecurityService.CreateApiKey exists but binding is incomplete (missing params: refresh) |
 | `security.create_cross_cluster_api_key` | not-implemented | stable | public | no SecurityService.CreateCrossClusterApiKey method |
 | `security.create_service_token` | not-implemented | stable | public | no SecurityService.CreateServiceToken method |
 | `security.delegate_pki` | not-implemented | stable | public | no SecurityService.DelegatePki method |
-| `security.delete_privileges` | not-implemented | stable | public | SecurityService.DeletePrivileges exists but binding is incomplete (missing params: refresh) |
-| `security.delete_role` | not-implemented | stable | public | SecurityService.DeleteRole exists but binding is incomplete (missing params: refresh) |
-| `security.delete_role_mapping` | not-implemented | stable | public | SecurityService.DeleteRoleMapping exists but binding is incomplete (missing params: refresh) |
 | `security.delete_service_token` | not-implemented | stable | public | no SecurityService.DeleteServiceToken method |
-| `security.delete_user` | not-implemented | stable | public | SecurityService.DeleteUser exists but binding is incomplete (missing params: refresh) |
-| `security.disable_user` | not-implemented | stable | public | SecurityService.DisableUser exists but binding is incomplete (missing params: refresh) |
-| `security.enable_user` | not-implemented | stable | public | SecurityService.EnableUser exists but binding is incomplete (missing params: refresh) |
 | `security.enroll_kibana` | not-implemented | stable | public | no SecurityService.EnrollKibana method |
 | `security.enroll_node` | not-implemented | stable | public | no SecurityService.EnrollNode method |
-| `security.get_api_key` | not-implemented | stable | public | SecurityService.GetApiKey exists but binding is incomplete (missing params: id,with_limited_by) |
 | `security.get_builtin_privileges` | not-implemented | stable | public | no SecurityService.GetBuiltinPrivileges method |
 | `security.get_service_accounts` | not-implemented | stable | public | no SecurityService.GetServiceAccounts method |
 | `security.get_service_credentials` | not-implemented | stable | public | no SecurityService.GetServiceCredentials method |
 | `security.get_settings` | not-implemented | stable | public | no SecurityService.GetSettings method |
-| `security.get_user` | not-implemented | stable | public | SecurityService.GetUser exists but binding is incomplete (missing params: with_profile_uid) |
 | `security.grant_api_key` | not-implemented | stable | public | no SecurityService.GrantApiKey method |
-| `security.has_privileges` | not-implemented | stable | public | SecurityService.HasPrivileges exists but binding is incomplete (unmapped parts: user) |
 | `security.oidc_authenticate` | not-implemented | stable | public | no SecurityService.OidcAuthenticate method |
 | `security.oidc_logout` | not-implemented | stable | public | no SecurityService.OidcLogout method |
 | `security.oidc_prepare_authentication` | not-implemented | stable | public | no SecurityService.OidcPrepareAuthentication method |
-| `security.put_privileges` | not-implemented | stable | public | SecurityService.PutPrivileges exists but binding is incomplete (missing params: refresh) |
-| `security.put_role` | not-implemented | stable | public | SecurityService.PutRole exists but binding is incomplete (missing params: refresh) |
-| `security.put_role_mapping` | not-implemented | stable | public | SecurityService.PutRoleMapping exists but binding is incomplete (missing params: refresh) |
-| `security.put_user` | not-implemented | stable | public | SecurityService.PutUser exists but binding is incomplete (missing params: refresh) |
 | `security.query_api_keys` | not-implemented | stable | public | no SecurityService.QueryApiKeys method |
 | `security.query_role` | not-implemented | stable | public | no SecurityService.QueryRole method |
 | `security.query_user` | not-implemented | stable | public | no SecurityService.QueryUser method |

@@ -149,3 +149,22 @@ func pathFromIndices(indices []string) string {
 
 // ensure querydsl is referenced (used by normalizeBody via bodyProvider).
 var _ = querydsl.NewSearchRequest
+
+// SecurityHasPrivilegesSpecRequest is the opt-in request for
+// security.has_privileges. Body is required; User is optional and selects the
+// per-user route.
+type SecurityHasPrivilegesSpecRequest struct {
+	User string
+	Body any
+}
+
+// Validate ensures a request body is present.
+func (r *SecurityHasPrivilegesSpecRequest) Validate() error {
+	if r == nil {
+		return fmt.Errorf("validation: request is required")
+	}
+	if r.Body == nil {
+		return fmt.Errorf("validation: body is required")
+	}
+	return nil
+}

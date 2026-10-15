@@ -129,3 +129,77 @@ type SlmPutLifecycleRequest struct {
 	Body     any
 	Params   *MasterTimeoutAndTimeoutSpecParams
 }
+
+// SecurityRefreshSpecParams is the shared opt-in query carrier for security
+// endpoints whose only endpoint-local parameter is refresh.
+type SecurityRefreshSpecParams struct {
+	Common  *CommonParams
+	Refresh Refresh
+}
+
+// ToMap converts SecurityRefreshSpecParams to a query-parameter map.
+func (p *SecurityRefreshSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	if p.Refresh != "" {
+		m["refresh"] = string(p.Refresh)
+	}
+	return mergeParams(m, p.Common)
+}
+
+// SecurityGetUserSpecParams are the opt-in query parameters for security.get_user.
+type SecurityGetUserSpecParams struct {
+	Common         *CommonParams
+	WithProfileUid *bool
+}
+
+// ToMap converts SecurityGetUserSpecParams to a query-parameter map.
+func (p *SecurityGetUserSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	setBoolParam(m, "with_profile_uid", p.WithProfileUid)
+	return mergeParams(m, p.Common)
+}
+
+// SecurityChangePasswordRequest is the opt-in request for
+// security.change_password. Username may be empty to target the authenticated
+// user.
+type SecurityChangePasswordRequest struct {
+	Username string
+	Body     any
+	Params   *SecurityRefreshSpecParams
+}
+
+// SecurityDeletePrivilegesRequest is the opt-in request for
+// security.delete_privileges.
+type SecurityDeletePrivilegesRequest struct {
+	Application string
+	Name        string
+	Params      *SecurityRefreshSpecParams
+}
+
+// SecurityPutRoleRequest is the opt-in request for security.put_role.
+type SecurityPutRoleRequest struct {
+	Name   string
+	Body   any
+	Params *SecurityRefreshSpecParams
+}
+
+// SecurityPutRoleMappingRequest is the opt-in request for
+// security.put_role_mapping.
+type SecurityPutRoleMappingRequest struct {
+	Name   string
+	Body   any
+	Params *SecurityRefreshSpecParams
+}
+
+// SecurityPutUserRequest is the opt-in request for security.put_user.
+type SecurityPutUserRequest struct {
+	Username string
+	Body     any
+	Params   *SecurityRefreshSpecParams
+}

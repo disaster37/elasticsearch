@@ -2134,6 +2134,23 @@
     "evidence": "DefaultSecurityService.Authenticate route /_security/_authenticate"
   },
   {
+    "name": "security.change_password",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "ChangePasswordWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": "Username"
+      }
+    },
+    "evidence": "DefaultSecurityService.ChangePasswordWithRequest POST /_security/user/{username}/_password"
+  },
+  {
     "name": "security.clear_cached_realms",
     "service": "SecurityService",
     "method": "ClearRealmCache",
@@ -2149,6 +2166,137 @@
       }
     },
     "evidence": "DefaultSecurityService.ClearRealmCache route /_security/realm/%s/_clear_cache"
+  },
+  {
+    "name": "security.create_api_key",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "CreateAPIKeyWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultSecurityService.CreateAPIKeyWithParams POST /_security/api_key"
+  },
+  {
+    "name": "security.delete_privileges",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeletePrivilegesWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "application": {
+        "argument": 1,
+        "field": "Application"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSecurityService.DeletePrivilegesWithRequest DELETE /_security/privilege/{application}/{name}"
+  },
+  {
+    "name": "security.delete_role",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeleteRoleWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DeleteRoleWithParams DELETE /_security/role/{name}"
+  },
+  {
+    "name": "security.delete_role_mapping",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeleteRoleMappingWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DeleteRoleMappingWithParams DELETE /_security/role_mapping/{name}"
+  },
+  {
+    "name": "security.delete_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeleteUserWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DeleteUserWithParams DELETE /_security/user/{username}"
+  },
+  {
+    "name": "security.disable_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DisableUserWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DisableUserWithParams PUT /_security/user/{username}/_disable"
+  },
+  {
+    "name": "security.enable_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "EnableUserWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.EnableUserWithParams PUT /_security/user/{username}/_enable"
+  },
+  {
+    "name": "security.get_api_key",
+    "service": "SecurityService",
+    "method": "GetAPIKey",
+    "paramsStruct": "api.SecurityGetAPIKeyParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "queryFields": {
+      "id": "ID"
+    },
+    "evidence": "DefaultSecurityService.GetAPIKey GET /_security/api_key (ID override)"
   },
   {
     "name": "security.get_privileges",
@@ -2197,10 +2345,39 @@
     "evidence": "DefaultSecurityService.GetToken route /_security/oauth2/token"
   },
   {
+    "name": "security.get_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "GetUserWithParams",
+    "paramsStruct": "api.SecurityGetUserSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.GetUserWithParams GET /_security/user/{username}"
+  },
+  {
     "name": "security.get_user_privileges",
     "service": "SecurityService",
     "method": "GetUserPrivileges",
     "evidence": "DefaultSecurityService.GetUserPrivileges route /_security/user/_privileges"
+  },
+  {
+    "name": "security.has_privileges",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "HasPrivilegesWithRequest",
+    "pathSources": {
+      "user": {
+        "argument": 1,
+        "field": "User"
+      }
+    },
+    "evidence": "DefaultSecurityService.HasPrivilegesWithRequest POST /_security/user/{user}/_has_privileges"
   },
   {
     "name": "security.invalidate_api_key",
@@ -2213,6 +2390,68 @@
     "service": "SecurityService",
     "method": "InvalidateToken",
     "evidence": "DefaultSecurityService.InvalidateToken route /_security/oauth2/token"
+  },
+  {
+    "name": "security.put_privileges",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutPrivilegesWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultSecurityService.PutPrivilegesWithParams PUT /_security/privilege"
+  },
+  {
+    "name": "security.put_role",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutRoleWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSecurityService.PutRoleWithRequest PUT /_security/role/{name}"
+  },
+  {
+    "name": "security.put_role_mapping",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutRoleMappingWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSecurityService.PutRoleMappingWithRequest PUT /_security/role_mapping/{name}"
+  },
+  {
+    "name": "security.put_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutUserWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": "Username"
+      }
+    },
+    "evidence": "DefaultSecurityService.PutUserWithRequest PUT /_security/user/{username}"
   },
   {
     "name": "security.update_api_key",

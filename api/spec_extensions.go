@@ -481,3 +481,148 @@ func (s *DefaultXpackService) UsageWithParams(ctx context.Context, params *Maste
 	var result XpackUsageResponse
 	return result, doReq(s.logger, ctx, s.client, "GET", "/_xpack/usage", nil, params, &result)
 }
+
+// SecurityServiceSpecExtensions exposes the opt-in security query carriers.
+// Obtain it with [AsSecurityServiceSpecExtensions].
+type SecurityServiceSpecExtensions interface {
+	ChangePasswordWithRequest(ctx context.Context, req *SecurityChangePasswordRequest) (*types.AcknowledgedResponse, error)
+	CreateAPIKeyWithParams(ctx context.Context, body any, params *SecurityRefreshSpecParams) (*SecurityCreateAPIKeyResponse, error)
+	DeletePrivilegesWithRequest(ctx context.Context, req *SecurityDeletePrivilegesRequest) (*types.AcknowledgedResponse, error)
+	DeleteRoleWithParams(ctx context.Context, name string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error)
+	DeleteRoleMappingWithParams(ctx context.Context, name string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error)
+	DeleteUserWithParams(ctx context.Context, username string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error)
+	DisableUserWithParams(ctx context.Context, username string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error)
+	EnableUserWithParams(ctx context.Context, username string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error)
+	PutPrivilegesWithParams(ctx context.Context, body any, params *SecurityRefreshSpecParams) (*SecurityPutPrivilegesResponse, error)
+	PutRoleWithRequest(ctx context.Context, req *SecurityPutRoleRequest) (*SecurityCreateResponse, error)
+	PutRoleMappingWithRequest(ctx context.Context, req *SecurityPutRoleMappingRequest) (*SecurityRoleMappingCreateResponse, error)
+	PutUserWithRequest(ctx context.Context, req *SecurityPutUserRequest) (*SecurityCreateResponse, error)
+	GetUserWithParams(ctx context.Context, usernames []string, params *SecurityGetUserSpecParams) (map[string]*SecurityUser, error)
+	HasPrivilegesWithRequest(ctx context.Context, req *SecurityHasPrivilegesSpecRequest) (*SecurityHasPrivilegesResponse, error)
+}
+
+var _ SecurityServiceSpecExtensions = (*DefaultSecurityService)(nil)
+
+// AsSecurityServiceSpecExtensions adapts a SecurityService to its extension
+// interface.
+func AsSecurityServiceSpecExtensions(service SecurityService) (SecurityServiceSpecExtensions, error) {
+	return asSpecExtensions[SecurityServiceSpecExtensions]("security", service)
+}
+
+func (s *DefaultSecurityService) ChangePasswordWithRequest(ctx context.Context, req *SecurityChangePasswordRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("request is required")
+	}
+	path := "/_security/user/_password"
+	if req.Username != "" {
+		path = fmt.Sprintf("/_security/user/%s/_password", pathSegment(req.Username))
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", path, req.Body, req.Params, &result)
+}
+
+func (s *DefaultSecurityService) CreateAPIKeyWithParams(ctx context.Context, body any, params *SecurityRefreshSpecParams) (*SecurityCreateAPIKeyResponse, error) {
+	var result SecurityCreateAPIKeyResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_security/api_key", body, params, &result)
+}
+
+func (s *DefaultSecurityService) DeletePrivilegesWithRequest(ctx context.Context, req *SecurityDeletePrivilegesRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.Application == "" || req.Name == "" {
+		return nil, fmt.Errorf("application and name are required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_security/privilege/%s/%s", pathSegment(req.Application), pathSegment(req.Name)), nil, req.Params, &result)
+}
+
+func (s *DefaultSecurityService) DeleteRoleWithParams(ctx context.Context, name string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_security/role/%s", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultSecurityService) DeleteRoleMappingWithParams(ctx context.Context, name string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_security/role_mapping/%s", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultSecurityService) DeleteUserWithParams(ctx context.Context, username string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error) {
+	if username == "" {
+		return nil, fmt.Errorf("username is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_security/user/%s", pathSegment(username)), nil, params, &result)
+}
+
+func (s *DefaultSecurityService) DisableUserWithParams(ctx context.Context, username string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error) {
+	if username == "" {
+		return nil, fmt.Errorf("username is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_security/user/%s/_disable", pathSegment(username)), nil, params, &result)
+}
+
+func (s *DefaultSecurityService) EnableUserWithParams(ctx context.Context, username string, params *SecurityRefreshSpecParams) (*types.AcknowledgedResponse, error) {
+	if username == "" {
+		return nil, fmt.Errorf("username is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_security/user/%s/_enable", pathSegment(username)), nil, params, &result)
+}
+
+func (s *DefaultSecurityService) PutPrivilegesWithParams(ctx context.Context, body any, params *SecurityRefreshSpecParams) (*SecurityPutPrivilegesResponse, error) {
+	var result SecurityPutPrivilegesResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", "/_security/privilege", body, params, &result)
+}
+
+func (s *DefaultSecurityService) PutRoleWithRequest(ctx context.Context, req *SecurityPutRoleRequest) (*SecurityCreateResponse, error) {
+	if req == nil || req.Name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result SecurityCreateResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_security/role/%s", pathSegment(req.Name)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultSecurityService) PutRoleMappingWithRequest(ctx context.Context, req *SecurityPutRoleMappingRequest) (*SecurityRoleMappingCreateResponse, error) {
+	if req == nil || req.Name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result SecurityRoleMappingCreateResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_security/role_mapping/%s", pathSegment(req.Name)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultSecurityService) PutUserWithRequest(ctx context.Context, req *SecurityPutUserRequest) (*SecurityCreateResponse, error) {
+	if req == nil || req.Username == "" {
+		return nil, fmt.Errorf("username is required")
+	}
+	var result SecurityCreateResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_security/user/%s", pathSegment(req.Username)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultSecurityService) GetUserWithParams(ctx context.Context, usernames []string, params *SecurityGetUserSpecParams) (map[string]*SecurityUser, error) {
+	path := "/_security/user"
+	if len(usernames) > 0 {
+		path = fmt.Sprintf("/_security/user/%s", escapedList(usernames))
+	}
+	var result map[string]*SecurityUser
+	return result, doReq(s.logger, ctx, s.client, "GET", path, nil, params, &result)
+}
+
+func (s *DefaultSecurityService) HasPrivilegesWithRequest(ctx context.Context, req *SecurityHasPrivilegesSpecRequest) (*SecurityHasPrivilegesResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("request is required")
+	}
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+	path := "/_security/user/_has_privileges"
+	if req.User != "" {
+		path = fmt.Sprintf("/_security/user/%s/_has_privileges", pathSegment(req.User))
+	}
+	var result SecurityHasPrivilegesResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", path, req.Body, nil, &result)
+}
