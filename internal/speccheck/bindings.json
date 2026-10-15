@@ -1129,6 +1129,27 @@
     "evidence": "DefaultIlmService.StopWithParams POST /_ilm/stop"
   },
   {
+    "name": "indices.add_block",
+    "service": "IndicesService",
+    "method": "AddBlock",
+    "paramsStruct": "api.AddBlockParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "block": {
+        "argument": 1,
+        "field": "Block"
+      }
+    },
+    "evidence": "DefaultIndicesService.AddBlock PUT /{index}/_block/{block}"
+  },
+  {
     "name": "indices.analyze",
     "service": "IndicesService",
     "method": "Analyze",
@@ -1145,6 +1166,29 @@
       }
     },
     "evidence": "DefaultIndicesService.Analyze route /%s/_analyze"
+  },
+  {
+    "name": "indices.clear_cache",
+    "service": "IndicesService",
+    "method": "ClearCache",
+    "paramsStruct": "api.IndicesClearCacheParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ClearCache POST /{index}/_cache/clear (index also emitted as query)"
   },
   {
     "name": "indices.clone",
@@ -1185,6 +1229,40 @@
     "evidence": "DefaultIndicesService.Close POST /{index}/_close"
   },
   {
+    "name": "indices.create",
+    "service": "IndicesService",
+    "method": "Create",
+    "paramsStruct": "api.IndicesCreateParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Create PUT /{index}"
+  },
+  {
+    "name": "indices.create_data_stream",
+    "service": "IndicesService",
+    "method": "CreateDataStream",
+    "paramsStruct": "api.IndicesCreateDataStreamParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.CreateDataStream PUT /_data_stream/{name}"
+  },
+  {
     "name": "indices.data_streams_stats",
     "service": "IndicesService",
     "method": "DataStreamStats",
@@ -1195,6 +1273,23 @@
       }
     },
     "evidence": "DefaultIndicesService.DataStreamStats route /_data_stream/%s/_stats"
+  },
+  {
+    "name": "indices.delete",
+    "service": "IndicesService",
+    "method": "Delete",
+    "paramsStruct": "api.IndicesDeleteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Delete DELETE /{index}"
   },
   {
     "name": "indices.delete_alias",
@@ -1216,6 +1311,57 @@
       }
     },
     "evidence": "DefaultIndicesService.DeleteAlias DELETE /{index}/_alias/{name}"
+  },
+  {
+    "name": "indices.delete_data_stream",
+    "service": "IndicesService",
+    "method": "DeleteDataStream",
+    "paramsStruct": "api.IndicesDeleteDataStreamParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteDataStream DELETE /_data_stream/{name}"
+  },
+  {
+    "name": "indices.delete_index_template",
+    "service": "IndicesService",
+    "method": "DeleteIndexTemplate",
+    "paramsStruct": "api.IndicesDeleteIndexTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteIndexTemplate DELETE /_index_template/{name}"
+  },
+  {
+    "name": "indices.delete_template",
+    "service": "IndicesService",
+    "method": "DeleteTemplate",
+    "paramsStruct": "api.IndicesDeleteTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteTemplate DELETE /_template/{name}"
   },
   {
     "name": "indices.downsample",
@@ -1272,6 +1418,40 @@
     "evidence": "DefaultIndicesService.ExistsAlias HEAD /{index}/_alias/{name}"
   },
   {
+    "name": "indices.exists_index_template",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "ExistsIndexTemplateWithParams",
+    "paramsStruct": "api.IndicesGetIndexTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ExistsIndexTemplateWithParams HEAD /_index_template/{name}"
+  },
+  {
+    "name": "indices.exists_template",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "ExistsTemplateWithParams",
+    "paramsStruct": "api.IndicesGetTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ExistsTemplateWithParams HEAD /_template/{name}"
+  },
+  {
     "name": "indices.flush",
     "service": "IndicesService",
     "method": "Flush",
@@ -1287,6 +1467,40 @@
       }
     },
     "evidence": "DefaultIndicesService.Flush"
+  },
+  {
+    "name": "indices.forcemerge",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "ForceMergeWithRequest",
+    "paramsStruct": "api.IndicesForceMergeParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultIndicesService.ForceMergeWithRequest POST /{index}/_forcemerge (sync+async response)"
+  },
+  {
+    "name": "indices.get",
+    "service": "IndicesService",
+    "method": "Get",
+    "paramsStruct": "api.IndicesGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Get GET /{index}"
   },
   {
     "name": "indices.get_alias",
@@ -1310,6 +1524,23 @@
     "evidence": "DefaultIndicesService.GetAlias GET /{index}/_alias/{name}"
   },
   {
+    "name": "indices.get_data_stream",
+    "service": "IndicesService",
+    "method": "GetDataStream",
+    "paramsStruct": "api.IndicesGetDataStreamParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetDataStream GET /_data_stream/{name}"
+  },
+  {
     "name": "indices.get_field_mapping",
     "service": "IndicesService",
     "method": "GetFieldMapping",
@@ -1329,6 +1560,95 @@
       }
     },
     "evidence": "DefaultIndicesService.GetFieldMapping route /%s/_mapping/field/%s"
+  },
+  {
+    "name": "indices.get_index_template",
+    "service": "IndicesService",
+    "method": "GetIndexTemplate",
+    "paramsStruct": "api.IndicesGetIndexTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetIndexTemplate GET /_index_template/{name}"
+  },
+  {
+    "name": "indices.get_mapping",
+    "service": "IndicesService",
+    "method": "GetMapping",
+    "paramsStruct": "api.IndicesGetMappingParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetMapping GET /{index}/_mapping"
+  },
+  {
+    "name": "indices.get_settings",
+    "service": "IndicesService",
+    "method": "GetSettings",
+    "paramsStruct": "api.GetSettingsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.GetSettings GET /{index}/_settings/{name}"
+  },
+  {
+    "name": "indices.get_template",
+    "service": "IndicesService",
+    "method": "GetTemplate",
+    "paramsStruct": "api.IndicesGetTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetTemplate GET /_template/{name}"
+  },
+  {
+    "name": "indices.migrate_to_data_stream",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "MigrateToDataStreamWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.MigrateToDataStreamWithParams POST /_data_stream/_migrate/{name}"
   },
   {
     "name": "indices.modify_data_stream",
@@ -1359,6 +1679,23 @@
     "evidence": "DefaultIndicesService.Open POST /{index}/_open"
   },
   {
+    "name": "indices.promote_data_stream",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "PromoteDataStreamWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.PromoteDataStreamWithParams POST /_data_stream/_promote/{name}"
+  },
+  {
     "name": "indices.put_alias",
     "service": "IndicesService",
     "method": "PutAlias",
@@ -1378,6 +1715,74 @@
       }
     },
     "evidence": "DefaultIndicesService.PutAlias PUT /{index}/_alias/{name}"
+  },
+  {
+    "name": "indices.put_index_template",
+    "service": "IndicesService",
+    "method": "PutIndexTemplate",
+    "paramsStruct": "api.PutIndexTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutIndexTemplate PUT /_index_template/{name}"
+  },
+  {
+    "name": "indices.put_mapping",
+    "service": "IndicesService",
+    "method": "PutMapping",
+    "paramsStruct": "api.PutMappingParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutMapping PUT /{index}/_mapping"
+  },
+  {
+    "name": "indices.put_settings",
+    "service": "IndicesService",
+    "method": "PutSettings",
+    "paramsStruct": "api.IndicesPutSettingsParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.PutSettings PUT /{index}/_settings"
+  },
+  {
+    "name": "indices.put_template",
+    "service": "IndicesService",
+    "method": "PutTemplate",
+    "paramsStruct": "api.PutTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutTemplate PUT /_template/{name}"
   },
   {
     "name": "indices.recovery",
@@ -1414,6 +1819,40 @@
     "evidence": "DefaultIndicesService.Refresh route /%s/_refresh"
   },
   {
+    "name": "indices.reload_search_analyzers",
+    "service": "IndicesService",
+    "method": "ReloadSearchAnalyzers",
+    "paramsStruct": "api.IndicesReloadAnalyzersParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ReloadSearchAnalyzers POST /{index}/_reload_search_analyzers"
+  },
+  {
+    "name": "indices.resolve_cluster",
+    "service": "IndicesService",
+    "method": "ResolveCluster",
+    "paramsStruct": "api.IndicesResolveClusterParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ResolveCluster GET /_resolve/cluster/{name}"
+  },
+  {
     "name": "indices.resolve_index",
     "service": "IndicesService",
     "method": "ResolveIndex",
@@ -1429,6 +1868,27 @@
       }
     },
     "evidence": "DefaultIndicesService.ResolveIndex route /_resolve/index/%s"
+  },
+  {
+    "name": "indices.rollover",
+    "service": "IndicesService",
+    "method": "Rollover",
+    "paramsStruct": "api.RolloverParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "alias": {
+        "argument": 1,
+        "field": "Alias"
+      },
+      "new_index": {
+        "argument": 1,
+        "field": "NewIndex"
+      }
+    },
+    "evidence": "DefaultIndicesService.Rollover POST /{alias}/_rollover/{new_index}"
   },
   {
     "name": "indices.segments",
@@ -1560,6 +2020,17 @@
       }
     },
     "evidence": "DefaultIndicesService.Stats route /%s/_stats/%s"
+  },
+  {
+    "name": "indices.update_aliases",
+    "service": "IndicesService",
+    "method": "UpdateAliases",
+    "paramsStruct": "api.IndicesUpdateAliasesParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultIndicesService.UpdateAliases POST /_aliases"
   },
   {
     "name": "indices.validate_query",

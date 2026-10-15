@@ -626,3 +626,67 @@ func (s *DefaultSecurityService) HasPrivilegesWithRequest(ctx context.Context, r
 	var result SecurityHasPrivilegesResponse
 	return &result, doReq(s.logger, ctx, s.client, "POST", path, req.Body, nil, &result)
 }
+
+// IndicesServiceSpecExtensions exposes the opt-in indices query carriers.
+// Obtain it with [AsIndicesServiceSpecExtensions].
+type IndicesServiceSpecExtensions interface {
+	ExistsTemplateWithParams(ctx context.Context, name string, params *IndicesGetTemplateParams) (bool, error)
+	ExistsIndexTemplateWithParams(ctx context.Context, name string, params *IndicesGetIndexTemplateParams) (bool, error)
+	MigrateToDataStreamWithParams(ctx context.Context, name string, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	PromoteDataStreamWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	ForceMergeWithRequest(ctx context.Context, req *IndicesForceMergeRequest) (*IndicesForceMergeSpecResponse, error)
+}
+
+var _ IndicesServiceSpecExtensions = (*DefaultIndicesService)(nil)
+
+// AsIndicesServiceSpecExtensions adapts an IndicesService to its extension
+// interface.
+func AsIndicesServiceSpecExtensions(service IndicesService) (IndicesServiceSpecExtensions, error) {
+	return asSpecExtensions[IndicesServiceSpecExtensions]("indices", service)
+}
+
+func (s *DefaultIndicesService) ExistsTemplateWithParams(ctx context.Context, name string, params *IndicesGetTemplateParams) (bool, error) {
+	if name == "" {
+		return false, fmt.Errorf("name is required")
+	}
+	return headReq(s.logger, ctx, s.client, fmt.Sprintf("/_template/%s", pathSegment(name)), params)
+}
+
+func (s *DefaultIndicesService) ExistsIndexTemplateWithParams(ctx context.Context, name string, params *IndicesGetIndexTemplateParams) (bool, error) {
+	if name == "" {
+		return false, fmt.Errorf("name is required")
+	}
+	return headReq(s.logger, ctx, s.client, fmt.Sprintf("/_index_template/%s", pathSegment(name)), params)
+}
+
+func (s *DefaultIndicesService) MigrateToDataStreamWithParams(ctx context.Context, name string, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_data_stream/_migrate/%s", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultIndicesService) PromoteDataStreamWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_data_stream/_promote/%s", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultIndicesService) ForceMergeWithRequest(ctx context.Context, req *IndicesForceMergeRequest) (*IndicesForceMergeSpecResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("request is required")
+	}
+	path := "/_forcemerge"
+	if len(req.Indices) > 0 {
+		path = fmt.Sprintf("/%s/_forcemerge", escapedList(req.Indices))
+	}
+	var result IndicesForceMergeSpecResponse
+	err := doReq(s.logger, ctx, s.client, "POST", path, nil, req.Params, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}

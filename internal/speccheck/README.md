@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 227 |
-| Known-missing (baselined) endpoints | 285 |
+| Registered implementations | 254 |
+| Known-missing (baselined) endpoints | 258 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -71,6 +71,8 @@ number, not a claim of full REST implementation equivalence.
 | `api.SecurityGetAPIKeyParams` | added `WithLimitedBy *bool`; `id` field override to `ID` (B2) | `with_limited_by` |
 | `api.SecurityRefreshSpecParams`, `api.SecurityGetUserSpecParams` | new opt-in extension carriers (B2) | `refresh`, `with_profile_uid` |
 | `api.ShrinkParams`, `api.IndicesOpenParams`, `api.AliasParams`, `api.GetAliasParams`, `api.SimulateIndexTemplateParams`, `api.DanglingIndicesImportParams`, `api.LicensePostParams` | existing shared carriers extended (B3) | `master_timeout`, `include_defaults` |
+| `api.IndicesServiceSpecExtensions` | new opt-in `ExistsTemplateWithParams`/`ExistsIndexTemplateWithParams`/`MigrateToDataStreamWithParams`/`PromoteDataStreamWithParams`/`ForceMergeWithRequest` (B4) | `master_timeout`, `timeout`, `wait_for_completion` |
+| remaining `api.*Params` (indices) | direct fields added per the B4 matrix; `ClearCache` now also emits the `index` query parameter | `master_timeout`, `timeout`, `request`, `reopen`, `lazy`, `resource`, `verbose`, `ignore_throttled`, `wait_for_completion` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -292,40 +294,13 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `indices.add_block` | not-implemented | stable | public | IndicesService.AddBlock exists but binding is incomplete (missing params: master_timeout) |
-| `indices.clear_cache` | not-implemented | stable | public | IndicesService.ClearCache exists but binding is incomplete (missing params: request) |
-| `indices.create` | not-implemented | stable | public | IndicesService.Create exists but binding is incomplete (missing params: timeout,master_timeout) |
-| `indices.create_data_stream` | not-implemented | stable | public | IndicesService.CreateDataStream exists but binding is incomplete (missing params: master_timeout) |
-| `indices.delete` | not-implemented | stable | public | IndicesService.Delete exists but binding is incomplete (missing params: timeout,master_timeout) |
 | `indices.delete_data_lifecycle` | not-implemented | stable | public | no IndicesService.DeleteDataLifecycle method |
-| `indices.delete_data_stream` | not-implemented | stable | public | IndicesService.DeleteDataStream exists but binding is incomplete (missing params: master_timeout) |
-| `indices.delete_index_template` | not-implemented | stable | public | IndicesService.DeleteIndexTemplate exists but binding is incomplete (missing params: master_timeout) |
-| `indices.delete_template` | not-implemented | stable | public | IndicesService.DeleteTemplate exists but binding is incomplete (missing params: master_timeout) |
 | `indices.disk_usage` | not-implemented | experimental | public | no IndicesService.DiskUsage method |
-| `indices.exists_index_template` | not-implemented | stable | public | IndicesService.ExistsIndexTemplate exists but binding is incomplete (missing params: flat_settings,master_timeout,local) |
-| `indices.exists_template` | not-implemented | stable | public | IndicesService.ExistsTemplate exists but binding is incomplete (missing params: local,flat_settings,master_timeout) |
 | `indices.explain_data_lifecycle` | not-implemented | stable | public | no IndicesService.ExplainDataLifecycle method |
 | `indices.field_usage_stats` | not-implemented | experimental | public | no IndicesService.FieldUsageStats method |
-| `indices.forcemerge` | not-implemented | stable | public | IndicesService.Forcemerge exists but binding is incomplete (missing params: wait_for_completion) |
-| `indices.get` | not-implemented | stable | public | IndicesService.Get exists but binding is incomplete (missing params: master_timeout) |
 | `indices.get_data_lifecycle` | not-implemented | stable | public | no IndicesService.GetDataLifecycle method |
 | `indices.get_data_lifecycle_stats` | not-implemented | stable | public | no IndicesService.GetDataLifecycleStats method |
-| `indices.get_data_stream` | not-implemented | stable | public | IndicesService.GetDataStream exists but binding is incomplete (missing params: master_timeout,verbose) |
-| `indices.get_index_template` | not-implemented | stable | public | IndicesService.GetIndexTemplate exists but binding is incomplete (missing params: include_defaults,master_timeout) |
-| `indices.get_mapping` | not-implemented | stable | public | IndicesService.GetMapping exists but binding is incomplete (missing params: master_timeout) |
-| `indices.get_settings` | not-implemented | stable | public | IndicesService.GetSettings exists but binding is incomplete (missing params: master_timeout) |
-| `indices.get_template` | not-implemented | stable | public | IndicesService.GetTemplate exists but binding is incomplete (missing params: master_timeout) |
-| `indices.migrate_to_data_stream` | not-implemented | stable | public | IndicesService.MigrateToDataStream exists but binding is incomplete (missing params: timeout,master_timeout) |
-| `indices.promote_data_stream` | not-implemented | stable | public | IndicesService.PromoteDataStream exists but binding is incomplete (missing params: master_timeout) |
 | `indices.put_data_lifecycle` | not-implemented | stable | public | no IndicesService.PutDataLifecycle method |
-| `indices.put_index_template` | not-implemented | stable | public | IndicesService.PutIndexTemplate exists but binding is incomplete (missing params: master_timeout) |
-| `indices.put_mapping` | not-implemented | stable | public | IndicesService.PutMapping exists but binding is incomplete (missing params: master_timeout) |
-| `indices.put_settings` | not-implemented | stable | public | IndicesService.PutSettings exists but binding is incomplete (missing params: master_timeout,reopen) |
-| `indices.put_template` | not-implemented | stable | public | IndicesService.PutTemplate exists but binding is incomplete (missing params: cause,master_timeout) |
-| `indices.reload_search_analyzers` | not-implemented | stable | public | IndicesService.ReloadSearchAnalyzers exists but binding is incomplete (missing params: resource) |
-| `indices.resolve_cluster` | not-implemented | stable | public | IndicesService.ResolveCluster exists but binding is incomplete (missing params: ignore_throttled,timeout) |
-| `indices.rollover` | not-implemented | stable | public | IndicesService.Rollover exists but binding is incomplete (missing params: master_timeout,lazy) |
-| `indices.update_aliases` | not-implemented | stable | public | IndicesService.UpdateAliases exists but binding is incomplete (missing params: master_timeout) |
 
 ### inference
 

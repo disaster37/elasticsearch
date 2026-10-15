@@ -1,5 +1,7 @@
 package api
 
+import "github.com/disaster37/elasticsearch/v9/types"
+
 // AsyncSearchStatusParams are the opt-in query parameters for
 // async_search.status. The original Status method has no carrier, so callers
 // that need the keep_alive parameter use
@@ -202,4 +204,18 @@ type SecurityPutUserRequest struct {
 	Username string
 	Body     any
 	Params   *SecurityRefreshSpecParams
+}
+
+// IndicesForceMergeRequest is the opt-in request for indices.forcemerge. When
+// Params.WaitForCompletion is false the response carries a task id.
+type IndicesForceMergeRequest struct {
+	Indices []string
+	Params  *IndicesForceMergeParams
+}
+
+// IndicesForceMergeSpecResponse retains both the synchronous shard results and
+// the asynchronous task id from the forcemerge response.
+type IndicesForceMergeSpecResponse struct {
+	types.BroadcastResponse
+	Task string `json:"task,omitempty"`
 }
