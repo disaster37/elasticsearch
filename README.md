@@ -127,6 +127,12 @@ and request structs. Downstream code that uses **keyed** composite literals
 Code that uses **unkeyed** composite literals may need to add field names, as
 the new fields shift positional order; keyed literals are recommended.
 
+`api.SnapshotInfo.VersionId` changed from `string` to `int64` to match the
+Elasticsearch 9 wire format, which serializes `version_id` as a JSON number
+(and always has). The previous `string` type could never unmarshal a real
+response, so this is a bug fix; any downstream code that referenced the field
+as a string needs a compile-time type adjustment.
+
 ## Query DSL
 
 Use the `querydsl` package to build type-safe queries:
