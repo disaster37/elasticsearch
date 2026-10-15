@@ -1964,6 +1964,18 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultMlService.DeleteDatafeed route /_ml/datafeeds/%s",
 	},
+	"ml.delete_job": {
+		Service:      "MlService",
+		Method:       "DeleteJob",
+		ParamsStruct: "api.MlDeleteJobParams",
+		ParamsFields: []string{"Common", "DeleteUserAnnotations", "Force", "WaitForCompletion"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"job_id"},
+		PathSources: map[string]ValueSource{
+			"job_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultMlService.DeleteJob DELETE /_ml/anomaly_detectors/{job_id}",
+	},
 	"ml.flush_job": {
 		Service:      "MlService",
 		Method:       "FlushJob",
@@ -2047,6 +2059,42 @@ var Registry = map[string]EndpointImpl{
 			"job_id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultMlService.OpenJob route /_ml/anomaly_detectors/%s/_open",
+	},
+	"ml.put_datafeed": {
+		Service:      "MlServiceSpecExtensions",
+		Method:       "PutDatafeedWithRequest",
+		ParamsStruct: "api.MlPutSpecParams",
+		ParamsFields: []string{"AllowNoIndices", "Common", "ExpandWildcards", "IgnoreThrottled", "IgnoreUnavailable"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"datafeed_id"},
+		PathSources: map[string]ValueSource{
+			"datafeed_id": ValueSource{Argument: 1, Field: "DatafeedID"},
+		},
+		Evidence: "DefaultMlService.PutDatafeedWithRequest PUT /_ml/datafeeds/{datafeed_id}",
+	},
+	"ml.put_job": {
+		Service:      "MlServiceSpecExtensions",
+		Method:       "PutJobWithRequest",
+		ParamsStruct: "api.MlPutSpecParams",
+		ParamsFields: []string{"AllowNoIndices", "Common", "ExpandWildcards", "IgnoreThrottled", "IgnoreUnavailable"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"job_id"},
+		PathSources: map[string]ValueSource{
+			"job_id": ValueSource{Argument: 1, Field: "JobID"},
+		},
+		Evidence: "DefaultMlService.PutJobWithRequest PUT /_ml/anomaly_detectors/{job_id}",
+	},
+	"ml.reset_job": {
+		Service:      "MlService",
+		Method:       "ResetJob",
+		ParamsStruct: "api.MlResetJobParams",
+		ParamsFields: []string{"Common", "DeleteUserAnnotations", "WaitForCompletion"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"job_id"},
+		PathSources: map[string]ValueSource{
+			"job_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultMlService.ResetJob POST /_ml/anomaly_detectors/{job_id}/_reset",
 	},
 	"ml.start_datafeed": {
 		Service:      "MlService",
@@ -2144,6 +2192,20 @@ var Registry = map[string]EndpointImpl{
 			"node_id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultNodesService.ReloadSecureSettings route /_nodes/%s/reload_secure_settings",
+	},
+	"nodes.stats": {
+		Service:      "NodesService",
+		Method:       "Stats",
+		ParamsStruct: "api.NodesStatsParams",
+		ParamsFields: []string{"Common", "CompletionFields", "FielddataFields", "Fields", "Groups", "IncludeSegmentFileSizes", "IncludeUnloadedSegments", "Level", "Timeout", "Types"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"index_metric", "metric", "node_id"},
+		PathSources: map[string]ValueSource{
+			"index_metric": ValueSource{Argument: 1, Field: "IndexMetrics"},
+			"metric":       ValueSource{Argument: 1, Field: "Metrics"},
+			"node_id":      ValueSource{Argument: 1, Field: "NodeIds"},
+		},
+		Evidence: "DefaultNodesService.Stats GET /_nodes/{node_id}/stats/{metric}/{index_metric}",
 	},
 	"nodes.usage": {
 		Service:      "NodesService",
@@ -2341,6 +2403,14 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultSearchApplicationService.GetBehavioralAnalytics route /_application/analytics/%s",
 	},
+	"search_application.list": {
+		Service:      "SearchApplicationService",
+		Method:       "List",
+		ParamsStruct: "api.SearchApplicationListParams",
+		ParamsFields: []string{"Common", "From", "Q", "Size"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultSearchApplicationService.List GET /_application/search_application",
+	},
 	"search_application.put": {
 		Service:      "SearchApplicationService",
 		Method:       "Put",
@@ -2361,6 +2431,18 @@ var Registry = map[string]EndpointImpl{
 			"name": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultSearchApplicationService.PutBehavioralAnalytics route /_application/analytics/%s",
+	},
+	"search_application.search": {
+		Service:      "SearchApplicationServiceSpecExtensions",
+		Method:       "SearchWithRequest",
+		ParamsStruct: "api.SearchApplicationSearchSpecParams",
+		ParamsFields: []string{"Common", "TypedKeys"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"name"},
+		PathSources: map[string]ValueSource{
+			"name": ValueSource{Argument: 1, Field: "Name"},
+		},
+		Evidence: "DefaultSearchApplicationService.SearchWithRequest POST /_application/search_application/{name}/_search",
 	},
 	"search_mvt": {
 		Service:      "SearchService",
@@ -2410,6 +2492,34 @@ var Registry = map[string]EndpointImpl{
 			"node_id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultSearchableSnapshotsService.CacheStats route /_searchable_snapshots/cache/stats/%s",
+	},
+	"searchable_snapshots.clear_cache": {
+		Service:      "SearchableSnapshotsServiceSpecExtensions",
+		Method:       "ClearCacheWithParams",
+		ParamsStruct: "api.SearchableSnapshotsClearCacheSpecParams",
+		ParamsFields: []string{"AllowNoIndices", "Common", "ExpandWildcards", "IgnoreUnavailable"},
+		ParamsSource: &ValueSource{Argument: 2},
+		QueryArgs: map[string]ValueSource{
+			"index": ValueSource{Argument: 1},
+		},
+		PathParts: []string{"index"},
+		PathSources: map[string]ValueSource{
+			"index": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultSearchableSnapshotsService.ClearCacheWithParams POST /{index}/_searchable_snapshots/cache/clear (index also emitted as query)",
+	},
+	"searchable_snapshots.mount": {
+		Service:      "SearchableSnapshotsService",
+		Method:       "Mount",
+		ParamsStruct: "api.SearchableSnapshotsMountParams",
+		ParamsFields: []string{"Common", "MasterTimeout", "Storage", "WaitForActiveShards", "WaitForCompletion"},
+		ParamsSource: &ValueSource{Argument: 4},
+		PathParts:    []string{"repository", "snapshot"},
+		PathSources: map[string]ValueSource{
+			"repository": ValueSource{Argument: 1},
+			"snapshot":   ValueSource{Argument: 2},
+		},
+		Evidence: "DefaultSearchableSnapshotsService.Mount POST /_snapshot/{repository}/{snapshot}/_mount",
 	},
 	"searchable_snapshots.stats": {
 		Service:      "SearchableSnapshotsService",
@@ -3069,6 +3179,18 @@ var Registry = map[string]EndpointImpl{
 		ParamsSource: &ValueSource{Argument: 2},
 		Evidence:     "DefaultTextStructureService.TestGrokPattern route /_text_structure/test_grok_pattern",
 	},
+	"transform.delete_transform": {
+		Service:      "TransformService",
+		Method:       "Delete",
+		ParamsStruct: "api.TransformDeleteParams",
+		ParamsFields: []string{"Common", "DeleteDestIndex", "Force", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"transform_id"},
+		PathSources: map[string]ValueSource{
+			"transform_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultTransformService.Delete DELETE /_transform/{transform_id}",
+	},
 	"transform.get_node_stats": {
 		Service:  "TransformService",
 		Method:   "GetNodeStats",
@@ -3133,6 +3255,30 @@ var Registry = map[string]EndpointImpl{
 			"transform_id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultTransformService.Reset route /_transform/%s/_reset",
+	},
+	"transform.schedule_now_transform": {
+		Service:      "TransformServiceSpecExtensions",
+		Method:       "ScheduleNowWithParams",
+		ParamsStruct: "api.TimeoutSpecParams",
+		ParamsFields: []string{"Common", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"transform_id"},
+		PathSources: map[string]ValueSource{
+			"transform_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultTransformService.ScheduleNowWithParams POST /_transform/{transform_id}/_schedule_now",
+	},
+	"transform.start_transform": {
+		Service:      "TransformService",
+		Method:       "Start",
+		ParamsStruct: "api.TransformStartParams",
+		ParamsFields: []string{"Common", "From", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"transform_id"},
+		PathSources: map[string]ValueSource{
+			"transform_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultTransformService.Start POST /_transform/{transform_id}/_start",
 	},
 	"transform.stop_transform": {
 		Service:      "TransformService",
@@ -3256,6 +3402,14 @@ var Registry = map[string]EndpointImpl{
 		ParamsFields: []string{"Common", "MasterTimeout"},
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultWatcherService.StopWithParams POST /_watcher/_stop",
+	},
+	"xpack.info": {
+		Service:      "XpackService",
+		Method:       "Info",
+		ParamsStruct: "api.XpackInfoParams",
+		ParamsFields: []string{"AcceptEnterprise", "Categories", "Common", "Human"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultXpackService.Info GET /_xpack",
 	},
 	"xpack.usage": {
 		Service:      "XpackServiceSpecExtensions",

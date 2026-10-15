@@ -321,3 +321,33 @@ func TestUnitNodesReloadSecureSettingsNetworkError(t *testing.T) {
 	_, err := svc.ReloadSecureSettings(context.Background(), nil, nil, &NodesReloadSecureSettingsParams{})
 	assert.Error(t, err)
 }
+
+func TestUnitNodesB9Stats(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewNodesService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	cases := []struct {
+		name  string
+		req   *NodesStatsRequest
+		path  string
+		query map[string]string
+	}{
+		{"all", &NodesStatsRequest{Params: &NodesStatsParams{IncludeUnloadedSegments: ptrBool(true)}}, "/_nodes/stats", map[string]string{"include_unloaded_segments": "true"}},
+		{"node", &NodesStatsRequest{NodeIds: []string{"n1"}, Params: &NodesStatsParams{}}, "/_nodes/n1/stats", map[string]string{}},
+		{"metric", &NodesStatsRequest{Metrics: []string{"jvm"}, Params: &NodesStatsParams{}}, "/_nodes/stats/jvm", map[string]string{}},
+		{"index_metric", &NodesStatsRequest{Metrics: []string{"indices"}, IndexMetrics: []string{"docs"}, Params: &NodesStatsParams{}}, "/_nodes/stats/indices/docs", map[string]string{}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			_, err := svc.Stats(ctx, tc.req)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}

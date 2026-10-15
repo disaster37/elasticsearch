@@ -86,3 +86,17 @@ func TestUnitXpackUsageNetworkError(t *testing.T) {
 	_, err := svc.Usage(context.Background())
 	assert.Error(t, err)
 }
+
+func TestUnitXpackB9InfoParams(t *testing.T) {
+	var gotQuery map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotQuery = queryMap(r)
+		jsonResponse(w, 200, `{"build":{},"license":{},"features":{},"tagline":""}`)
+	}))
+	defer srv.Close()
+	svc := NewXpackService(restyClient(srv), testLogger())
+	_, err := svc.Info(context.Background(), &XpackInfoParams{Human: ptrBool(true), AcceptEnterprise: ptrBool(true)})
+	assert.NoError(t, err)
+	assert.Equal(t, "true", gotQuery["human"])
+	assert.Equal(t, "true", gotQuery["accept_enterprise"])
+}

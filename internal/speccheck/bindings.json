@@ -2813,6 +2813,23 @@
     "evidence": "DefaultMlService.DeleteDatafeed route /_ml/datafeeds/%s"
   },
   {
+    "name": "ml.delete_job",
+    "service": "MlService",
+    "method": "DeleteJob",
+    "paramsStruct": "api.MlDeleteJobParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.DeleteJob DELETE /_ml/anomaly_detectors/{job_id}"
+  },
+  {
     "name": "ml.flush_job",
     "service": "MlService",
     "method": "FlushJob",
@@ -2930,6 +2947,57 @@
       }
     },
     "evidence": "DefaultMlService.OpenJob route /_ml/anomaly_detectors/%s/_open"
+  },
+  {
+    "name": "ml.put_datafeed",
+    "service": "MlServiceSpecExtensions",
+    "method": "PutDatafeedWithRequest",
+    "paramsStruct": "api.MlPutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": "DatafeedID"
+      }
+    },
+    "evidence": "DefaultMlService.PutDatafeedWithRequest PUT /_ml/datafeeds/{datafeed_id}"
+  },
+  {
+    "name": "ml.put_job",
+    "service": "MlServiceSpecExtensions",
+    "method": "PutJobWithRequest",
+    "paramsStruct": "api.MlPutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": "JobID"
+      }
+    },
+    "evidence": "DefaultMlService.PutJobWithRequest PUT /_ml/anomaly_detectors/{job_id}"
+  },
+  {
+    "name": "ml.reset_job",
+    "service": "MlService",
+    "method": "ResetJob",
+    "paramsStruct": "api.MlResetJobParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.ResetJob POST /_ml/anomaly_detectors/{job_id}/_reset"
   },
   {
     "name": "ml.start_datafeed",
@@ -3070,6 +3138,31 @@
       }
     },
     "evidence": "DefaultNodesService.ReloadSecureSettings route /_nodes/%s/reload_secure_settings"
+  },
+  {
+    "name": "nodes.stats",
+    "service": "NodesService",
+    "method": "Stats",
+    "paramsStruct": "api.NodesStatsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": "NodeIds"
+      },
+      "metric": {
+        "argument": 1,
+        "field": "Metrics"
+      },
+      "index_metric": {
+        "argument": 1,
+        "field": "IndexMetrics"
+      }
+    },
+    "evidence": "DefaultNodesService.Stats GET /_nodes/{node_id}/stats/{metric}/{index_metric}"
   },
   {
     "name": "nodes.usage",
@@ -3346,6 +3439,17 @@
     "evidence": "DefaultSearchApplicationService.GetBehavioralAnalytics route /_application/analytics/%s"
   },
   {
+    "name": "search_application.list",
+    "service": "SearchApplicationService",
+    "method": "List",
+    "paramsStruct": "api.SearchApplicationListParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSearchApplicationService.List GET /_application/search_application"
+  },
+  {
     "name": "search_application.put",
     "service": "SearchApplicationService",
     "method": "Put",
@@ -3373,6 +3477,23 @@
       }
     },
     "evidence": "DefaultSearchApplicationService.PutBehavioralAnalytics route /_application/analytics/%s"
+  },
+  {
+    "name": "search_application.search",
+    "service": "SearchApplicationServiceSpecExtensions",
+    "method": "SearchWithRequest",
+    "paramsStruct": "api.SearchApplicationSearchSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.SearchWithRequest POST /_application/search_application/{name}/_search"
   },
   {
     "name": "search_mvt",
@@ -3452,6 +3573,50 @@
       }
     },
     "evidence": "DefaultSearchableSnapshotsService.CacheStats route /_searchable_snapshots/cache/stats/%s"
+  },
+  {
+    "name": "searchable_snapshots.clear_cache",
+    "service": "SearchableSnapshotsServiceSpecExtensions",
+    "method": "ClearCacheWithParams",
+    "paramsStruct": "api.SearchableSnapshotsClearCacheSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchableSnapshotsService.ClearCacheWithParams POST /{index}/_searchable_snapshots/cache/clear (index also emitted as query)"
+  },
+  {
+    "name": "searchable_snapshots.mount",
+    "service": "SearchableSnapshotsService",
+    "method": "Mount",
+    "paramsStruct": "api.SearchableSnapshotsMountParams",
+    "paramsSource": {
+      "argument": 4,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      },
+      "snapshot": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchableSnapshotsService.Mount POST /_snapshot/{repository}/{snapshot}/_mount"
   },
   {
     "name": "searchable_snapshots.stats",
@@ -4391,6 +4556,23 @@
     "evidence": "DefaultTextStructureService.TestGrokPattern route /_text_structure/test_grok_pattern"
   },
   {
+    "name": "transform.delete_transform",
+    "service": "TransformService",
+    "method": "Delete",
+    "paramsStruct": "api.TransformDeleteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Delete DELETE /_transform/{transform_id}"
+  },
+  {
     "name": "transform.get_node_stats",
     "service": "TransformService",
     "method": "GetNodeStats",
@@ -4480,6 +4662,40 @@
       }
     },
     "evidence": "DefaultTransformService.Reset route /_transform/%s/_reset"
+  },
+  {
+    "name": "transform.schedule_now_transform",
+    "service": "TransformServiceSpecExtensions",
+    "method": "ScheduleNowWithParams",
+    "paramsStruct": "api.TimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.ScheduleNowWithParams POST /_transform/{transform_id}/_schedule_now"
+  },
+  {
+    "name": "transform.start_transform",
+    "service": "TransformService",
+    "method": "Start",
+    "paramsStruct": "api.TransformStartParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Start POST /_transform/{transform_id}/_start"
   },
   {
     "name": "transform.stop_transform",
@@ -4655,6 +4871,17 @@
       "field": ""
     },
     "evidence": "DefaultWatcherService.StopWithParams POST /_watcher/_stop"
+  },
+  {
+    "name": "xpack.info",
+    "service": "XpackService",
+    "method": "Info",
+    "paramsStruct": "api.XpackInfoParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultXpackService.Info GET /_xpack"
   },
   {
     "name": "xpack.usage",

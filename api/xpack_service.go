@@ -10,8 +10,10 @@ import (
 
 // XpackInfoParams are the query parameters for GET /_xpack.
 type XpackInfoParams struct {
-	Common     *CommonParams
-	Categories []string
+	Common           *CommonParams
+	AcceptEnterprise *bool
+	Categories       []string
+	Human            *bool
 }
 
 // ToMap converts XpackInfoParams to a query-parameter map.
@@ -20,7 +22,9 @@ func (p *XpackInfoParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "accept_enterprise", p.AcceptEnterprise)
 	setListParam(m, "categories", p.Categories)
+	setBoolParam(m, "human", p.Human)
 	return mergeParams(m, p.Common)
 }
 

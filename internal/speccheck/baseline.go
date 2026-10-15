@@ -603,13 +603,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ml",
 	},
-	"ml.delete_job": {
-		Status:     "not-implemented",
-		Reason:     "MlService.DeleteJob exists but binding is incomplete (missing params: delete_user_annotations)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ml",
-	},
 	"ml.delete_model_snapshot": {
 		Status:     "not-implemented",
 		Reason:     "no MlService.DeleteModelSnapshot method",
@@ -820,23 +813,9 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ml",
 	},
-	"ml.put_datafeed": {
-		Status:     "not-implemented",
-		Reason:     "MlService.PutDatafeed exists but binding is incomplete (missing params: ignore_unavailable,allow_no_indices,ignore_throttled,expand_wildcards)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ml",
-	},
 	"ml.put_filter": {
 		Status:     "not-implemented",
 		Reason:     "no MlService.PutFilter method",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ml",
-	},
-	"ml.put_job": {
-		Status:     "not-implemented",
-		Reason:     "MlService.PutJob exists but binding is incomplete (missing params: ignore_unavailable,allow_no_indices,ignore_throttled,expand_wildcards)",
 		Stability:  "stable",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ml",
@@ -865,13 +844,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 	"ml.put_trained_model_vocabulary": {
 		Status:     "not-implemented",
 		Reason:     "no MlService.PutTrainedModelVocabulary method",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ml",
-	},
-	"ml.reset_job": {
-		Status:     "not-implemented",
-		Reason:     "MlService.ResetJob exists but binding is incomplete (missing params: delete_user_annotations)",
 		Stability:  "stable",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ml",
@@ -981,13 +953,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-nodes",
 	},
-	"nodes.stats": {
-		Status:     "not-implemented",
-		Reason:     "NodesService.Stats exists but binding is incomplete (missing params: include_unloaded_segments)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-nodes",
-	},
 	"query_rules.delete_rule": {
 		Status:     "not-implemented",
 		Reason:     "no QueryRulesService.DeleteRule method",
@@ -1065,13 +1030,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-rollup",
 	},
-	"search_application.list": {
-		Status:     "not-implemented",
-		Reason:     "SearchApplicationService.List exists but binding is incomplete (missing params: q)",
-		Stability:  "experimental",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-search_application",
-	},
 	"search_application.post_behavioral_analytics_event": {
 		Status:     "not-implemented",
 		Reason:     "no SearchApplicationService.PostBehavioralAnalyticsEvent method",
@@ -1085,27 +1043,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Stability:  "experimental",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-search_application",
-	},
-	"search_application.search": {
-		Status:     "not-implemented",
-		Reason:     "SearchApplicationService.Search exists but binding is incomplete (missing params: typed_keys)",
-		Stability:  "experimental",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-search_application",
-	},
-	"searchable_snapshots.clear_cache": {
-		Status:     "not-implemented",
-		Reason:     "SearchableSnapshotsService.ClearCache exists but binding is incomplete (missing params: ignore_unavailable,allow_no_indices,expand_wildcards)",
-		Stability:  "experimental",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-searchable_snapshots",
-	},
-	"searchable_snapshots.mount": {
-		Status:     "not-implemented",
-		Reason:     "SearchableSnapshotsService.Mount exists but binding is incomplete (missing params: master_timeout,storage)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-searchable_snapshots",
 	},
 	"security.bulk_delete_role": {
 		Status:     "not-implemented",
@@ -1373,27 +1310,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-text_structure",
 	},
-	"transform.delete_transform": {
-		Status:     "not-implemented",
-		Reason:     "TransformService.Delete exists but binding is incomplete (missing params: delete_dest_index)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-transform",
-	},
-	"transform.schedule_now_transform": {
-		Status:     "not-implemented",
-		Reason:     "TransformService.ScheduleNow exists but binding is incomplete (missing params: timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-transform",
-	},
-	"transform.start_transform": {
-		Status:     "not-implemented",
-		Reason:     "TransformService.Start exists but binding is incomplete (missing params: from)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-transform",
-	},
 	"transform.update_transform": {
 		Status:     "not-implemented",
 		Reason:     "no TransformService.UpdateTransform method",
@@ -1442,13 +1358,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Stability:  "stable",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-watcher",
-	},
-	"xpack.info": {
-		Status:     "not-implemented",
-		Reason:     "XpackService.Info exists but binding is incomplete (missing params: human,accept_enterprise)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-xpack",
 	},
 }
 

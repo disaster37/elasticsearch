@@ -45,6 +45,7 @@ type NodesStatsParams struct {
 	Fields                  []string
 	Groups                  []string
 	IncludeSegmentFileSizes *bool
+	IncludeUnloadedSegments *bool
 	Level                   Level
 	Timeout                 string
 	Types                   []string
@@ -61,6 +62,7 @@ func (p *NodesStatsParams) ToMap() map[string]string {
 	setListParam(m, "fields", p.Fields)
 	setListParam(m, "groups", p.Groups)
 	setBoolParam(m, "include_segment_file_sizes", p.IncludeSegmentFileSizes)
+	setBoolParam(m, "include_unloaded_segments", p.IncludeUnloadedSegments)
 	if p.Level != "" {
 		m["level"] = string(p.Level)
 	}

@@ -244,3 +244,90 @@ type MtermvectorsSpecRequest struct {
 	Body   any
 	Params *MtermvectorsSpecParams
 }
+
+// MlPutSpecParams are the shared opt-in query parameters for ml.put_job and
+// ml.put_datafeed.
+type MlPutSpecParams struct {
+	Common            *CommonParams
+	AllowNoIndices    *bool
+	ExpandWildcards   ExpandWildcards
+	IgnoreThrottled   *bool
+	IgnoreUnavailable *bool
+}
+
+// ToMap converts MlPutSpecParams to a query-parameter map.
+func (p *MlPutSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	setBoolParam(m, "allow_no_indices", p.AllowNoIndices)
+	if p.ExpandWildcards != "" {
+		m["expand_wildcards"] = string(p.ExpandWildcards)
+	}
+	setBoolParam(m, "ignore_throttled", p.IgnoreThrottled)
+	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	return mergeParams(m, p.Common)
+}
+
+// MlPutJobSpecRequest is the opt-in request for ml.put_job.
+type MlPutJobSpecRequest struct {
+	JobID  string
+	Body   any
+	Params *MlPutSpecParams
+}
+
+// MlPutDatafeedSpecRequest is the opt-in request for ml.put_datafeed.
+type MlPutDatafeedSpecRequest struct {
+	DatafeedID string
+	Body       any
+	Params     *MlPutSpecParams
+}
+
+// SearchableSnapshotsClearCacheSpecParams are the opt-in query parameters for
+// searchable_snapshots.clear_cache.
+type SearchableSnapshotsClearCacheSpecParams struct {
+	Common            *CommonParams
+	AllowNoIndices    *bool
+	ExpandWildcards   ExpandWildcards
+	IgnoreUnavailable *bool
+}
+
+// ToMap converts SearchableSnapshotsClearCacheSpecParams to a query-parameter map.
+func (p *SearchableSnapshotsClearCacheSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	setBoolParam(m, "allow_no_indices", p.AllowNoIndices)
+	if p.ExpandWildcards != "" {
+		m["expand_wildcards"] = string(p.ExpandWildcards)
+	}
+	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	return mergeParams(m, p.Common)
+}
+
+// SearchApplicationSearchSpecParams are the opt-in query parameters for
+// search_application.search.
+type SearchApplicationSearchSpecParams struct {
+	Common    *CommonParams
+	TypedKeys *bool
+}
+
+// ToMap converts SearchApplicationSearchSpecParams to a query-parameter map.
+func (p *SearchApplicationSearchSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	setBoolParam(m, "typed_keys", p.TypedKeys)
+	return mergeParams(m, p.Common)
+}
+
+// SearchApplicationSearchSpecRequest is the opt-in request for
+// search_application.search.
+type SearchApplicationSearchSpecRequest struct {
+	Name   string
+	Body   any
+	Params *SearchApplicationSearchSpecParams
+}

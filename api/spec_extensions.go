@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	json "github.com/goccy/go-json"
 
+	"github.com/disaster37/elasticsearch/v9/querydsl"
 	"github.com/disaster37/elasticsearch/v9/types"
 )
 
@@ -776,4 +778,116 @@ func AsLicenseServiceSpecExtensions(service LicenseService) (LicenseServiceSpecE
 func (s *DefaultLicenseService) DeleteWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
 	var result types.AcknowledgedResponse
 	return &result, doReq(s.logger, ctx, s.client, "DELETE", "/_license", nil, params, &result)
+}
+
+// MlServiceSpecExtensions exposes the opt-in ML put carriers. Obtain it with
+// [AsMlServiceSpecExtensions].
+type MlServiceSpecExtensions interface {
+	PutJobWithRequest(ctx context.Context, req *MlPutJobSpecRequest) (*MlJobConfig, error)
+	PutDatafeedWithRequest(ctx context.Context, req *MlPutDatafeedSpecRequest) (*MlDatafeedConfig, error)
+}
+
+var _ MlServiceSpecExtensions = (*DefaultMlService)(nil)
+
+// AsMlServiceSpecExtensions adapts an MlService to its extension interface.
+func AsMlServiceSpecExtensions(service MlService) (MlServiceSpecExtensions, error) {
+	return asSpecExtensions[MlServiceSpecExtensions]("ml", service)
+}
+
+func (s *DefaultMlService) PutJobWithRequest(ctx context.Context, req *MlPutJobSpecRequest) (*MlJobConfig, error) {
+	if req == nil || req.JobID == "" {
+		return nil, fmt.Errorf("job_id is required")
+	}
+	var result MlJobConfig
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_ml/anomaly_detectors/%s", pathSegment(req.JobID)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultMlService) PutDatafeedWithRequest(ctx context.Context, req *MlPutDatafeedSpecRequest) (*MlDatafeedConfig, error) {
+	if req == nil || req.DatafeedID == "" {
+		return nil, fmt.Errorf("datafeed_id is required")
+	}
+	var result MlDatafeedConfig
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_ml/datafeeds/%s", pathSegment(req.DatafeedID)), req.Body, req.Params, &result)
+}
+
+// SearchableSnapshotsServiceSpecExtensions exposes the opt-in clear-cache
+// carrier. Obtain it with [AsSearchableSnapshotsServiceSpecExtensions].
+type SearchableSnapshotsServiceSpecExtensions interface {
+	ClearCacheWithParams(ctx context.Context, indices []string, params *SearchableSnapshotsClearCacheSpecParams) (*types.AcknowledgedResponse, error)
+}
+
+var _ SearchableSnapshotsServiceSpecExtensions = (*DefaultSearchableSnapshotsService)(nil)
+
+// AsSearchableSnapshotsServiceSpecExtensions adapts a SearchableSnapshotsService
+// to its extension interface.
+func AsSearchableSnapshotsServiceSpecExtensions(service SearchableSnapshotsService) (SearchableSnapshotsServiceSpecExtensions, error) {
+	return asSpecExtensions[SearchableSnapshotsServiceSpecExtensions]("searchable_snapshots", service)
+}
+
+func (s *DefaultSearchableSnapshotsService) ClearCacheWithParams(ctx context.Context, indices []string, params *SearchableSnapshotsClearCacheSpecParams) (*types.AcknowledgedResponse, error) {
+	r, err := buildRequest(s.client, ctx, nil, params)
+	if err != nil {
+		return nil, err
+	}
+	path := "/_searchable_snapshots/cache/clear"
+	if len(indices) > 0 {
+		path = fmt.Sprintf("/%s/_searchable_snapshots/cache/clear", escapedList(indices))
+		r.SetQueryParam("index", strings.Join(indices, ","))
+	}
+	resp, err := r.Post(path)
+	if err != nil {
+		return nil, wrapNetworkError(s.logger, err)
+	}
+	if resp.IsError() {
+		return nil, logAndReturnError(s.logger, resp)
+	}
+	var result types.AcknowledgedResponse
+	if err := json.Unmarshal(resp.Body(), &result); err != nil {
+		return nil, wrapUnmarshalError(s.logger, resp, err)
+	}
+	return &result, nil
+}
+
+// TransformServiceSpecExtensions exposes the opt-in schedule-now carrier.
+// Obtain it with [AsTransformServiceSpecExtensions].
+type TransformServiceSpecExtensions interface {
+	ScheduleNowWithParams(ctx context.Context, transformId string, params *TimeoutSpecParams) (*types.AcknowledgedResponse, error)
+}
+
+var _ TransformServiceSpecExtensions = (*DefaultTransformService)(nil)
+
+// AsTransformServiceSpecExtensions adapts a TransformService to its extension
+// interface.
+func AsTransformServiceSpecExtensions(service TransformService) (TransformServiceSpecExtensions, error) {
+	return asSpecExtensions[TransformServiceSpecExtensions]("transform", service)
+}
+
+func (s *DefaultTransformService) ScheduleNowWithParams(ctx context.Context, transformId string, params *TimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if transformId == "" {
+		return nil, fmt.Errorf("transform_id is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_transform/%s/_schedule_now", pathSegment(transformId)), nil, params, &result)
+}
+
+// SearchApplicationServiceSpecExtensions exposes the opt-in search carrier.
+// Obtain it with [AsSearchApplicationServiceSpecExtensions].
+type SearchApplicationServiceSpecExtensions interface {
+	SearchWithRequest(ctx context.Context, req *SearchApplicationSearchSpecRequest) (*querydsl.SearchResult, error)
+}
+
+var _ SearchApplicationServiceSpecExtensions = (*DefaultSearchApplicationService)(nil)
+
+// AsSearchApplicationServiceSpecExtensions adapts a SearchApplicationService to
+// its extension interface.
+func AsSearchApplicationServiceSpecExtensions(service SearchApplicationService) (SearchApplicationServiceSpecExtensions, error) {
+	return asSpecExtensions[SearchApplicationServiceSpecExtensions]("search_application", service)
+}
+
+func (s *DefaultSearchApplicationService) SearchWithRequest(ctx context.Context, req *SearchApplicationSearchSpecRequest) (*querydsl.SearchResult, error) {
+	if req == nil || req.Name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result querydsl.SearchResult
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_application/search_application/%s/_search", pathSegment(req.Name)), req.Body, req.Params, &result)
 }

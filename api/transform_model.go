@@ -94,9 +94,10 @@ func (p *TransformPreviewParams) ToMap() map[string]string {
 
 // TransformDeleteParams are the query parameters for transform delete.
 type TransformDeleteParams struct {
-	Common  *CommonParams
-	Force   *bool
-	Timeout string
+	Common          *CommonParams
+	DeleteDestIndex *bool
+	Force           *bool
+	Timeout         string
 }
 
 // ToMap converts TransformDeleteParams to a query-parameter map.
@@ -105,6 +106,7 @@ func (p *TransformDeleteParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "delete_dest_index", p.DeleteDestIndex)
 	setBoolParam(m, "force", p.Force)
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
@@ -115,6 +117,7 @@ func (p *TransformDeleteParams) ToMap() map[string]string {
 // TransformStartParams are the query parameters for transform start.
 type TransformStartParams struct {
 	Common  *CommonParams
+	From    string
 	Timeout string
 }
 
@@ -124,6 +127,9 @@ func (p *TransformStartParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.From != "" {
+		m["from"] = p.From
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}

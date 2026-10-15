@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 306 |
-| Known-missing (baselined) endpoints | 206 |
+| Registered implementations | 319 |
+| Known-missing (baselined) endpoints | 193 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -78,6 +78,7 @@ number, not a claim of full REST implementation equivalence.
 | snapshot carriers + `SnapshotService.Get` | direct `MasterTimeout`/paging additions; `snapshot.get` empty selector now routes to `/_snapshot/{repository}/_all` (B6) | `master_timeout`, `order`, `sort`, `size`, `offset`, `after`, `from_sort_value`, `verbose`, `index_names`, `slm_policy_filter` |
 | document/search/async/eql carriers; `DocumentService.Create` | direct fields added; `Create` route corrected to `PUT /{index}/_create/{id}`; new `DocumentServiceSpecExtensions.MultiTermVectorsWithRequest` and `EqlServiceSpecExtensions.GetWithParams` (B7) | `routing`, `require_data_stream`, `include_source_on_error`, `wait_for_active_shards`, `allow_no_indices`, `ids`, `docvalue_fields`, etc. |
 | ingest/script/license/health carriers; `ScriptService.Put` | direct `MasterTimeout` additions; optional path `/{context}`; new `LicenseServiceSpecExtensions.DeleteWithParams` (B8) | `master_timeout`, `accept_enterprise`, `timeout` |
+| ml/searchable_snapshots/transform/search_application/nodes/xpack carriers | direct fields added; new `MlServiceSpecExtensions`, `SearchableSnapshotsServiceSpecExtensions`, `TransformServiceSpecExtensions`, `SearchApplicationServiceSpecExtensions` (B9) | `delete_user_annotations`, `storage`, `typed_keys`, `from`, `include_unloaded_segments`, `human` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -352,7 +353,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 | `ml.delete_expired_data` | not-implemented | stable | public | no MlService.DeleteExpiredData method |
 | `ml.delete_filter` | not-implemented | stable | public | no MlService.DeleteFilter method |
 | `ml.delete_forecast` | not-implemented | stable | public | no MlService.DeleteForecast method |
-| `ml.delete_job` | not-implemented | stable | public | MlService.DeleteJob exists but binding is incomplete (missing params: delete_user_annotations) |
 | `ml.delete_model_snapshot` | not-implemented | stable | public | no MlService.DeleteModelSnapshot method |
 | `ml.delete_trained_model` | not-implemented | stable | public | no MlService.DeleteTrainedModel method |
 | `ml.delete_trained_model_alias` | not-implemented | stable | public | no MlService.DeleteTrainedModelAlias method |
@@ -383,14 +383,11 @@ with its exact reason. The authoritative map is `baseline.go`.
 | `ml.put_calendar` | not-implemented | stable | public | no MlService.PutCalendar method |
 | `ml.put_calendar_job` | not-implemented | stable | public | no MlService.PutCalendarJob method |
 | `ml.put_data_frame_analytics` | not-implemented | stable | public | no MlService.PutDataFrameAnalytics method |
-| `ml.put_datafeed` | not-implemented | stable | public | MlService.PutDatafeed exists but binding is incomplete (missing params: ignore_unavailable,allow_no_indices,ignore_throttled,expand_wildcards) |
 | `ml.put_filter` | not-implemented | stable | public | no MlService.PutFilter method |
-| `ml.put_job` | not-implemented | stable | public | MlService.PutJob exists but binding is incomplete (missing params: ignore_unavailable,allow_no_indices,ignore_throttled,expand_wildcards) |
 | `ml.put_trained_model` | not-implemented | stable | public | no MlService.PutTrainedModel method |
 | `ml.put_trained_model_alias` | not-implemented | stable | public | no MlService.PutTrainedModelAlias method |
 | `ml.put_trained_model_definition_part` | not-implemented | stable | public | no MlService.PutTrainedModelDefinitionPart method |
 | `ml.put_trained_model_vocabulary` | not-implemented | stable | public | no MlService.PutTrainedModelVocabulary method |
-| `ml.reset_job` | not-implemented | stable | public | MlService.ResetJob exists but binding is incomplete (missing params: delete_user_annotations) |
 | `ml.revert_model_snapshot` | not-implemented | stable | public | no MlService.RevertModelSnapshot method |
 | `ml.set_upgrade_mode` | not-implemented | stable | public | no MlService.SetUpgradeMode method |
 | `ml.start_data_frame_analytics` | not-implemented | stable | public | no MlService.StartDataFrameAnalytics method |
@@ -413,7 +410,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 | --- | --- | --- | --- | --- |
 | `nodes.clear_repositories_metering_archive` | not-implemented | experimental | public | no NodesService.ClearRepositoriesMeteringArchive method |
 | `nodes.get_repositories_metering_info` | not-implemented | experimental | public | no NodesService.GetRepositoriesMeteringInfo method |
-| `nodes.stats` | not-implemented | stable | public | NodesService.Stats exists but binding is incomplete (missing params: include_unloaded_segments) |
 
 ### query_rules
 
@@ -454,10 +450,8 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `search_application.list` | not-implemented | experimental | public | SearchApplicationService.List exists but binding is incomplete (missing params: q) |
 | `search_application.post_behavioral_analytics_event` | not-implemented | experimental | public | no SearchApplicationService.PostBehavioralAnalyticsEvent method |
 | `search_application.render_query` | not-implemented | experimental | public | no SearchApplicationService.RenderQuery method |
-| `search_application.search` | not-implemented | experimental | public | SearchApplicationService.Search exists but binding is incomplete (missing params: typed_keys) |
 
 ### searchable_snapshots
 
@@ -465,8 +459,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `searchable_snapshots.clear_cache` | not-implemented | experimental | public | SearchableSnapshotsService.ClearCache exists but binding is incomplete (missing params: ignore_unavailable,allow_no_indices,expand_wildcards) |
-| `searchable_snapshots.mount` | not-implemented | stable | public | SearchableSnapshotsService.Mount exists but binding is incomplete (missing params: master_timeout,storage) |
 
 ### security
 
@@ -554,9 +546,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `transform.delete_transform` | not-implemented | stable | public | TransformService.Delete exists but binding is incomplete (missing params: delete_dest_index) |
-| `transform.schedule_now_transform` | not-implemented | stable | public | TransformService.ScheduleNow exists but binding is incomplete (missing params: timeout) |
-| `transform.start_transform` | not-implemented | stable | public | TransformService.Start exists but binding is incomplete (missing params: from) |
 | `transform.update_transform` | not-implemented | stable | public | no TransformService.UpdateTransform method |
 
 ### watcher
@@ -578,4 +567,3 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `xpack.info` | not-implemented | stable | public | XpackService.Info exists but binding is incomplete (missing params: human,accept_enterprise) |

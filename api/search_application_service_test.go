@@ -316,3 +316,43 @@ func TestUnitSearchApplicationDeleteBehavioralAnalyticsNetworkError(t *testing.T
 	_, err := svc.DeleteBehavioralAnalytics(context.Background(), "a1")
 	assert.Error(t, err)
 }
+
+type customSearchApplication struct{ SearchApplicationService }
+
+func TestSearchApplicationSpecExtensionAdapters(t *testing.T) {
+	svc := NewSearchApplicationService(nil, testLogger())
+	if _, err := AsSearchApplicationServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("search_application default: %v", err)
+	}
+	if _, err := AsSearchApplicationServiceSpecExtensions(nil); err == nil {
+		t.Error("search_application nil: want error")
+	}
+	var typedNil SearchApplicationService = (*DefaultSearchApplicationService)(nil)
+	if _, err := AsSearchApplicationServiceSpecExtensions(typedNil); err == nil {
+		t.Error("search_application typed-nil: want error")
+	}
+	if _, err := AsSearchApplicationServiceSpecExtensions(customSearchApplication{svc}); err == nil {
+		t.Error("search_application custom: want error")
+	}
+}
+
+func TestUnitSearchApplicationB9Transport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewSearchApplicationService(restyClient(srv), testLogger())
+	ext, err := AsSearchApplicationServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+
+	_, err = svc.List(ctx, &SearchApplicationListParams{Q: "app*"})
+	assert.NoError(t, err)
+	assert.Equal(t, "GET", got.method)
+	assert.Equal(t, "/_application/search_application", got.path)
+	assert.Equal(t, "app*", got.query["q"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.SearchWithRequest(ctx, &SearchApplicationSearchSpecRequest{Name: "a1", Body: map[string]any{}, Params: &SearchApplicationSearchSpecParams{TypedKeys: ptrBool(true)}})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_application/search_application/a1/_search", got.path)
+	assert.Equal(t, "true", got.query["typed_keys"])
+}
