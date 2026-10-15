@@ -20,11 +20,15 @@ import (
 const (
 	// ElasticsearchVersion is the pinned 9.x patch used for acceptance tests.
 	ElasticsearchVersion string = "9.0.0"
-	username             string = "elastic"
-	password             string = "vLPeJYa8.3RqtZCcAK6jNz"
-	gitUsername          string = "ci"
-	gitEmail             string = "ci@localhost"
-	defaultGitBranch     string = "release-branch.v9"
+	// elasticsearchURL is the HTTPS endpoint exposed by the Elasticsearch
+	// service. Elasticsearch generates its own self-signed certificates on
+	// first start, so consumers skip certificate verification.
+	elasticsearchURL string = "https://elasticsearch.svc:9200"
+	username         string = "elastic"
+	password         string = "vLPeJYa8.3RqtZCcAK6jNz"
+	gitUsername      string = "ci"
+	gitEmail         string = "ci@localhost"
+	defaultGitBranch string = "release-branch.v9"
 )
 
 // Elasticsearch is the Dagger module entrypoint.
@@ -108,7 +112,10 @@ func (h *Elasticsearch) Ci(
 	dir = dir.WithFile("coverage.out", reportFile)
 
 	// Acceptance tests (merged coverage)
-	acceptanceFile := h.TestAcceptance(ctx, "")
+	acceptanceFile, err := h.TestAcceptance(ctx, "")
+	if err != nil {
+		return nil, err
+	}
 	dir = dir.WithFile("coverage_acceptance.out", acceptanceFile)
 
 	if ci {
@@ -188,30 +195,179 @@ gotestsum --format testname -- -covermode=atomic -coverprofile coverage.out ./..
 }
 
 // TestAcceptance runs the integration tests against a containerized ES 9 and
-// returns coverage.out.
+// returns coverage.out. It waits for authenticated HTTPS health, applies the
+// shared index template and then runs the integration-tagged tests. Any
+// readiness, template, installation or test failure is surfaced here instead of
+// returning a partial coverage artifact.
 func (h *Elasticsearch) TestAcceptance(
 	ctx context.Context,
 	// run select tests only, defined using a regex
 	// +optional
 	run string,
-) *dagger.File {
+) (*dagger.File, error) {
 	expectedRunTest := ""
 	if run != "" {
 		expectedRunTest = fmt.Sprintf("-run %s", run)
 	}
 	esService := h.Elasticsearch(ctx)
-	return h.GolangModule.Container().
+	container := h.GolangModule.Container().
 		WithServiceBinding("elasticsearch.svc", esService).
-		WithEnvVariable("ELASTICSEARCH_URL", "https://elasticsearch.svc:9200").
+		WithEnvVariable("ELASTICSEARCH_URL", elasticsearchURL).
 		WithEnvVariable("ELASTICSEARCH_USERNAME", username).
 		WithSecretVariable("ELASTICSEARCH_PASSWORD", dag.SetSecret("es-password", password)).
-		WithExec(helper.ForgeScript(`
-curl --fail -k -u elastic:`+password+` "https://elasticsearch.svc:9200/_cluster/health?wait_for_status=yellow&timeout=500s"
-curl --fail -XPUT -k -u elastic:`+password+` -H 'Content-Type: application/json' "https://elasticsearch.svc:9200/_index_template/ci-base" -d '{"index_patterns":["test-*"],"priority":500,"template":{"settings":{"number_of_shards":1,"number_of_replicas":0}}}'
+		WithExec(helper.ForgeScript("%s", readinessScript()+acceptanceScript(expectedRunTest)))
+
+	synced, err := container.Sync(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "acceptance tests failed against %s", elasticsearchURL)
+	}
+	return synced.File("coverage.out"), nil
+}
+
+// acceptanceScript validates the shared index template and runs the
+// integration-tagged tests. It is appended to the shared readiness script so
+// the service is healthy before the template is applied.
+func acceptanceScript(testArgs string) string {
+	return `
+template_body=$(mktemp)
+template_err=$(mktemp)
+trap 'rm -f "$template_body" "$template_err"' EXIT
+template_rc=0
+template_status=$(curl --silent --show-error --insecure --connect-timeout 2 \
+	--max-time 30 \
+	--user "$ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD" \
+	-X PUT -H 'Content-Type: application/json' \
+	--output "$template_body" --write-out '%{http_code}' \
+	"$ELASTICSEARCH_URL/_index_template/ci-base" \
+	-d '{"index_patterns":["test-*"],"priority":500,"template":{"settings":{"number_of_shards":1,"number_of_replicas":0}}}') || template_rc=$?
+if [ "$template_rc" -ne 0 ] || [ "$template_status" != "200" ] || \
+	! grep -Eq '"acknowledged"[[:space:]]*:[[:space:]]*true' "$template_body"; then
+	printf 'Elasticsearch index template PUT failed (curl_rc=%s http=%s)\n' "$template_rc" "$template_status" >&2
+	bounded_dump "curl error" "$template_err"
+	bounded_dump "response body" "$template_body"
+	exit 1
+fi
+printf 'Elasticsearch index template ci-base acknowledged\n'
+
 go install gotest.tools/gotestsum@latest
-gotestsum --format testname -- -tags integration -covermode=atomic -coverprofile coverage.out ./... %s
-		`, expectedRunTest)).
-		File("coverage.out")
+gotestsum --format testname -- -tags integration -timeout=10m -covermode=atomic -coverprofile coverage.out ./... ` + testArgs + `
+`
+}
+
+// readinessScript returns a POSIX shell fragment that waits for Elasticsearch
+// to answer authenticated HTTPS cluster-health requests. It is reused by both
+// the acceptance and debug consumers so they share the same bounded wait.
+func readinessScript() string {
+	return `set -eu
+
+bounded_dump() {
+	if [ -s "$2" ]; then
+		printf '  %s: ' "$1" >&2
+		head -c 8192 "$2" >&2
+		printf '\n' >&2
+	fi
+}
+
+readiness_fail() {
+	printf 'Elasticsearch HTTPS readiness failed: %s\n' "$1" >&2
+	printf '  expected URL: %s\n' "$ELASTICSEARCH_URL" >&2
+	bounded_dump "curl error" "$readiness_err"
+	bounded_dump "response body" "$readiness_body"
+	exit 1
+}
+
+wait_for_elasticsearch() {
+	readiness_deadline=$(( $(date +%s) + 180 ))
+	readiness_body=$(mktemp)
+	readiness_err=$(mktemp)
+	trap 'rm -f "$readiness_body" "$readiness_err"' EXIT
+	readiness_attempt=0
+	readiness_rc=0
+	readiness_status=000
+	readiness_hinted=0
+	while :; do
+		readiness_now=$(date +%s)
+		readiness_remaining=$(( readiness_deadline - readiness_now ))
+		if [ "$readiness_remaining" -le 0 ]; then
+			break
+		fi
+		if [ "$readiness_remaining" -lt 5 ]; then
+			readiness_timeout=$readiness_remaining
+		else
+			readiness_timeout=5
+		fi
+		readiness_attempt=$(( readiness_attempt + 1 ))
+		: > "$readiness_body"
+		: > "$readiness_err"
+		readiness_rc=0
+		readiness_status=$(curl --silent --show-error --insecure --connect-timeout 2 \
+			--max-time "$readiness_timeout" \
+			--user "$ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD" \
+			--output "$readiness_body" --write-out '%{http_code}' \
+			"$ELASTICSEARCH_URL/_cluster/health?wait_for_status=yellow&timeout=2s" 2>"$readiness_err") || readiness_rc=$?
+		readiness_elapsed=$(( $(date +%s) - (readiness_deadline - 180) ))
+		printf 'elasticsearch readiness: attempt=%s elapsed=%ss curl_rc=%s http=%s\n' "$readiness_attempt" "$readiness_elapsed" "$readiness_rc" "$readiness_status"
+
+		if [ "$readiness_rc" -eq 0 ]; then
+			case "$readiness_status" in
+			200)
+				if grep -Eq '"status"[[:space:]]*:[[:space:]]*"(yellow|green)"' "$readiness_body" && \
+					grep -Eq '"timed_out"[[:space:]]*:[[:space:]]*false' "$readiness_body"; then
+					printf 'elasticsearch readiness: ready (HTTP 200, status yellow/green, timed_out false)\n'
+					return 0
+				fi
+				if ! grep -Eq '"status"[[:space:]]*:[[:space:]]*"' "$readiness_body" || \
+					! grep -Eq '"timed_out"[[:space:]]*:' "$readiness_body"; then
+					readiness_fail "malformed health response (missing status/timed_out)"
+				fi
+				;;
+			401|403)
+				readiness_fail "authentication rejected (HTTP $readiness_status); check ELASTICSEARCH_USERNAME and ELASTICSEARCH_PASSWORD"
+				;;
+			408|429|5*)
+				;;
+			3*|4*)
+				readiness_fail "unexpected HTTP $readiness_status"
+				;;
+			esac
+		else
+			case "$readiness_rc" in
+			6|7|16|18|28|35|52|55|56)
+				if [ "$readiness_rc" -eq 35 ] || [ "$readiness_rc" -eq 52 ]; then
+					if [ "$readiness_hinted" -eq 0 ]; then
+						printf 'elasticsearch readiness: hint: HTTPS request failed (curl rc=%s); the listener may be serving plain HTTP because automatic security/TLS configuration was skipped. Verify ELASTICSEARCH_URL and Elasticsearch auto-configuration. Refusing to fall back to HTTP.\n' "$readiness_rc" >&2
+						readiness_hinted=1
+					fi
+				fi
+				;;
+			*)
+				readiness_fail "non-transient curl error (rc=$readiness_rc)"
+				;;
+			esac
+		fi
+
+		readiness_now=$(date +%s)
+		readiness_remaining=$(( readiness_deadline - readiness_now ))
+		if [ "$readiness_remaining" -le 0 ]; then
+			break
+		fi
+		if [ "$readiness_remaining" -lt 2 ]; then
+			sleep "$readiness_remaining"
+		else
+			sleep 2
+		fi
+	done
+
+	printf 'Elasticsearch HTTPS readiness failed after 180s\n' >&2
+	printf '  expected URL: %s\n' "$ELASTICSEARCH_URL" >&2
+	printf '  last curl rc=%s http=%s\n' "$readiness_rc" "$readiness_status" >&2
+	bounded_dump "last curl error" "$readiness_err"
+	bounded_dump "last response body" "$readiness_body"
+	exit 1
+}
+
+wait_for_elasticsearch
+`
 }
 
 // DebugTest runs the integration tests under delve for interactive debugging.
@@ -226,15 +382,15 @@ func (h *Elasticsearch) DebugTest(
 		expectedRunTest = fmt.Sprintf("-- -test.run %s", run)
 	}
 	esService := h.Elasticsearch(ctx)
-	defer esService.Stop(ctx)
 	return h.GolangModule.Container().
 		WithServiceBinding("elasticsearch.svc", esService).
+		WithEnvVariable("ELASTICSEARCH_URL", elasticsearchURL).
+		WithEnvVariable("ELASTICSEARCH_USERNAME", username).
+		WithSecretVariable("ELASTICSEARCH_PASSWORD", dag.SetSecret("es-password", password)).
 		WithExposedPort(4000).
-		WithExec(helper.ForgeScript(`
-curl --fail -k -u elastic:`+password+` "https://elasticsearch.svc:9200/_cluster/health?wait_for_status=yellow&timeout=500s"
+		WithExec(helper.ForgeScript("%s", readinessScript()+`
 go install github.com/go-delve/delve/cmd/dlv@latest
-dlv test --listen=:4000 --log=true --headless=true --accept-multiclient --api-version=2 %s
-		`, expectedRunTest)).
+dlv test --listen=:4000 --log=true --headless=true --accept-multiclient --api-version=2 --build-flags="-tags=integration" `+expectedRunTest)).
 		AsService()
 }
 
@@ -243,11 +399,14 @@ func (h *Elasticsearch) Build(ctx context.Context) *dagger.Directory {
 	return h.GolangModule.Build()
 }
 
-// Elasticsearch returns the containerized Elasticsearch 9 service with security
-// enabled (HTTPS, fixed ELASTIC_PASSWORD, trial license, path.repo for
-// snapshot tests).
+// Elasticsearch returns the containerized Elasticsearch 9 service. HTTPS,
+// basic authentication and self-signed certificates are configured
+// automatically by Elasticsearch on first start; explicitly overriding
+// security or SSL settings can disable that automatic configuration.
+// Certificates, configuration and data are ephemeral per service container, so
+// do not persist them or rely on certificates from a previous run.
 func (h *Elasticsearch) Elasticsearch(ctx context.Context) *dagger.Service {
-	svc := dag.Container().
+	return dag.Container().
 		From(fmt.Sprintf("docker.elastic.co/elasticsearch/elasticsearch:%s", ElasticsearchVersion)).
 		WithUser("root").
 		WithExec([]string{"mkdir", "-p", "/usr/share/elasticsearch/backup"}).
@@ -258,7 +417,6 @@ func (h *Elasticsearch) Elasticsearch(ctx context.Context) *dagger.Service {
 		WithEnvVariable("discovery.type", "single-node").
 		WithEnvVariable("network.publish_host", "0.0.0.0").
 		WithEnvVariable("bootstrap.memory_lock", "false").
-		WithEnvVariable("xpack.security.enabled", "true").
 		WithEnvVariable("ELASTIC_PASSWORD", password).
 		WithEnvVariable("xpack.license.self_generated.type", "trial").
 		WithEnvVariable("path.repo", "/usr/share/elasticsearch/backup").
@@ -266,23 +424,6 @@ func (h *Elasticsearch) Elasticsearch(ctx context.Context) *dagger.Service {
 		WithEnvVariable("CLEAN_CACHE", time.Now().String()).
 		WithExposedPort(9200).
 		AsService()
-
-	// Health wait via a curl sidecar.
-	if _, err := dag.Container().
-		From("alpine/curl").
-		WithEntrypoint([]string{"sh", "-c"}).
-		WithServiceBinding("elasticsearch.svc", svc).
-		WithEnvVariable("CLEAN_CACHE", time.Now().String()).
-		WithExec(helper.ForgeScript(`
-sleep 10
-curl --fail -k -u elastic:` + password + ` "https://elasticsearch.svc:9200/_cluster/health?wait_for_status=yellow&timeout=500s"
-		`)).
-		WithExec([]string{"sh", "-c", "echo done"}).
-		Stdout(ctx); err != nil {
-		panic(err)
-	}
-
-	return svc
 }
 
 // CodeCov uploads coverage.out to CodeCov.
