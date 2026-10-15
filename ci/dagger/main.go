@@ -231,7 +231,9 @@ func acceptanceScript(testArgs string) string {
 	return `
 template_body=$(mktemp)
 template_err=$(mktemp)
-trap 'rm -f "$template_body" "$template_err"' EXIT
+# Replaces the readiness stage's EXIT trap; include its temp files so the
+# combined readiness+acceptance script still cleans them up on exit.
+trap 'rm -f "$readiness_body" "$readiness_err" "$template_body" "$template_err"' EXIT
 template_rc=0
 template_status=$(curl --silent --show-error --insecure --connect-timeout 2 \
 	--max-time 30 \
@@ -371,6 +373,9 @@ wait_for_elasticsearch
 }
 
 // DebugTest runs the integration tests under delve for interactive debugging.
+// The integration build tag is forwarded through --build-flags because delve
+// has no direct -tags flag; --build-flags="-tags=integration" makes dlv pass
+// -tags=integration to the underlying go build/test.
 func (h *Elasticsearch) DebugTest(
 	ctx context.Context,
 	// run select tests only, defined using a regex
