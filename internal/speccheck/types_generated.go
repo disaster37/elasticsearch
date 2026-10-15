@@ -169,6 +169,7 @@ var paramsTypes = map[string]reflect.Type{
 	"api.SnapshotCreateParams":                      reflect.TypeOf(api.SnapshotCreateParams{}),
 	"api.SnapshotCreateRepositoryParams":            reflect.TypeOf(api.SnapshotCreateRepositoryParams{}),
 	"api.SnapshotDeleteRepositoryParams":            reflect.TypeOf(api.SnapshotDeleteRepositoryParams{}),
+	"api.SnapshotDeleteSpecParams":                  reflect.TypeOf(api.SnapshotDeleteSpecParams{}),
 	"api.SnapshotGetParams":                         reflect.TypeOf(api.SnapshotGetParams{}),
 	"api.SnapshotGetRepositoryParams":               reflect.TypeOf(api.SnapshotGetRepositoryParams{}),
 	"api.SnapshotRepositoryAnalyzeParams":           reflect.TypeOf(api.SnapshotRepositoryAnalyzeParams{}),

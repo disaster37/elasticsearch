@@ -1,12 +1,17 @@
 package api
 
-import "github.com/disaster37/elasticsearch/v9/types"
+import (
+	"strconv"
+
+	"github.com/disaster37/elasticsearch/v9/types"
+)
 
 // SnapshotCreateRepositoryParams are the query parameters for create repository.
 type SnapshotCreateRepositoryParams struct {
-	Common  *CommonParams
-	Timeout string
-	Verify  *bool
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
+	Verify        *bool
 }
 
 // ToMap converts SnapshotCreateRepositoryParams to a query-parameter map.
@@ -15,6 +20,9 @@ func (p *SnapshotCreateRepositoryParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -24,8 +32,9 @@ func (p *SnapshotCreateRepositoryParams) ToMap() map[string]string {
 
 // SnapshotGetRepositoryParams are the query parameters for get repository.
 type SnapshotGetRepositoryParams struct {
-	Common *CommonParams
-	Local  *bool
+	Common        *CommonParams
+	Local         *bool
+	MasterTimeout string
 }
 
 // ToMap converts SnapshotGetRepositoryParams to a query-parameter map.
@@ -35,13 +44,17 @@ func (p *SnapshotGetRepositoryParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
 // SnapshotDeleteRepositoryParams are the query parameters for delete repository.
 type SnapshotDeleteRepositoryParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts SnapshotDeleteRepositoryParams to a query-parameter map.
@@ -50,6 +63,9 @@ func (p *SnapshotDeleteRepositoryParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -58,8 +74,9 @@ func (p *SnapshotDeleteRepositoryParams) ToMap() map[string]string {
 
 // SnapshotVerifyRepositoryParams are the query parameters for verify repository.
 type SnapshotVerifyRepositoryParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts SnapshotVerifyRepositoryParams to a query-parameter map.
@@ -68,6 +85,9 @@ func (p *SnapshotVerifyRepositoryParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -76,14 +96,18 @@ func (p *SnapshotVerifyRepositoryParams) ToMap() map[string]string {
 
 // SnapshotRepositoryAnalyzeParams are the query parameters for repository analyze.
 type SnapshotRepositoryAnalyzeParams struct {
-	Common           *CommonParams
-	BlobCount        *int
-	Concurrency      *int
-	Detailed         *bool
-	MaxBlobSize      string
-	MaxTotalDataSize string
-	Seed             *int
-	Timeout          string
+	Common                *CommonParams
+	BlobCount             *int
+	Concurrency           *int
+	Detailed              *bool
+	EarlyReadNodeCount    *int
+	MaxBlobSize           string
+	MaxTotalDataSize      string
+	RareActionProbability *float64
+	RarelyAbortWrites     *bool
+	ReadNodeCount         *int
+	Seed                  *int
+	Timeout               string
 }
 
 // ToMap converts SnapshotRepositoryAnalyzeParams to a query-parameter map.
@@ -99,11 +123,21 @@ func (p *SnapshotRepositoryAnalyzeParams) ToMap() map[string]string {
 		m["concurrency"] = intStr(*p.Concurrency)
 	}
 	setBoolParam(m, "detailed", p.Detailed)
+	if p.EarlyReadNodeCount != nil {
+		m["early_read_node_count"] = intStr(*p.EarlyReadNodeCount)
+	}
 	if p.MaxBlobSize != "" {
 		m["max_blob_size"] = p.MaxBlobSize
 	}
 	if p.MaxTotalDataSize != "" {
 		m["max_total_data_size"] = p.MaxTotalDataSize
+	}
+	if p.RareActionProbability != nil {
+		m["rare_action_probability"] = strconv.FormatFloat(*p.RareActionProbability, 'g', -1, 64)
+	}
+	setBoolParam(m, "rarely_abort_writes", p.RarelyAbortWrites)
+	if p.ReadNodeCount != nil {
+		m["read_node_count"] = intStr(*p.ReadNodeCount)
 	}
 	if p.Seed != nil {
 		m["seed"] = intStr(*p.Seed)
@@ -150,6 +184,7 @@ func (r *SnapshotCreateRequest) Validate() error { return validationError(valida
 // SnapshotCreateParams are the query parameters for create snapshot.
 type SnapshotCreateParams struct {
 	Common            *CommonParams
+	MasterTimeout     string
 	WaitForCompletion *bool
 }
 
@@ -159,6 +194,9 @@ func (p *SnapshotCreateParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
 }
@@ -176,9 +214,19 @@ func (r *SnapshotGetRequest) Validate() error { return validationError(validate.
 // SnapshotGetParams are the query parameters for get snapshot.
 type SnapshotGetParams struct {
 	Common            *CommonParams
+	After             string
+	FromSortValue     string
 	IgnoreUnavailable *bool
 	IncludeRepository *bool
 	IndexDetails      *bool
+	IndexNames        *bool
+	MasterTimeout     string
+	Offset            *int
+	Order             SortOrder
+	Size              *int
+	SlmPolicyFilter   string
+	Sort              SnapshotSort
+	Verbose           *bool
 }
 
 // ToMap converts SnapshotGetParams to a query-parameter map.
@@ -187,9 +235,56 @@ func (p *SnapshotGetParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.After != "" {
+		m["after"] = p.After
+	}
+	if p.FromSortValue != "" {
+		m["from_sort_value"] = p.FromSortValue
+	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "include_repository", p.IncludeRepository)
 	setBoolParam(m, "index_details", p.IndexDetails)
+	setBoolParam(m, "index_names", p.IndexNames)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Offset != nil {
+		m["offset"] = intStr(*p.Offset)
+	}
+	if p.Order != "" {
+		m["order"] = string(p.Order)
+	}
+	if p.Size != nil {
+		m["size"] = intStr(*p.Size)
+	}
+	if p.SlmPolicyFilter != "" {
+		m["slm_policy_filter"] = p.SlmPolicyFilter
+	}
+	if p.Sort != "" {
+		m["sort"] = string(p.Sort)
+	}
+	setBoolParam(m, "verbose", p.Verbose)
+	return mergeParams(m, p.Common)
+}
+
+// SnapshotDeleteSpecParams are the opt-in query parameters for snapshot.delete.
+// The existing Snapshot field may be a comma-separated list.
+type SnapshotDeleteSpecParams struct {
+	Common            *CommonParams
+	MasterTimeout     string
+	WaitForCompletion *bool
+}
+
+// ToMap converts SnapshotDeleteSpecParams to a query-parameter map.
+func (p *SnapshotDeleteSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
 }
 
@@ -197,6 +292,7 @@ func (p *SnapshotGetParams) ToMap() map[string]string {
 type SnapshotDeleteRequest struct {
 	Repository string `validate:"required"`
 	Snapshot   string `validate:"required"`
+	Params     *SnapshotDeleteSpecParams
 }
 
 // Validate validates the SnapshotDeleteRequest.
@@ -216,6 +312,7 @@ func (r *SnapshotRestoreRequest) Validate() error { return validationError(valid
 // SnapshotRestoreParams are the query parameters for restore.
 type SnapshotRestoreParams struct {
 	Common            *CommonParams
+	MasterTimeout     string
 	WaitForCompletion *bool
 }
 
@@ -225,6 +322,9 @@ func (p *SnapshotRestoreParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
 }
@@ -240,6 +340,7 @@ type SnapshotStatusRequest struct {
 type SnapshotStatusParams struct {
 	Common            *CommonParams
 	IgnoreUnavailable *bool
+	MasterTimeout     string
 }
 
 // ToMap converts SnapshotStatusParams to a query-parameter map.
@@ -249,6 +350,9 @@ func (p *SnapshotStatusParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -258,6 +362,7 @@ type SnapshotCloneRequest struct {
 	Snapshot       string `validate:"required"`
 	TargetSnapshot string `validate:"required"`
 	Body           any
+	Params         *MasterTimeoutSpecParams
 }
 
 // Validate validates the SnapshotCloneRequest.
@@ -265,8 +370,9 @@ func (r *SnapshotCloneRequest) Validate() error { return validationError(validat
 
 // SnapshotCleanupRepositoryParams are the query parameters for cleanup repository.
 type SnapshotCleanupRepositoryParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts SnapshotCleanupRepositoryParams to a query-parameter map.
@@ -275,6 +381,9 @@ func (p *SnapshotCleanupRepositoryParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}

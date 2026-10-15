@@ -104,7 +104,7 @@ func (s *DefaultSnapshotService) Get(ctx context.Context, req *SnapshotGetReques
 	if len(req.Snapshots) > 0 {
 		path = fmt.Sprintf("/_snapshot/%s/%s", pathSegment(req.Repository), escapedList(req.Snapshots))
 	} else {
-		path = fmt.Sprintf("/_snapshot/%s", pathSegment(req.Repository))
+		path = fmt.Sprintf("/_snapshot/%s/_all", pathSegment(req.Repository))
 	}
 	var result SnapshotGetResponse
 	return &result, doReq(s.logger, ctx, s.client, "GET", path, nil, req.Params, &result)
@@ -115,7 +115,7 @@ func (s *DefaultSnapshotService) Delete(ctx context.Context, req *SnapshotDelete
 		return nil, err
 	}
 	var result types.AcknowledgedResponse
-	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_snapshot/%s/%s", pathSegment(req.Repository), pathSegment(req.Snapshot)), nil, nil, &result)
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_snapshot/%s/%s", pathSegment(req.Repository), pathSegment(req.Snapshot)), nil, req.Params, &result)
 }
 
 func (s *DefaultSnapshotService) Restore(ctx context.Context, req *SnapshotRestoreRequest) (*SnapshotRestoreResponse, error) {
@@ -145,7 +145,7 @@ func (s *DefaultSnapshotService) Clone(ctx context.Context, req *SnapshotCloneRe
 		return nil, err
 	}
 	var result types.AcknowledgedResponse
-	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_snapshot/%s/%s/_clone/%s", pathSegment(req.Repository), pathSegment(req.Snapshot), pathSegment(req.TargetSnapshot)), req.Body, nil, &result)
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_snapshot/%s/%s/_clone/%s", pathSegment(req.Repository), pathSegment(req.Snapshot), pathSegment(req.TargetSnapshot)), req.Body, req.Params, &result)
 }
 
 func (s *DefaultSnapshotService) CleanupRepository(ctx context.Context, name string, params *SnapshotCleanupRepositoryParams) (*SnapshotCleanupRepositoryResponse, error) {

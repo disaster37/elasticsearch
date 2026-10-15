@@ -3543,6 +3543,238 @@
     "evidence": "DefaultSlmService.StopWithParams POST /_slm/stop"
   },
   {
+    "name": "snapshot.cleanup_repository",
+    "service": "SnapshotService",
+    "method": "CleanupRepository",
+    "paramsStruct": "api.SnapshotCleanupRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.CleanupRepository POST /_snapshot/{repository}/_cleanup"
+  },
+  {
+    "name": "snapshot.clone",
+    "service": "SnapshotService",
+    "method": "Clone",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      },
+      "target_snapshot": {
+        "argument": 1,
+        "field": "TargetSnapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Clone PUT /_snapshot/{repository}/{snapshot}/_clone/{target_snapshot}"
+  },
+  {
+    "name": "snapshot.create",
+    "service": "SnapshotService",
+    "method": "Create",
+    "paramsStruct": "api.SnapshotCreateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Create PUT /_snapshot/{repository}/{snapshot}"
+  },
+  {
+    "name": "snapshot.create_repository",
+    "service": "SnapshotService",
+    "method": "CreateRepository",
+    "paramsStruct": "api.SnapshotCreateRepositoryParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.CreateRepository PUT /_snapshot/{repository}"
+  },
+  {
+    "name": "snapshot.delete",
+    "service": "SnapshotService",
+    "method": "Delete",
+    "paramsStruct": "api.SnapshotDeleteSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Delete DELETE /_snapshot/{repository}/{snapshot}"
+  },
+  {
+    "name": "snapshot.delete_repository",
+    "service": "SnapshotService",
+    "method": "DeleteRepository",
+    "paramsStruct": "api.SnapshotDeleteRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.DeleteRepository DELETE /_snapshot/{repository}"
+  },
+  {
+    "name": "snapshot.get",
+    "service": "SnapshotService",
+    "method": "Get",
+    "paramsStruct": "api.SnapshotGetParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshots"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Get GET /_snapshot/{repository}/{snapshot} (empty snapshots selects /_all)"
+  },
+  {
+    "name": "snapshot.get_repository",
+    "service": "SnapshotService",
+    "method": "GetRepository",
+    "paramsStruct": "api.SnapshotGetRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.GetRepository GET /_snapshot/{repository}"
+  },
+  {
+    "name": "snapshot.repository_analyze",
+    "service": "SnapshotService",
+    "method": "RepositoryAnalyze",
+    "paramsStruct": "api.SnapshotRepositoryAnalyzeParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.RepositoryAnalyze POST /_snapshot/{repository}/_analyze"
+  },
+  {
+    "name": "snapshot.restore",
+    "service": "SnapshotService",
+    "method": "Restore",
+    "paramsStruct": "api.SnapshotRestoreParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Restore POST /_snapshot/{repository}/{snapshot}/_restore"
+  },
+  {
+    "name": "snapshot.status",
+    "service": "SnapshotService",
+    "method": "Status",
+    "paramsStruct": "api.SnapshotStatusParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshots"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Status GET /_snapshot/{repository}/{snapshot}/_status"
+  },
+  {
+    "name": "snapshot.verify_repository",
+    "service": "SnapshotService",
+    "method": "VerifyRepository",
+    "paramsStruct": "api.SnapshotVerifyRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.VerifyRepository POST /_snapshot/{repository}/_verify"
+  },
+  {
     "name": "sql.clear_cursor",
     "service": "SqlService",
     "method": "ClearCursor",

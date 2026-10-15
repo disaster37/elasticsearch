@@ -118,6 +118,19 @@ const (
 	SortOrderDesc SortOrder = "desc"
 )
 
+// SnapshotSort values for snapshot.get sort.
+type SnapshotSort string
+
+const (
+	SnapshotSortStartTime        SnapshotSort = "start_time"
+	SnapshotSortDuration         SnapshotSort = "duration"
+	SnapshotSortName             SnapshotSort = "name"
+	SnapshotSortRepository       SnapshotSort = "repository"
+	SnapshotSortIndexCount       SnapshotSort = "index_count"
+	SnapshotSortShardCount       SnapshotSort = "shard_count"
+	SnapshotSortFailedShardCount SnapshotSort = "failed_shard_count"
+)
+
 // CatFormat values. The client always requests JSON.
 type CatFormat string
 

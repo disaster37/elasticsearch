@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 269 |
-| Known-missing (baselined) endpoints | 243 |
+| Registered implementations | 281 |
+| Known-missing (baselined) endpoints | 231 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -75,6 +75,7 @@ number, not a claim of full REST implementation equivalence.
 | remaining `api.*Params` (indices) | direct fields added per the B4 matrix; `ClearCache` now also emits the `index` query parameter | `master_timeout`, `timeout`, `request`, `reopen`, `lazy`, `resource`, `verbose`, `ignore_throttled`, `wait_for_completion` |
 | `api.ClusterServiceSpecExtensions` | new opt-in `ExistsComponentTemplateWithParams` (B5) | `master_timeout`, `local` |
 | cluster carriers + `ClusterService.Info` | direct `MasterTimeout`/`ExpandWildcards`/`IncludeDefaults`/`IncludeRemotes` additions; Info route corrected to `GET /_info/{target}` with `_all` default | `master_timeout`, `include_defaults`, `include_remotes` |
+| snapshot carriers + `SnapshotService.Get` | direct `MasterTimeout`/paging additions; `snapshot.get` empty selector now routes to `/_snapshot/{repository}/_all` (B6) | `master_timeout`, `order`, `sort`, `size`, `offset`, `after`, `from_sort_value`, `verbose`, `index_names`, `slm_policy_filter` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -550,18 +551,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `snapshot.cleanup_repository` | not-implemented | stable | public | SnapshotService.CleanupRepository exists but binding is incomplete (missing params: master_timeout; unmapped parts: repository) |
-| `snapshot.clone` | not-implemented | stable | public | SnapshotService.Clone exists but binding is incomplete (missing params: master_timeout) |
-| `snapshot.create` | not-implemented | stable | public | SnapshotService.Create exists but binding is incomplete (missing params: master_timeout) |
-| `snapshot.create_repository` | not-implemented | stable | public | SnapshotService.CreateRepository exists but binding is incomplete (missing params: master_timeout; unmapped parts: repository) |
-| `snapshot.delete` | not-implemented | stable | public | SnapshotService.Delete exists but binding is incomplete (missing params: master_timeout,wait_for_completion) |
-| `snapshot.delete_repository` | not-implemented | stable | public | SnapshotService.DeleteRepository exists but binding is incomplete (missing params: master_timeout; unmapped parts: repository) |
-| `snapshot.get` | not-implemented | stable | public | SnapshotService.Get exists but binding is incomplete (missing params: master_timeout,order,from_sort_value,after,verbose,index_names,sort,size,offset,slm_policy_filter) |
-| `snapshot.get_repository` | not-implemented | stable | public | SnapshotService.GetRepository exists but binding is incomplete (missing params: master_timeout; unmapped parts: repository) |
-| `snapshot.repository_analyze` | not-implemented | stable | public | SnapshotService.RepositoryAnalyze exists but binding is incomplete (missing params: early_read_node_count,rarely_abort_writes,rare_action_probability,read_node_count; unmapped parts: repository) |
-| `snapshot.restore` | not-implemented | stable | public | SnapshotService.Restore exists but binding is incomplete (missing params: master_timeout) |
-| `snapshot.status` | not-implemented | stable | public | SnapshotService.Status exists but binding is incomplete (missing params: master_timeout) |
-| `snapshot.verify_repository` | not-implemented | stable | public | SnapshotService.VerifyRepository exists but binding is incomplete (missing params: master_timeout; unmapped parts: repository) |
 
 ### synonyms
 
