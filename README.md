@@ -119,6 +119,14 @@ The following endpoints were removed upstream and are intentionally absent:
 - **Rollup** — removed in ES 9.
 - **`_knn_search`** — removed in ES 9 (kNN is now part of `_search`).
 
+## Compatibility
+
+Recent spec-coverage work added optional exported fields to several `*Params`
+and request structs. Downstream code that uses **keyed** composite literals
+(e.g. `api.IndexParams{Refresh: api.RefreshTrue}`) remains source compatible.
+Code that uses **unkeyed** composite literals may need to add field names, as
+the new fields shift positional order; keyed literals are recommended.
+
 ## Query DSL
 
 Use the `querydsl` package to build type-safe queries:
