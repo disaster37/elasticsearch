@@ -3,8 +3,10 @@ package api
 // ClusterHealthParams are the query parameters for GET /_cluster/health.
 type ClusterHealthParams struct {
 	Common                      *CommonParams
+	ExpandWildcards             ExpandWildcards
 	Level                       Level
 	Local                       *bool
+	MasterTimeout               string
 	Timeout                     string
 	WaitForActiveShards         string
 	WaitForEvents               string
@@ -20,10 +22,16 @@ func (p *ClusterHealthParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.ExpandWildcards != "" {
+		m["expand_wildcards"] = string(p.ExpandWildcards)
+	}
 	if p.Level != "" {
 		m["level"] = string(p.Level)
 	}
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -59,6 +67,7 @@ type ClusterStateParams struct {
 	FlatSettings           *bool
 	IgnoreUnavailable      *bool
 	Local                  *bool
+	MasterTimeout          string
 	WaitForMetadataVersion *int64
 	WaitForTimeout         string
 }
@@ -76,6 +85,9 @@ func (p *ClusterStateParams) ToMap() map[string]string {
 	setBoolParam(m, "flat_settings", p.FlatSettings)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.WaitForMetadataVersion != nil {
 		m["wait_for_metadata_version"] = int64Str(*p.WaitForMetadataVersion)
 	}
@@ -87,9 +99,10 @@ func (p *ClusterStateParams) ToMap() map[string]string {
 
 // ClusterStatsParams are the query parameters for cluster.stats.
 type ClusterStatsParams struct {
-	Common       *CommonParams
-	FlatSettings *bool
-	Timeout      string
+	Common         *CommonParams
+	FlatSettings   *bool
+	IncludeRemotes *bool
+	Timeout        string
 }
 
 // ToMap converts ClusterStatsParams to a query-parameter map.
@@ -99,6 +112,7 @@ func (p *ClusterStatsParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
+	setBoolParam(m, "include_remotes", p.IncludeRemotes)
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -110,6 +124,7 @@ type ClusterGetSettingsParams struct {
 	Common          *CommonParams
 	FlatSettings    *bool
 	IncludeDefaults *bool
+	MasterTimeout   string
 	Timeout         string
 }
 
@@ -121,6 +136,9 @@ func (p *ClusterGetSettingsParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
 	setBoolParam(m, "include_defaults", p.IncludeDefaults)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -129,9 +147,10 @@ func (p *ClusterGetSettingsParams) ToMap() map[string]string {
 
 // ClusterPutSettingsParams are the query parameters for PUT /_cluster/settings.
 type ClusterPutSettingsParams struct {
-	Common       *CommonParams
-	FlatSettings *bool
-	Timeout      string
+	Common        *CommonParams
+	FlatSettings  *bool
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts ClusterPutSettingsParams to a query-parameter map.
@@ -141,6 +160,9 @@ func (p *ClusterPutSettingsParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -152,6 +174,7 @@ type ClusterAllocationExplainParams struct {
 	Common              *CommonParams
 	IncludeDiskInfo     *bool
 	IncludeYesDecisions *bool
+	MasterTimeout       string
 }
 
 // ToMap converts ClusterAllocationExplainParams to a query-parameter map.
@@ -162,17 +185,21 @@ func (p *ClusterAllocationExplainParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	setBoolParam(m, "include_disk_info", p.IncludeDiskInfo)
 	setBoolParam(m, "include_yes_decisions", p.IncludeYesDecisions)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
 // ClusterRerouteParams are the query parameters for cluster.reroute.
 type ClusterRerouteParams struct {
-	Common      *CommonParams
-	DryRun      *bool
-	Explain     *bool
-	Metric      []string
-	RetryFailed *bool
-	Timeout     string
+	Common        *CommonParams
+	DryRun        *bool
+	Explain       *bool
+	MasterTimeout string
+	Metric        []string
+	RetryFailed   *bool
+	Timeout       string
 }
 
 // ToMap converts ClusterRerouteParams to a query-parameter map.
@@ -183,6 +210,9 @@ func (p *ClusterRerouteParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	setBoolParam(m, "dry_run", p.DryRun)
 	setBoolParam(m, "explain", p.Explain)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setListParam(m, "metric", p.Metric)
 	setBoolParam(m, "retry_failed", p.RetryFailed)
 	if p.Timeout != "" {
@@ -193,8 +223,9 @@ func (p *ClusterRerouteParams) ToMap() map[string]string {
 
 // ClusterPendingTasksParams are the query parameters for pending_tasks.
 type ClusterPendingTasksParams struct {
-	Common *CommonParams
-	Local  *bool
+	Common        *CommonParams
+	Local         *bool
+	MasterTimeout string
 }
 
 // ToMap converts ClusterPendingTasksParams to a query-parameter map.
@@ -204,15 +235,19 @@ func (p *ClusterPendingTasksParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
 // ClusterVotingConfigExclusionsParams are the query parameters for voting_config_exclusions.
 type ClusterVotingConfigExclusionsParams struct {
-	Common    *CommonParams
-	NodeIds   []string
-	NodeNames []string
-	Timeout   string
+	Common        *CommonParams
+	MasterTimeout string
+	NodeIds       []string
+	NodeNames     []string
+	Timeout       string
 }
 
 // ToMap converts ClusterVotingConfigExclusionsParams to a query-parameter map.
@@ -221,6 +256,9 @@ func (p *ClusterVotingConfigExclusionsParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setListParam(m, "node_ids", p.NodeIds)
 	setListParam(m, "node_names", p.NodeNames)
 	if p.Timeout != "" {
@@ -232,6 +270,7 @@ func (p *ClusterVotingConfigExclusionsParams) ToMap() map[string]string {
 // ClusterDeleteVotingConfigExclusionsParams are the query parameters for delete voting_config_exclusions.
 type ClusterDeleteVotingConfigExclusionsParams struct {
 	Common         *CommonParams
+	MasterTimeout  string
 	WaitForRemoval *bool
 }
 
@@ -241,15 +280,20 @@ func (p *ClusterDeleteVotingConfigExclusionsParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "wait_for_removal", p.WaitForRemoval)
 	return mergeParams(m, p.Common)
 }
 
 // ClusterGetComponentTemplateParams are the query parameters for get component templates.
 type ClusterGetComponentTemplateParams struct {
-	Common       *CommonParams
-	FlatSettings *bool
-	Local        *bool
+	Common          *CommonParams
+	FlatSettings    *bool
+	IncludeDefaults *bool
+	Local           *bool
+	MasterTimeout   string
 }
 
 // ToMap converts ClusterGetComponentTemplateParams to a query-parameter map.
@@ -259,7 +303,11 @@ func (p *ClusterGetComponentTemplateParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
+	setBoolParam(m, "include_defaults", p.IncludeDefaults)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -275,10 +323,11 @@ func (r *PutComponentTemplateRequest) Validate() error { return validationError(
 
 // PutComponentTemplateParams are the query parameters for put component template.
 type PutComponentTemplateParams struct {
-	Common  *CommonParams
-	Cause   string
-	Create  *bool
-	Timeout string
+	Common        *CommonParams
+	Cause         string
+	Create        *bool
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts PutComponentTemplateParams to a query-parameter map.
@@ -291,6 +340,9 @@ func (p *PutComponentTemplateParams) ToMap() map[string]string {
 		m["cause"] = p.Cause
 	}
 	setBoolParam(m, "create", p.Create)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -299,8 +351,9 @@ func (p *PutComponentTemplateParams) ToMap() map[string]string {
 
 // ClusterDeleteComponentTemplateParams are the query parameters for delete component template.
 type ClusterDeleteComponentTemplateParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts ClusterDeleteComponentTemplateParams to a query-parameter map.
@@ -309,6 +362,9 @@ func (p *ClusterDeleteComponentTemplateParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}

@@ -215,6 +215,7 @@ var serviceTypes = map[string]reflect.Type{
 	"api.CcrService":                       reflect.TypeOf((*api.CcrService)(nil)).Elem(),
 	"api.CcrServiceSpecExtensions":         reflect.TypeOf((*api.CcrServiceSpecExtensions)(nil)).Elem(),
 	"api.ClusterService":                   reflect.TypeOf((*api.ClusterService)(nil)).Elem(),
+	"api.ClusterServiceSpecExtensions":     reflect.TypeOf((*api.ClusterServiceSpecExtensions)(nil)).Elem(),
 	"api.DanglingIndicesService":           reflect.TypeOf((*api.DanglingIndicesService)(nil)).Elem(),
 	"api.DocumentService":                  reflect.TypeOf((*api.DocumentService)(nil)).Elem(),
 	"api.EnrichService":                    reflect.TypeOf((*api.EnrichService)(nil)).Elem(),

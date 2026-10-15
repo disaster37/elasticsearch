@@ -690,3 +690,24 @@ func (s *DefaultIndicesService) ForceMergeWithRequest(ctx context.Context, req *
 	}
 	return &result, nil
 }
+
+// ClusterServiceSpecExtensions exposes the opt-in cluster query carriers.
+// Obtain it with [AsClusterServiceSpecExtensions].
+type ClusterServiceSpecExtensions interface {
+	ExistsComponentTemplateWithParams(ctx context.Context, name string, params *ClusterGetComponentTemplateParams) (bool, error)
+}
+
+var _ ClusterServiceSpecExtensions = (*DefaultClusterService)(nil)
+
+// AsClusterServiceSpecExtensions adapts a ClusterService to its extension
+// interface.
+func AsClusterServiceSpecExtensions(service ClusterService) (ClusterServiceSpecExtensions, error) {
+	return asSpecExtensions[ClusterServiceSpecExtensions]("cluster", service)
+}
+
+func (s *DefaultClusterService) ExistsComponentTemplateWithParams(ctx context.Context, name string, params *ClusterGetComponentTemplateParams) (bool, error) {
+	if name == "" {
+		return false, fmt.Errorf("name is required")
+	}
+	return headReq(s.logger, ctx, s.client, fmt.Sprintf("/_component_template/%s", pathSegment(name)), params)
+}

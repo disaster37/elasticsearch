@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 254 |
-| Known-missing (baselined) endpoints | 258 |
+| Registered implementations | 269 |
+| Known-missing (baselined) endpoints | 243 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -73,6 +73,8 @@ number, not a claim of full REST implementation equivalence.
 | `api.ShrinkParams`, `api.IndicesOpenParams`, `api.AliasParams`, `api.GetAliasParams`, `api.SimulateIndexTemplateParams`, `api.DanglingIndicesImportParams`, `api.LicensePostParams` | existing shared carriers extended (B3) | `master_timeout`, `include_defaults` |
 | `api.IndicesServiceSpecExtensions` | new opt-in `ExistsTemplateWithParams`/`ExistsIndexTemplateWithParams`/`MigrateToDataStreamWithParams`/`PromoteDataStreamWithParams`/`ForceMergeWithRequest` (B4) | `master_timeout`, `timeout`, `wait_for_completion` |
 | remaining `api.*Params` (indices) | direct fields added per the B4 matrix; `ClearCache` now also emits the `index` query parameter | `master_timeout`, `timeout`, `request`, `reopen`, `lazy`, `resource`, `verbose`, `ignore_throttled`, `wait_for_completion` |
+| `api.ClusterServiceSpecExtensions` | new opt-in `ExistsComponentTemplateWithParams` (B5) | `master_timeout`, `local` |
+| cluster carriers + `ClusterService.Info` | direct `MasterTimeout`/`ExpandWildcards`/`IncludeDefaults`/`IncludeRemotes` additions; Info route corrected to `GET /_info/{target}` with `_all` default | `master_timeout`, `include_defaults`, `include_remotes` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -177,21 +179,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `cluster.allocation_explain` | not-implemented | stable | public | ClusterService.AllocationExplain exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.delete_component_template` | not-implemented | stable | public | ClusterService.DeleteComponentTemplate exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.delete_voting_config_exclusions` | not-implemented | stable | public | ClusterService.DeleteVotingConfigExclusions exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.exists_component_template` | not-implemented | stable | public | ClusterService.ExistsComponentTemplate exists but binding is incomplete (missing params: master_timeout,local) |
-| `cluster.get_component_template` | not-implemented | stable | public | ClusterService.GetComponentTemplate exists but binding is incomplete (missing params: master_timeout,include_defaults) |
-| `cluster.get_settings` | not-implemented | stable | public | ClusterService.GetSettings exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.health` | not-implemented | stable | public | ClusterService.Health exists but binding is incomplete (missing params: expand_wildcards,master_timeout) |
-| `cluster.info` | not-implemented | stable | public | ClusterService.Info exists but binding is incomplete (unmapped parts: target) |
-| `cluster.pending_tasks` | not-implemented | stable | public | ClusterService.PendingTasks exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.post_voting_config_exclusions` | not-implemented | stable | public | ClusterService.PostVotingConfigExclusions exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.put_component_template` | not-implemented | stable | public | ClusterService.PutComponentTemplate exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.put_settings` | not-implemented | stable | public | ClusterService.PutSettings exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.reroute` | not-implemented | stable | public | ClusterService.Reroute exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.state` | not-implemented | stable | public | ClusterService.State exists but binding is incomplete (missing params: master_timeout) |
-| `cluster.stats` | not-implemented | stable | public | ClusterService.Stats exists but binding is incomplete (missing params: include_remotes) |
 
 ### connector
 

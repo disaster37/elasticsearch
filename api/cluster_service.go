@@ -132,9 +132,9 @@ func (s *DefaultClusterService) RemoteInfo(ctx context.Context) (*ClusterRemoteI
 func (s *DefaultClusterService) Info(ctx context.Context, features []string) (*ClusterInfoResponse, error) {
 	var path string
 	if len(features) > 0 {
-		path = fmt.Sprintf("/_cluster/info/%s", escapedList(features))
+		path = fmt.Sprintf("/_info/%s", escapedList(features))
 	} else {
-		path = "/_cluster/info"
+		path = "/_info/_all"
 	}
 	var result ClusterInfoResponse
 	return &result, doReq(s.logger, ctx, s.client, "GET", path, nil, nil, &result)

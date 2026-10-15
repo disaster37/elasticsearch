@@ -624,10 +624,222 @@
     "evidence": "DefaultSearchService.ClosePointInTime route /_pit"
   },
   {
+    "name": "cluster.allocation_explain",
+    "service": "ClusterService",
+    "method": "AllocationExplain",
+    "paramsStruct": "api.ClusterAllocationExplainParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.AllocationExplain POST /_cluster/allocation/explain"
+  },
+  {
+    "name": "cluster.delete_component_template",
+    "service": "ClusterService",
+    "method": "DeleteComponentTemplate",
+    "paramsStruct": "api.ClusterDeleteComponentTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.DeleteComponentTemplate DELETE /_component_template/{name}"
+  },
+  {
+    "name": "cluster.delete_voting_config_exclusions",
+    "service": "ClusterService",
+    "method": "DeleteVotingConfigExclusions",
+    "paramsStruct": "api.ClusterDeleteVotingConfigExclusionsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.DeleteVotingConfigExclusions DELETE /_cluster/voting_config_exclusions"
+  },
+  {
+    "name": "cluster.exists_component_template",
+    "service": "ClusterServiceSpecExtensions",
+    "method": "ExistsComponentTemplateWithParams",
+    "paramsStruct": "api.ClusterGetComponentTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.ExistsComponentTemplateWithParams HEAD /_component_template/{name}"
+  },
+  {
+    "name": "cluster.get_component_template",
+    "service": "ClusterService",
+    "method": "GetComponentTemplate",
+    "paramsStruct": "api.ClusterGetComponentTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.GetComponentTemplate GET /_component_template/{name}"
+  },
+  {
+    "name": "cluster.get_settings",
+    "service": "ClusterService",
+    "method": "GetSettings",
+    "paramsStruct": "api.ClusterGetSettingsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.GetSettings GET /_cluster/settings"
+  },
+  {
+    "name": "cluster.health",
+    "service": "ClusterService",
+    "method": "Health",
+    "paramsStruct": "api.ClusterHealthParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.Health GET /_cluster/health/{index}"
+  },
+  {
+    "name": "cluster.info",
+    "service": "ClusterService",
+    "method": "Info",
+    "pathSources": {
+      "target": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.Info GET /_info/{target} (empty features selects /_info/_all)"
+  },
+  {
+    "name": "cluster.pending_tasks",
+    "service": "ClusterService",
+    "method": "PendingTasks",
+    "paramsStruct": "api.ClusterPendingTasksParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.PendingTasks GET /_cluster/pending_tasks"
+  },
+  {
+    "name": "cluster.post_voting_config_exclusions",
+    "service": "ClusterService",
+    "method": "PostVotingConfigExclusions",
+    "paramsStruct": "api.ClusterVotingConfigExclusionsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.PostVotingConfigExclusions POST /_cluster/voting_config_exclusions"
+  },
+  {
+    "name": "cluster.put_component_template",
+    "service": "ClusterService",
+    "method": "PutComponentTemplate",
+    "paramsStruct": "api.PutComponentTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultClusterService.PutComponentTemplate PUT /_component_template/{name}"
+  },
+  {
+    "name": "cluster.put_settings",
+    "service": "ClusterService",
+    "method": "PutSettings",
+    "paramsStruct": "api.ClusterPutSettingsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.PutSettings PUT /_cluster/settings"
+  },
+  {
     "name": "cluster.remote_info",
     "service": "ClusterService",
     "method": "RemoteInfo",
     "evidence": "DefaultClusterService.RemoteInfo route /_remote/info"
+  },
+  {
+    "name": "cluster.reroute",
+    "service": "ClusterService",
+    "method": "Reroute",
+    "paramsStruct": "api.ClusterRerouteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.Reroute POST /_cluster/reroute"
+  },
+  {
+    "name": "cluster.state",
+    "service": "ClusterService",
+    "method": "State",
+    "paramsStruct": "api.ClusterStateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "metric": {
+        "argument": 1,
+        "field": "Metrics"
+      },
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultClusterService.State GET /_cluster/state/{metric}/{index}"
+  },
+  {
+    "name": "cluster.stats",
+    "service": "ClusterService",
+    "method": "Stats",
+    "paramsStruct": "api.ClusterStatsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.Stats GET /_cluster/stats/nodes/{node_id}"
   },
   {
     "name": "count",
