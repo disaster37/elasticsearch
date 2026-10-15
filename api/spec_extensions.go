@@ -4,6 +4,11 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strconv"
+
+	json "github.com/goccy/go-json"
+
+	"github.com/disaster37/elasticsearch/v9/types"
 )
 
 // This file adds opt-in extension APIs for spec endpoints whose original
@@ -67,4 +72,412 @@ func isNilService(v any) bool {
 	default:
 		return false
 	}
+}
+
+// asSpecExtensions adapts a service to an extension interface, rejecting nil
+// and typed-nil services and returning a descriptive error for custom
+// implementations without support.
+func asSpecExtensions[T any](group string, service any) (T, error) {
+	var zero T
+	if isNilService(service) {
+		return zero, fmt.Errorf("as %s spec extensions: nil service", group)
+	}
+	ext, ok := service.(T)
+	if !ok {
+		return zero, fmt.Errorf("as %s spec extensions: %T does not implement the spec extension interface", group, service)
+	}
+	if isNilService(ext) {
+		return zero, fmt.Errorf("as %s spec extensions: typed-nil service", group)
+	}
+	return ext, nil
+}
+
+// CcrServiceSpecExtensions exposes the opt-in CCR query carriers. Obtain it
+// with [AsCcrServiceSpecExtensions].
+type CcrServiceSpecExtensions interface {
+	PutAutoFollowPatternWithRequest(ctx context.Context, req *CcrPutAutoFollowPatternRequest) (*types.AcknowledgedResponse, error)
+	DeleteAutoFollowPatternWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	GetAutoFollowPatternWithParams(ctx context.Context, names []string, params *MasterTimeoutSpecParams) (*CcrGetAutoFollowPatternResponse, error)
+	PauseAutoFollowPatternWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	ResumeAutoFollowPatternWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	PauseFollowWithParams(ctx context.Context, index string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	ResumeFollowWithRequest(ctx context.Context, req *CcrResumeFollowRequest) (*types.AcknowledgedResponse, error)
+	UnfollowWithParams(ctx context.Context, index string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	ForgetFollowerWithRequest(ctx context.Context, req *CcrForgetFollowerRequest) (*CcrForgetFollowerResponse, error)
+	FollowInfoWithParams(ctx context.Context, indices []string, params *MasterTimeoutSpecParams) (*CcrFollowInfoResponse, error)
+	FollowStatsWithParams(ctx context.Context, indices []string, params *TimeoutSpecParams) (*CcrFollowStatsResponse, error)
+	StatsWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*CcrStatsResponse, error)
+}
+
+// Compile-time assertion that the default implementation supports the
+// extension interface.
+var _ CcrServiceSpecExtensions = (*DefaultCcrService)(nil)
+
+// AsCcrServiceSpecExtensions adapts a CcrService to its extension interface.
+func AsCcrServiceSpecExtensions(service CcrService) (CcrServiceSpecExtensions, error) {
+	return asSpecExtensions[CcrServiceSpecExtensions]("ccr", service)
+}
+
+func (s *DefaultCcrService) PutAutoFollowPatternWithRequest(ctx context.Context, req *CcrPutAutoFollowPatternRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.Name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_ccr/auto_follow/%s", pathSegment(req.Name)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultCcrService) DeleteAutoFollowPatternWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_ccr/auto_follow/%s", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultCcrService) GetAutoFollowPatternWithParams(ctx context.Context, names []string, params *MasterTimeoutSpecParams) (*CcrGetAutoFollowPatternResponse, error) {
+	path := "/_ccr/auto_follow"
+	if len(names) > 0 {
+		path = fmt.Sprintf("/_ccr/auto_follow/%s", escapedList(names))
+	}
+	var result CcrGetAutoFollowPatternResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", path, nil, params, &result)
+}
+
+func (s *DefaultCcrService) PauseAutoFollowPatternWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_ccr/auto_follow/%s/pause", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultCcrService) ResumeAutoFollowPatternWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_ccr/auto_follow/%s/resume", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultCcrService) PauseFollowWithParams(ctx context.Context, index string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if index == "" {
+		return nil, fmt.Errorf("index is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/%s/_ccr/pause_follow", pathSegment(index)), nil, params, &result)
+}
+
+func (s *DefaultCcrService) ResumeFollowWithRequest(ctx context.Context, req *CcrResumeFollowRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.Index == "" {
+		return nil, fmt.Errorf("index is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/%s/_ccr/resume_follow", pathSegment(req.Index)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultCcrService) UnfollowWithParams(ctx context.Context, index string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if index == "" {
+		return nil, fmt.Errorf("index is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/%s/_ccr/unfollow", pathSegment(index)), nil, params, &result)
+}
+
+func (s *DefaultCcrService) ForgetFollowerWithRequest(ctx context.Context, req *CcrForgetFollowerRequest) (*CcrForgetFollowerResponse, error) {
+	if req == nil || req.Index == "" {
+		return nil, fmt.Errorf("index is required")
+	}
+	var result CcrForgetFollowerResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/%s/_ccr/forget_follower", pathSegment(req.Index)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultCcrService) FollowInfoWithParams(ctx context.Context, indices []string, params *MasterTimeoutSpecParams) (*CcrFollowInfoResponse, error) {
+	path := "/_ccr/info"
+	if len(indices) > 0 {
+		path = fmt.Sprintf("/%s/_ccr/info", escapedList(indices))
+	}
+	var result CcrFollowInfoResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", path, nil, params, &result)
+}
+
+func (s *DefaultCcrService) FollowStatsWithParams(ctx context.Context, indices []string, params *TimeoutSpecParams) (*CcrFollowStatsResponse, error) {
+	path := "/_ccr/stats"
+	if len(indices) > 0 {
+		path = fmt.Sprintf("/%s/_ccr/stats", escapedList(indices))
+	}
+	var result CcrFollowStatsResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", path, nil, params, &result)
+}
+
+func (s *DefaultCcrService) StatsWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*CcrStatsResponse, error) {
+	var result CcrStatsResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", "/_ccr/stats", nil, params, &result)
+}
+
+// SlmServiceSpecExtensions exposes the opt-in SLM query carriers. Obtain it
+// with [AsSlmServiceSpecExtensions].
+type SlmServiceSpecExtensions interface {
+	GetLifecycleWithParams(ctx context.Context, policyIds []string, params *MasterTimeoutAndTimeoutSpecParams) (map[string]*SlmPolicy, error)
+	PutLifecycleWithRequest(ctx context.Context, req *SlmPutLifecycleRequest) (*types.AcknowledgedResponse, error)
+	DeleteLifecycleWithParams(ctx context.Context, policyId string, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	ExecuteLifecycleWithParams(ctx context.Context, policyId string, params *MasterTimeoutAndTimeoutSpecParams) (*SlmExecuteResponse, error)
+	ExecuteRetentionWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	GetStatsWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*SlmStatsResponse, error)
+	GetStatusWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*SlmStatusResponse, error)
+	StartWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	StopWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+}
+
+var _ SlmServiceSpecExtensions = (*DefaultSlmService)(nil)
+
+// AsSlmServiceSpecExtensions adapts a SlmService to its extension interface.
+func AsSlmServiceSpecExtensions(service SlmService) (SlmServiceSpecExtensions, error) {
+	return asSpecExtensions[SlmServiceSpecExtensions]("slm", service)
+}
+
+func (s *DefaultSlmService) GetLifecycleWithParams(ctx context.Context, policyIds []string, params *MasterTimeoutAndTimeoutSpecParams) (map[string]*SlmPolicy, error) {
+	path := "/_slm/policy"
+	if len(policyIds) > 0 {
+		path = fmt.Sprintf("/_slm/policy/%s", escapedList(policyIds))
+	}
+	var result map[string]*SlmPolicy
+	return result, doReq(s.logger, ctx, s.client, "GET", path, nil, params, &result)
+}
+
+func (s *DefaultSlmService) PutLifecycleWithRequest(ctx context.Context, req *SlmPutLifecycleRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.PolicyID == "" {
+		return nil, fmt.Errorf("policy_id is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_slm/policy/%s", pathSegment(req.PolicyID)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultSlmService) DeleteLifecycleWithParams(ctx context.Context, policyId string, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if policyId == "" {
+		return nil, fmt.Errorf("policy_id is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_slm/policy/%s", pathSegment(policyId)), nil, params, &result)
+}
+
+func (s *DefaultSlmService) ExecuteLifecycleWithParams(ctx context.Context, policyId string, params *MasterTimeoutAndTimeoutSpecParams) (*SlmExecuteResponse, error) {
+	if policyId == "" {
+		return nil, fmt.Errorf("policy_id is required")
+	}
+	var result SlmExecuteResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_slm/policy/%s/_execute", pathSegment(policyId)), nil, params, &result)
+}
+
+func (s *DefaultSlmService) ExecuteRetentionWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_slm/_execute_retention", nil, params, &result)
+}
+
+func (s *DefaultSlmService) GetStatsWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*SlmStatsResponse, error) {
+	var result SlmStatsResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", "/_slm/stats", nil, params, &result)
+}
+
+func (s *DefaultSlmService) GetStatusWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*SlmStatusResponse, error) {
+	var result SlmStatusResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", "/_slm/status", nil, params, &result)
+}
+
+func (s *DefaultSlmService) StartWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_slm/start", nil, params, &result)
+}
+
+func (s *DefaultSlmService) StopWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_slm/stop", nil, params, &result)
+}
+
+// IlmServiceSpecExtensions exposes the opt-in ILM query carriers. Obtain it
+// with [AsIlmServiceSpecExtensions].
+type IlmServiceSpecExtensions interface {
+	GetLifecycleWithParams(ctx context.Context, policies []string, params *MasterTimeoutAndTimeoutSpecParams) (map[string]*IlmPolicy, error)
+	PutLifecycleWithRequest(ctx context.Context, req *IlmPutLifecycleRequest) (*types.AcknowledgedResponse, error)
+	DeleteLifecycleWithParams(ctx context.Context, policy string, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	StartWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	StopWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	MigrateToDataTiersWithParams(ctx context.Context, dryRun *bool, params *MasterTimeoutSpecParams) (*IlmMigrateToDataTiersResponse, error)
+}
+
+var _ IlmServiceSpecExtensions = (*DefaultIlmService)(nil)
+
+// AsIlmServiceSpecExtensions adapts an IlmService to its extension interface.
+func AsIlmServiceSpecExtensions(service IlmService) (IlmServiceSpecExtensions, error) {
+	return asSpecExtensions[IlmServiceSpecExtensions]("ilm", service)
+}
+
+func (s *DefaultIlmService) GetLifecycleWithParams(ctx context.Context, policies []string, params *MasterTimeoutAndTimeoutSpecParams) (map[string]*IlmPolicy, error) {
+	path := "/_ilm/policy"
+	if len(policies) > 0 {
+		path = fmt.Sprintf("/_ilm/policy/%s", escapedList(policies))
+	}
+	var result map[string]*IlmPolicy
+	return result, doReq(s.logger, ctx, s.client, "GET", path, nil, params, &result)
+}
+
+func (s *DefaultIlmService) PutLifecycleWithRequest(ctx context.Context, req *IlmPutLifecycleRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.Policy == "" {
+		return nil, fmt.Errorf("policy is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_ilm/policy/%s", pathSegment(req.Policy)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultIlmService) DeleteLifecycleWithParams(ctx context.Context, policy string, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if policy == "" {
+		return nil, fmt.Errorf("policy is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_ilm/policy/%s", pathSegment(policy)), nil, params, &result)
+}
+
+func (s *DefaultIlmService) StartWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_ilm/start", nil, params, &result)
+}
+
+func (s *DefaultIlmService) StopWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_ilm/stop", nil, params, &result)
+}
+
+func (s *DefaultIlmService) MigrateToDataTiersWithParams(ctx context.Context, dryRun *bool, params *MasterTimeoutSpecParams) (*IlmMigrateToDataTiersResponse, error) {
+	r, err := buildRequest(s.client, ctx, nil, params)
+	if err != nil {
+		return nil, err
+	}
+	if dryRun != nil {
+		r.SetQueryParam("dry_run", strconv.FormatBool(*dryRun))
+	}
+	resp, err := r.Post("/_ilm/migrate_to_data_tiers")
+	if err != nil {
+		return nil, wrapNetworkError(s.logger, err)
+	}
+	if resp.IsError() {
+		return nil, logAndReturnError(s.logger, resp)
+	}
+	var result IlmMigrateToDataTiersResponse
+	if err := json.Unmarshal(resp.Body(), &result); err != nil {
+		return nil, wrapUnmarshalError(s.logger, resp, err)
+	}
+	return &result, nil
+}
+
+// EnrichServiceSpecExtensions exposes the opt-in enrich query carriers.
+// Obtain it with [AsEnrichServiceSpecExtensions].
+type EnrichServiceSpecExtensions interface {
+	GetPolicyWithParams(ctx context.Context, names []string, params *MasterTimeoutSpecParams) (json.RawMessage, error)
+	PutPolicyWithRequest(ctx context.Context, req *EnrichPutPolicyRequest) (*types.AcknowledgedResponse, error)
+	DeletePolicyWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	StatsWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (json.RawMessage, error)
+}
+
+var _ EnrichServiceSpecExtensions = (*DefaultEnrichService)(nil)
+
+// AsEnrichServiceSpecExtensions adapts an EnrichService to its extension
+// interface.
+func AsEnrichServiceSpecExtensions(service EnrichService) (EnrichServiceSpecExtensions, error) {
+	return asSpecExtensions[EnrichServiceSpecExtensions]("enrich", service)
+}
+
+func (s *DefaultEnrichService) GetPolicyWithParams(ctx context.Context, names []string, params *MasterTimeoutSpecParams) (json.RawMessage, error) {
+	path := "/_enrich/policy"
+	if len(names) > 0 {
+		path = fmt.Sprintf("/_enrich/policy/%s", escapedList(names))
+	}
+	return doReqRaw(s.logger, ctx, s.client, "GET", path, nil, params)
+}
+
+func (s *DefaultEnrichService) PutPolicyWithRequest(ctx context.Context, req *EnrichPutPolicyRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.Name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_enrich/policy/%s", pathSegment(req.Name)), req.Body, req.Params, &result)
+}
+
+func (s *DefaultEnrichService) DeletePolicyWithParams(ctx context.Context, name string, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	if name == "" {
+		return nil, fmt.Errorf("name is required")
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_enrich/policy/%s", pathSegment(name)), nil, params, &result)
+}
+
+func (s *DefaultEnrichService) StatsWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (json.RawMessage, error) {
+	return doReqRaw(s.logger, ctx, s.client, "GET", "/_enrich/_stats", nil, params)
+}
+
+// FeaturesServiceSpecExtensions exposes the opt-in features query carriers.
+// Obtain it with [AsFeaturesServiceSpecExtensions].
+type FeaturesServiceSpecExtensions interface {
+	GetFeaturesWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*FeaturesGetResponse, error)
+	ResetFeaturesWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+}
+
+var _ FeaturesServiceSpecExtensions = (*DefaultFeaturesService)(nil)
+
+// AsFeaturesServiceSpecExtensions adapts a FeaturesService to its extension
+// interface.
+func AsFeaturesServiceSpecExtensions(service FeaturesService) (FeaturesServiceSpecExtensions, error) {
+	return asSpecExtensions[FeaturesServiceSpecExtensions]("features", service)
+}
+
+func (s *DefaultFeaturesService) GetFeaturesWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*FeaturesGetResponse, error) {
+	var result FeaturesGetResponse
+	return &result, doReq(s.logger, ctx, s.client, "GET", "/_features", nil, params, &result)
+}
+
+func (s *DefaultFeaturesService) ResetFeaturesWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_features/_reset", nil, params, &result)
+}
+
+// WatcherServiceSpecExtensions exposes the opt-in watcher query carriers.
+// Obtain it with [AsWatcherServiceSpecExtensions].
+type WatcherServiceSpecExtensions interface {
+	StartWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+	StopWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+}
+
+var _ WatcherServiceSpecExtensions = (*DefaultWatcherService)(nil)
+
+// AsWatcherServiceSpecExtensions adapts a WatcherService to its extension
+// interface.
+func AsWatcherServiceSpecExtensions(service WatcherService) (WatcherServiceSpecExtensions, error) {
+	return asSpecExtensions[WatcherServiceSpecExtensions]("watcher", service)
+}
+
+func (s *DefaultWatcherService) StartWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_watcher/_start", nil, params, &result)
+}
+
+func (s *DefaultWatcherService) StopWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "POST", "/_watcher/_stop", nil, params, &result)
+}
+
+// XpackServiceSpecExtensions exposes the opt-in xpack query carriers. Obtain
+// it with [AsXpackServiceSpecExtensions].
+type XpackServiceSpecExtensions interface {
+	UsageWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (XpackUsageResponse, error)
+}
+
+var _ XpackServiceSpecExtensions = (*DefaultXpackService)(nil)
+
+// AsXpackServiceSpecExtensions adapts an XpackService to its extension
+// interface.
+func AsXpackServiceSpecExtensions(service XpackService) (XpackServiceSpecExtensions, error) {
+	return asSpecExtensions[XpackServiceSpecExtensions]("xpack", service)
+}
+
+func (s *DefaultXpackService) UsageWithParams(ctx context.Context, params *MasterTimeoutSpecParams) (XpackUsageResponse, error) {
+	var result XpackUsageResponse
+	return result, doReq(s.logger, ctx, s.client, "GET", "/_xpack/usage", nil, params, &result)
 }

@@ -13,6 +13,7 @@ import (
 // EnrichWaitForCompletionParams are the query parameters for execute policy.
 type EnrichWaitForCompletionParams struct {
 	Common            *CommonParams
+	MasterTimeout     string
 	WaitForCompletion *bool
 }
 
@@ -22,6 +23,9 @@ func (p *EnrichWaitForCompletionParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
 }

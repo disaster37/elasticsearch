@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 158 |
-| Known-missing (baselined) endpoints | 354 |
+| Registered implementations | 197 |
+| Known-missing (baselined) endpoints | 315 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -65,7 +65,9 @@ number, not a claim of full REST implementation equivalence.
 | `api.SearchParams` | added `ForceSyntheticSource *bool`, `IncludeNamedQueriesScore *bool` | `force_synthetic_source`, `include_named_queries_score` |
 | `api.catCommonParams` | added `MasterTimeout string`, `Time string` (promoted, not duplicated) | `master_timeout`, `time` |
 | `api.TextStructureFindParams` | added `DocumentsToSample *int`, `EcsCompatibility string`, `Timeout string` | `documents_to_sample`, `ecs_compatibility`, `timeout` |
-| `AsyncSearchServiceSpecExtensions` | new opt-in `StatusWithParams` carrier | `keep_alive` |
+| `api.AsyncSearchStatusParams` | new opt-in `StatusWithParams` carrier | `keep_alive` |
+| `api.MasterTimeoutSpecParams` / `TimeoutSpecParams` / `MasterTimeoutAndTimeoutSpecParams` | new shared opt-in extension carriers (B1) | `master_timeout`, `timeout` |
+| `api.CcrFollowParams`, `api.IlmExplainParams`, `api.EnrichWaitForCompletionParams` | added `MasterTimeout string` | `master_timeout` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -163,19 +165,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `ccr.delete_auto_follow_pattern` | not-implemented | stable | public | CcrService.DeleteAutoFollowPattern exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.follow` | not-implemented | stable | public | CcrService.Follow exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.follow_info` | not-implemented | stable | public | CcrService.FollowInfo exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.follow_stats` | not-implemented | stable | public | CcrService.FollowStats exists but binding is incomplete (missing params: timeout) |
-| `ccr.forget_follower` | not-implemented | stable | public | CcrService.ForgetFollower exists but binding is incomplete (missing params: timeout) |
-| `ccr.get_auto_follow_pattern` | not-implemented | stable | public | CcrService.GetAutoFollowPattern exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.pause_auto_follow_pattern` | not-implemented | stable | public | CcrService.PauseAutoFollowPattern exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.pause_follow` | not-implemented | stable | public | CcrService.PauseFollow exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.put_auto_follow_pattern` | not-implemented | stable | public | CcrService.PutAutoFollowPattern exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.resume_auto_follow_pattern` | not-implemented | stable | public | CcrService.ResumeAutoFollowPattern exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.resume_follow` | not-implemented | stable | public | CcrService.ResumeFollow exists but binding is incomplete (missing params: master_timeout) |
-| `ccr.stats` | not-implemented | stable | public | CcrService.Stats exists but binding is incomplete (missing params: timeout,master_timeout) |
-| `ccr.unfollow` | not-implemented | stable | public | CcrService.Unfollow exists but binding is incomplete (missing params: master_timeout) |
 
 ### cluster
 
@@ -251,11 +240,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `enrich.delete_policy` | not-implemented | stable | public | EnrichService.DeletePolicy exists but binding is incomplete (missing params: master_timeout) |
-| `enrich.execute_policy` | not-implemented | stable | public | EnrichService.ExecutePolicy exists but binding is incomplete (missing params: master_timeout) |
-| `enrich.get_policy` | not-implemented | stable | public | EnrichService.GetPolicy exists but binding is incomplete (missing params: master_timeout) |
-| `enrich.put_policy` | not-implemented | stable | public | EnrichService.PutPolicy exists but binding is incomplete (missing params: master_timeout) |
-| `enrich.stats` | not-implemented | stable | public | EnrichService.Stats exists but binding is incomplete (missing params: master_timeout) |
 
 ### eql
 
@@ -284,8 +268,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `features.get_features` | not-implemented | stable | public | FeaturesService.GetFeatures exists but binding is incomplete (missing params: master_timeout) |
-| `features.reset_features` | not-implemented | experimental | public | FeaturesService.ResetFeatures exists but binding is incomplete (missing params: master_timeout) |
 
 ### fleet
 
@@ -302,13 +284,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `ilm.delete_lifecycle` | not-implemented | stable | public | IlmService.DeleteLifecycle exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `ilm.explain_lifecycle` | not-implemented | stable | public | IlmService.ExplainLifecycle exists but binding is incomplete (missing params: master_timeout) |
-| `ilm.get_lifecycle` | not-implemented | stable | public | IlmService.GetLifecycle exists but binding is incomplete (missing params: master_timeout,timeout; unmapped parts: policy) |
-| `ilm.migrate_to_data_tiers` | not-implemented | stable | public | IlmService.MigrateToDataTiers exists but binding is incomplete (missing params: master_timeout) |
-| `ilm.put_lifecycle` | not-implemented | stable | public | IlmService.PutLifecycle exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `ilm.start` | not-implemented | stable | public | IlmService.Start exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `ilm.stop` | not-implemented | stable | public | IlmService.Stop exists but binding is incomplete (missing params: master_timeout,timeout) |
 
 ### indices
 
@@ -633,15 +608,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `slm.delete_lifecycle` | not-implemented | stable | public | SlmService.DeleteLifecycle exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.execute_lifecycle` | not-implemented | stable | public | SlmService.ExecuteLifecycle exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.execute_retention` | not-implemented | stable | public | SlmService.ExecuteRetention exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.get_lifecycle` | not-implemented | stable | public | SlmService.GetLifecycle exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.get_stats` | not-implemented | stable | public | SlmService.GetStats exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.get_status` | not-implemented | stable | public | SlmService.GetStatus exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.put_lifecycle` | not-implemented | stable | public | SlmService.PutLifecycle exists but binding is incomplete (missing params: timeout,master_timeout) |
-| `slm.start` | not-implemented | stable | public | SlmService.Start exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `slm.stop` | not-implemented | stable | public | SlmService.Stop exists but binding is incomplete (missing params: master_timeout,timeout) |
 
 ### snapshot
 
@@ -703,8 +669,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 | `watcher.deactivate_watch` | not-implemented | stable | public | WatcherService.DeactivateWatch exists but binding is incomplete (unmapped parts: watch_id) |
 | `watcher.get_settings` | not-implemented | stable | public | no WatcherService.GetSettings method |
 | `watcher.put_watch` | not-implemented | stable | public | WatcherService.PutWatch exists but binding is incomplete (missing params: version) |
-| `watcher.start` | not-implemented | stable | public | WatcherService.Start exists but binding is incomplete (missing params: master_timeout) |
-| `watcher.stop` | not-implemented | stable | public | WatcherService.Stop exists but binding is incomplete (missing params: master_timeout) |
 | `watcher.update_settings` | not-implemented | stable | public | no WatcherService.UpdateSettings method |
 
 ### xpack
@@ -714,4 +678,3 @@ with its exact reason. The authoritative map is `baseline.go`.
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
 | `xpack.info` | not-implemented | stable | public | XpackService.Info exists but binding is incomplete (missing params: human,accept_enterprise) |
-| `xpack.usage` | not-implemented | stable | public | XpackService.Usage exists but binding is incomplete (missing params: master_timeout) |

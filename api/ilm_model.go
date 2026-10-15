@@ -2,9 +2,10 @@ package api
 
 // IlmExplainParams are the query parameters for ILM explain.
 type IlmExplainParams struct {
-	Common      *CommonParams
-	OnlyErrors  *bool
-	OnlyManaged *bool
+	Common        *CommonParams
+	MasterTimeout string
+	OnlyErrors    *bool
+	OnlyManaged   *bool
 }
 
 // ToMap converts IlmExplainParams to a query-parameter map.
@@ -13,6 +14,9 @@ func (p *IlmExplainParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "only_errors", p.OnlyErrors)
 	setBoolParam(m, "only_managed", p.OnlyManaged)
 	return mergeParams(m, p.Common)

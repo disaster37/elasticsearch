@@ -391,6 +391,221 @@
     "evidence": "DefaultCatService.Transforms route /_cat/transforms/%s"
   },
   {
+    "name": "ccr.delete_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "DeleteAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.DeleteAutoFollowPatternWithParams DELETE /_ccr/auto_follow/{name}"
+  },
+  {
+    "name": "ccr.follow",
+    "service": "CcrService",
+    "method": "Follow",
+    "paramsStruct": "api.CcrFollowParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.Follow POST /{index}/_ccr/follow (CcrFollowParams carries master_timeout)"
+  },
+  {
+    "name": "ccr.follow_info",
+    "service": "CcrServiceSpecExtensions",
+    "method": "FollowInfoWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.FollowInfoWithParams GET /{indices}/_ccr/info"
+  },
+  {
+    "name": "ccr.follow_stats",
+    "service": "CcrServiceSpecExtensions",
+    "method": "FollowStatsWithParams",
+    "paramsStruct": "api.TimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.FollowStatsWithParams GET /{indices}/_ccr/stats"
+  },
+  {
+    "name": "ccr.forget_follower",
+    "service": "CcrServiceSpecExtensions",
+    "method": "ForgetFollowerWithRequest",
+    "paramsStruct": "api.TimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultCcrService.ForgetFollowerWithRequest POST /{index}/_ccr/forget_follower"
+  },
+  {
+    "name": "ccr.get_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "GetAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.GetAutoFollowPatternWithParams GET /_ccr/auto_follow/{name}"
+  },
+  {
+    "name": "ccr.pause_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "PauseAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.PauseAutoFollowPatternWithParams POST /_ccr/auto_follow/{name}/pause"
+  },
+  {
+    "name": "ccr.pause_follow",
+    "service": "CcrServiceSpecExtensions",
+    "method": "PauseFollowWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.PauseFollowWithParams POST /{index}/_ccr/pause_follow"
+  },
+  {
+    "name": "ccr.put_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "PutAutoFollowPatternWithRequest",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultCcrService.PutAutoFollowPatternWithRequest PUT /_ccr/auto_follow/{name}"
+  },
+  {
+    "name": "ccr.resume_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "ResumeAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.ResumeAutoFollowPatternWithParams POST /_ccr/auto_follow/{name}/resume"
+  },
+  {
+    "name": "ccr.resume_follow",
+    "service": "CcrServiceSpecExtensions",
+    "method": "ResumeFollowWithRequest",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultCcrService.ResumeFollowWithRequest POST /{index}/_ccr/resume_follow"
+  },
+  {
+    "name": "ccr.stats",
+    "service": "CcrServiceSpecExtensions",
+    "method": "StatsWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCcrService.StatsWithParams GET /_ccr/stats"
+  },
+  {
+    "name": "ccr.unfollow",
+    "service": "CcrServiceSpecExtensions",
+    "method": "UnfollowWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.UnfollowWithParams POST /{index}/_ccr/unfollow"
+  },
+  {
     "name": "clear_scroll",
     "service": "SearchService",
     "method": "ClearScroll",
@@ -453,6 +668,85 @@
       }
     },
     "evidence": "DefaultDocumentService.DeleteByQueryRethrottle"
+  },
+  {
+    "name": "enrich.delete_policy",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "DeletePolicyWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEnrichService.DeletePolicyWithParams DELETE /_enrich/policy/{name}"
+  },
+  {
+    "name": "enrich.execute_policy",
+    "service": "EnrichService",
+    "method": "ExecutePolicy",
+    "paramsStruct": "api.EnrichWaitForCompletionParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEnrichService.ExecutePolicy PUT /_enrich/policy/{name}/_execute (carrier carries master_timeout)"
+  },
+  {
+    "name": "enrich.get_policy",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "GetPolicyWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEnrichService.GetPolicyWithParams GET /_enrich/policy/{name}"
+  },
+  {
+    "name": "enrich.put_policy",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "PutPolicyWithRequest",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultEnrichService.PutPolicyWithRequest PUT /_enrich/policy/{name}"
+  },
+  {
+    "name": "enrich.stats",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "StatsWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultEnrichService.StatsWithParams GET /_enrich/_stats"
   },
   {
     "name": "eql.delete",
@@ -540,6 +834,28 @@
       }
     },
     "evidence": "DefaultDocumentService.Explain route /%s/_explain/%s"
+  },
+  {
+    "name": "features.get_features",
+    "service": "FeaturesServiceSpecExtensions",
+    "method": "GetFeaturesWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultFeaturesService.GetFeaturesWithParams GET /_features"
+  },
+  {
+    "name": "features.reset_features",
+    "service": "FeaturesServiceSpecExtensions",
+    "method": "ResetFeaturesWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultFeaturesService.ResetFeaturesWithParams POST /_features/_reset"
   },
   {
     "name": "fleet.global_checkpoints",
@@ -630,10 +946,78 @@
     "evidence": "DefaultGraphService.Explore route /%s/_graph/explore"
   },
   {
+    "name": "ilm.delete_lifecycle",
+    "service": "IlmServiceSpecExtensions",
+    "method": "DeleteLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.DeleteLifecycleWithParams DELETE /_ilm/policy/{policy}"
+  },
+  {
+    "name": "ilm.explain_lifecycle",
+    "service": "IlmService",
+    "method": "ExplainLifecycle",
+    "paramsStruct": "api.IlmExplainParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.ExplainLifecycle GET /{index}/_ilm/explain (IlmExplainParams carries master_timeout)"
+  },
+  {
+    "name": "ilm.get_lifecycle",
+    "service": "IlmServiceSpecExtensions",
+    "method": "GetLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.GetLifecycleWithParams GET /_ilm/policy/{policy}"
+  },
+  {
     "name": "ilm.get_status",
     "service": "IlmService",
     "method": "GetStatus",
     "evidence": "DefaultIlmService.GetStatus route /_ilm/status"
+  },
+  {
+    "name": "ilm.migrate_to_data_tiers",
+    "service": "IlmServiceSpecExtensions",
+    "method": "MigrateToDataTiersWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "dry_run": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.MigrateToDataTiersWithParams POST /_ilm/migrate_to_data_tiers"
   },
   {
     "name": "ilm.move_to_step",
@@ -646,6 +1030,23 @@
       }
     },
     "evidence": "DefaultIlmService.MoveToStep route /_ilm/move/%s"
+  },
+  {
+    "name": "ilm.put_lifecycle",
+    "service": "IlmServiceSpecExtensions",
+    "method": "PutLifecycleWithRequest",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "policy": {
+        "argument": 1,
+        "field": "Policy"
+      }
+    },
+    "evidence": "DefaultIlmService.PutLifecycleWithRequest PUT /_ilm/policy/{policy}"
   },
   {
     "name": "ilm.remove_policy",
@@ -670,6 +1071,28 @@
       }
     },
     "evidence": "DefaultIlmService.Retry route /%s/_ilm/retry"
+  },
+  {
+    "name": "ilm.start",
+    "service": "IlmServiceSpecExtensions",
+    "method": "StartWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultIlmService.StartWithParams POST /_ilm/start"
+  },
+  {
+    "name": "ilm.stop",
+    "service": "IlmServiceSpecExtensions",
+    "method": "StopWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultIlmService.StopWithParams POST /_ilm/stop"
   },
   {
     "name": "indices.analyze",
@@ -1804,6 +2227,129 @@
     "evidence": "DefaultSecurityService.UpdateAPIKey route /_security/api_key/%s"
   },
   {
+    "name": "slm.delete_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "DeleteLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSlmService.DeleteLifecycleWithParams DELETE /_slm/policy/{policy_id}"
+  },
+  {
+    "name": "slm.execute_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "ExecuteLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSlmService.ExecuteLifecycleWithParams PUT /_slm/policy/{policy_id}/_execute"
+  },
+  {
+    "name": "slm.execute_retention",
+    "service": "SlmServiceSpecExtensions",
+    "method": "ExecuteRetentionWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.ExecuteRetentionWithParams POST /_slm/_execute_retention"
+  },
+  {
+    "name": "slm.get_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "GetLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSlmService.GetLifecycleWithParams GET /_slm/policy/{policy_id}"
+  },
+  {
+    "name": "slm.get_stats",
+    "service": "SlmServiceSpecExtensions",
+    "method": "GetStatsWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.GetStatsWithParams GET /_slm/stats"
+  },
+  {
+    "name": "slm.get_status",
+    "service": "SlmServiceSpecExtensions",
+    "method": "GetStatusWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.GetStatusWithParams GET /_slm/status"
+  },
+  {
+    "name": "slm.put_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "PutLifecycleWithRequest",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": "PolicyID"
+      }
+    },
+    "evidence": "DefaultSlmService.PutLifecycleWithRequest PUT /_slm/policy/{policy_id}"
+  },
+  {
+    "name": "slm.start",
+    "service": "SlmServiceSpecExtensions",
+    "method": "StartWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.StartWithParams POST /_slm/start"
+  },
+  {
+    "name": "slm.stop",
+    "service": "SlmServiceSpecExtensions",
+    "method": "StopWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.StopWithParams POST /_slm/stop"
+  },
+  {
     "name": "sql.clear_cursor",
     "service": "SqlService",
     "method": "ClearCursor",
@@ -2214,6 +2760,17 @@
     "evidence": "DefaultWatcherService.QueryWatches route /_watcher/_query/watches"
   },
   {
+    "name": "watcher.start",
+    "service": "WatcherServiceSpecExtensions",
+    "method": "StartWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultWatcherService.StartWithParams POST /_watcher/_start"
+  },
+  {
     "name": "watcher.stats",
     "service": "WatcherService",
     "method": "Stats",
@@ -2235,5 +2792,27 @@
       }
     },
     "evidence": "DefaultWatcherService.Stats route /_watcher/stats/%s"
+  },
+  {
+    "name": "watcher.stop",
+    "service": "WatcherServiceSpecExtensions",
+    "method": "StopWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultWatcherService.StopWithParams POST /_watcher/_stop"
+  },
+  {
+    "name": "xpack.usage",
+    "service": "XpackServiceSpecExtensions",
+    "method": "UsageWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultXpackService.UsageWithParams GET /_xpack/usage"
   }
 ]
