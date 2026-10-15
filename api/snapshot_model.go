@@ -414,7 +414,7 @@ type SnapshotInfo struct {
 	DurationInMillis   int64             `json:"duration_in_millis,omitempty"`
 	Failures           []map[string]any  `json:"failures,omitempty"`
 	Shards             *types.ShardsInfo `json:"shards,omitempty"`
-	VersionId          string            `json:"version_id,omitempty"`
+	VersionId          int64             `json:"version_id,omitempty"`
 	Version            string            `json:"version,omitempty"`
 	IncludeGlobalState *bool             `json:"include_global_state,omitempty"`
 }
