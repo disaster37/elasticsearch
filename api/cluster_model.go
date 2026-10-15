@@ -487,7 +487,7 @@ type ClusterRemoteInfoResponse map[string]struct {
 	ClusterCredentials string   `json:"cluster_credentials,omitempty"`
 }
 
-// ClusterInfoResponse is the response from GET /_cluster/info/{feature}.
+// ClusterInfoResponse is the response from GET /_info/{target}.
 type ClusterInfoResponse map[string]any
 
 // ClusterGetComponentTemplateResponse is the response from get component templates.

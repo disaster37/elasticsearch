@@ -110,7 +110,7 @@ func (p *IndexParams) ToMap() map[string]string {
 	return mergeParams(m, p.Common)
 }
 
-// CreateRequest is the request for PUT /{index}/_doc/{id}/_create.
+// CreateRequest is the request for PUT /{index}/_create/{id}.
 type CreateRequest struct {
 	Index  string `validate:"required"`
 	Id     string `validate:"required"`
