@@ -168,3 +168,42 @@ func (r *SecurityHasPrivilegesSpecRequest) Validate() error {
 	}
 	return nil
 }
+
+// TextStructureFindFieldSpecRequest is the opt-in request for the correctly
+// routed text_structure.find_field_structure endpoint. Index and Field are
+// emitted as query values.
+type TextStructureFindFieldSpecRequest struct {
+	Index  string
+	Field  string
+	Params *TextStructureFindParams
+}
+
+// Validate requires both the index and field selectors.
+func (r *TextStructureFindFieldSpecRequest) Validate() error {
+	if r == nil {
+		return fmt.Errorf("validation: request is required")
+	}
+	if r.Index == "" || r.Field == "" {
+		return fmt.Errorf("validation: index and field are required")
+	}
+	return nil
+}
+
+// TextStructureFindMessageSpecRequest is the opt-in request for the correctly
+// routed text_structure.find_message_structure endpoint. Messages is emitted
+// as the required JSON body.
+type TextStructureFindMessageSpecRequest struct {
+	Messages []string
+	Params   *TextStructureFindParams
+}
+
+// Validate requires at least one message.
+func (r *TextStructureFindMessageSpecRequest) Validate() error {
+	if r == nil {
+		return fmt.Errorf("validation: request is required")
+	}
+	if len(r.Messages) == 0 {
+		return fmt.Errorf("validation: messages is required")
+	}
+	return nil
+}

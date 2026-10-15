@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	json "github.com/goccy/go-json"
+
 	"github.com/disaster37/elasticsearch/v9/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -736,4 +738,92 @@ func TestSecurityHasPrivilegesValidation(t *testing.T) {
 
 	_, err = ext.HasPrivilegesWithRequest(context.Background(), nil)
 	require.Error(t, err)
+}
+
+type customTextStructure struct{ TextStructureService }
+
+func TestTextStructureSpecExtensionAdapters(t *testing.T) {
+	svc := NewTextStructureService(nil, testLogger())
+	if _, err := AsTextStructureServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("text_structure default: %v", err)
+	}
+	if _, err := AsTextStructureServiceSpecExtensions(nil); err == nil {
+		t.Error("text_structure nil: want error")
+	}
+	var typedNil TextStructureService = (*DefaultTextStructureService)(nil)
+	if _, err := AsTextStructureServiceSpecExtensions(typedNil); err == nil {
+		t.Error("text_structure typed-nil: want error")
+	}
+	if _, err := AsTextStructureServiceSpecExtensions(customTextStructure{svc}); err == nil {
+		t.Error("text_structure custom: want error")
+	}
+}
+
+func TestUnitTextStructureFindFieldStructureWithRequest(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewTextStructureService(restyClient(srv), testLogger())
+	ext, err := AsTextStructureServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+
+	_, err = ext.FindFieldStructureWithRequest(context.Background(), &TextStructureFindFieldSpecRequest{
+		Index:  "logs",
+		Field:  "message",
+		Params: &TextStructureFindParams{DocumentsToSample: ptrInt(3)},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "GET", got.method)
+	assert.Equal(t, "/_text_structure/find_field_structure", got.path)
+	assert.Equal(t, "logs", got.query["index"])
+	assert.Equal(t, "message", got.query["field"])
+	assert.Equal(t, "3", got.query["documents_to_sample"])
+
+	// Required selectors are validated before any network call.
+	*got = capturedSpecRequest{}
+	_, err = ext.FindFieldStructureWithRequest(context.Background(), &TextStructureFindFieldSpecRequest{Index: "logs"})
+	require.Error(t, err)
+	assert.Empty(t, got.method)
+
+	// The legacy method keeps its old route.
+	*got = capturedSpecRequest{}
+	_, err = svc.FindFieldStructure(context.Background(), "logs", "message", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "/logs/_text_structure/field_structure", got.path)
+}
+
+func TestUnitTextStructureFindMessageStructureWithRequest(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewTextStructureService(restyClient(srv), testLogger())
+	ext, err := AsTextStructureServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+
+	messages := []string{"first\nline", "second \"quoted\"", "unicode \u00e9\u00e8"}
+	_, err = ext.FindMessageStructureWithRequest(context.Background(), &TextStructureFindMessageSpecRequest{
+		Messages: messages,
+		Params:   &TextStructureFindParams{EcsCompatibility: "v1"},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "POST", got.method)
+	assert.Equal(t, "/_text_structure/find_message_structure", got.path)
+	assert.NotContains(t, got.query, "index")
+	assert.NotContains(t, got.query, "field")
+	assert.Equal(t, "v1", got.query["ecs_compatibility"])
+	var decoded struct {
+		Messages []string `json:"messages"`
+	}
+	require.NoError(t, json.Unmarshal([]byte(got.body), &decoded))
+	assert.Equal(t, messages, decoded.Messages)
+
+	// Required messages are validated before any network call.
+	*got = capturedSpecRequest{}
+	_, err = ext.FindMessageStructureWithRequest(context.Background(), &TextStructureFindMessageSpecRequest{})
+	require.Error(t, err)
+	assert.Empty(t, got.method)
+
+	// The legacy method keeps its old route.
+	*got = capturedSpecRequest{}
+	_, err = svc.FindMessageStructure(context.Background(), "logs", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "/logs/_text_structure/message_structure", got.path)
 }

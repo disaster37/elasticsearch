@@ -4648,6 +4648,38 @@
     "evidence": "DefaultDocumentService.TermVectors route /%s/_termvectors/%s"
   },
   {
+    "name": "text_structure.find_field_structure",
+    "service": "TextStructureServiceSpecExtensions",
+    "method": "FindFieldStructureWithRequest",
+    "paramsStruct": "api.TextStructureFindParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "field": {
+        "argument": 1,
+        "field": "Field"
+      }
+    },
+    "evidence": "DefaultTextStructureService.FindFieldStructureWithRequest GET /_text_structure/find_field_structure (index/field emitted as query)"
+  },
+  {
+    "name": "text_structure.find_message_structure",
+    "service": "TextStructureServiceSpecExtensions",
+    "method": "FindMessageStructureWithRequest",
+    "paramsStruct": "api.TextStructureFindParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "evidence": "DefaultTextStructureService.FindMessageStructureWithRequest POST /_text_structure/find_message_structure (messages JSON body)"
+  },
+  {
     "name": "text_structure.find_structure",
     "service": "TextStructureService",
     "method": "FindStructure",

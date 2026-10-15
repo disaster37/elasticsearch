@@ -3239,6 +3239,26 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultDocumentService.TermVectors route /%s/_termvectors/%s",
 	},
+	"text_structure.find_field_structure": {
+		Service:      "TextStructureServiceSpecExtensions",
+		Method:       "FindFieldStructureWithRequest",
+		ParamsStruct: "api.TextStructureFindParams",
+		ParamsFields: []string{"Charset", "ColumnNames", "Common", "Delimiter", "DocumentsToSample", "EcsCompatibility", "Explain", "Format", "GrokPattern", "HasHeaderRow", "LineMergeSizeLimit", "LinesToSample", "Quote", "ShouldTrimFields", "Timeout", "TimestampField", "TimestampFormat"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		QueryArgs: map[string]ValueSource{
+			"field": ValueSource{Argument: 1, Field: "Field"},
+			"index": ValueSource{Argument: 1, Field: "Index"},
+		},
+		Evidence: "DefaultTextStructureService.FindFieldStructureWithRequest GET /_text_structure/find_field_structure (index/field emitted as query)",
+	},
+	"text_structure.find_message_structure": {
+		Service:      "TextStructureServiceSpecExtensions",
+		Method:       "FindMessageStructureWithRequest",
+		ParamsStruct: "api.TextStructureFindParams",
+		ParamsFields: []string{"Charset", "ColumnNames", "Common", "Delimiter", "DocumentsToSample", "EcsCompatibility", "Explain", "Format", "GrokPattern", "HasHeaderRow", "LineMergeSizeLimit", "LinesToSample", "Quote", "ShouldTrimFields", "Timeout", "TimestampField", "TimestampFormat"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		Evidence:     "DefaultTextStructureService.FindMessageStructureWithRequest POST /_text_structure/find_message_structure (messages JSON body)",
+	},
 	"text_structure.find_structure": {
 		Service:      "TextStructureService",
 		Method:       "FindStructure",

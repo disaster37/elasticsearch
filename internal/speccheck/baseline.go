@@ -1240,20 +1240,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-simulate",
 	},
-	"text_structure.find_field_structure": {
-		Status:     "not-implemented",
-		Reason:     "TextStructureService.FindFieldStructure uses legacy route /{index}/_text_structure/field_structure; v9 spec requires /_text_structure/find_field_structure with index/field as query params",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-text_structure",
-	},
-	"text_structure.find_message_structure": {
-		Status:     "not-implemented",
-		Reason:     "TextStructureService.FindMessageStructure uses legacy route /{index}/_text_structure/message_structure; v9 spec requires /_text_structure/find_message_structure with index in the body",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-text_structure",
-	},
 	"transform.update_transform": {
 		Status:     "not-implemented",
 		Reason:     "no TransformService.UpdateTransform method",

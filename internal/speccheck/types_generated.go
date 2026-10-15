@@ -268,6 +268,7 @@ var serviceTypes = map[string]reflect.Type{
 	"api.SynonymsService":                          reflect.TypeOf((*api.SynonymsService)(nil)).Elem(),
 	"api.TasksService":                             reflect.TypeOf((*api.TasksService)(nil)).Elem(),
 	"api.TextStructureService":                     reflect.TypeOf((*api.TextStructureService)(nil)).Elem(),
+	"api.TextStructureServiceSpecExtensions":       reflect.TypeOf((*api.TextStructureServiceSpecExtensions)(nil)).Elem(),
 	"api.TransformService":                         reflect.TypeOf((*api.TransformService)(nil)).Elem(),
 	"api.TransformServiceSpecExtensions":           reflect.TypeOf((*api.TransformServiceSpecExtensions)(nil)).Elem(),
 	"api.WatcherService":                           reflect.TypeOf((*api.WatcherService)(nil)).Elem(),

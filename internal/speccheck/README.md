@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 331 |
-| Known-missing (baselined) endpoints | 181 |
+| Registered implementations | 333 |
+| Known-missing (baselined) endpoints | 179 |
 | Controlled-ignored parameters | 25 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -80,14 +80,15 @@ number, not a claim of full REST implementation equivalence.
 | ingest/script/license/health carriers; `ScriptService.Put` | direct `MasterTimeout` additions; optional path `/{context}`; new `LicenseServiceSpecExtensions.DeleteWithParams` (B8) | `master_timeout`, `accept_enterprise`, `timeout` |
 | ml/searchable_snapshots/transform/search_application/nodes/xpack carriers | direct fields added; new `MlServiceSpecExtensions`, `SearchableSnapshotsServiceSpecExtensions`, `TransformServiceSpecExtensions`, `SearchApplicationServiceSpecExtensions` (B9) | `delete_user_annotations`, `storage`, `typed_keys`, `from`, `include_unloaded_segments`, `human` |
 | cat/nodes/tasks/plugins; watcher.put_watch; inference.update; synonyms rules | direct fields; `inference.update` verb corrected to PUT; `synonyms.*_synonym_rule` paths corrected to the pinned `/_synonyms/{set_id}/{rule_id}`; new `InferenceServiceSpecExtensions.UpdateWithRequest`; four more Cat `format` controlled ignores (B10) | `include_unloaded_segments`, `include_bootstrap`, `nodes`, `wait_for_completion`, `version` |
+| `api.TextStructureServiceSpecExtensions` | correctly routed opt-in `FindFieldStructureWithRequest` (GET `/_text_structure/find_field_structure`, index/field query) and `FindMessageStructureWithRequest` (POST `/_text_structure/find_message_structure`, messages body); legacy methods unchanged (B11) | `index`, `field`, `messages` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
-`text_structure.find_message_structure` are baselined as missing (see the
-backlog): the client sends the legacy `/{index}/_text_structure/...` routes,
-which do not match the v9 `/_text_structure/find_*` spec paths, so their
-`index`/`field` transport is not verified coverage. `documents_to_sample` was
-added for `find_field_structure` and remains as extra carrier capability.
+`text_structure.find_message_structure` are now registered through the opt-in
+`TextStructureServiceSpecExtensions`, which target the v9 `/_text_structure/find_*`
+routes. The legacy `FindFieldStructure`/`FindMessageStructure` methods keep the
+older `/{index}/_text_structure/...` routes and are intentionally not delegated.
+`documents_to_sample` remains as extra carrier capability.
 
 The Cat `format` parameter is a controlled exception for typed JSON decoding
 (see below). All other Cat promoted fields (`h`, `help`, `s`, `v`, `local`)
@@ -530,8 +531,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `text_structure.find_field_structure` | not-implemented | stable | public | TextStructureService.FindFieldStructure uses legacy route /{index}/_text_structure/field_structure; v9 spec requires /_text_structure/find_field_structure with index/field as query params |
-| `text_structure.find_message_structure` | not-implemented | stable | public | TextStructureService.FindMessageStructure uses legacy route /{index}/_text_structure/message_structure; v9 spec requires /_text_structure/find_message_structure with index in the body |
 
 ### transform
 

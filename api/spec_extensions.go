@@ -917,3 +917,59 @@ func (s *DefaultInferenceService) UpdateWithRequest(ctx context.Context, req *In
 	var result types.AcknowledgedResponse
 	return &result, doReq(s.logger, ctx, s.client, "PUT", path, req.Body, nil, &result)
 }
+
+// TextStructureServiceSpecExtensions exposes correctly routed text-structure
+// endpoints. The original TextStructureService methods are unchanged and keep
+// using the legacy routes; these extensions target the pinned v9 routes.
+// Obtain the extensions with [AsTextStructureServiceSpecExtensions].
+type TextStructureServiceSpecExtensions interface {
+	FindFieldStructureWithRequest(ctx context.Context, req *TextStructureFindFieldSpecRequest) (json.RawMessage, error)
+	FindMessageStructureWithRequest(ctx context.Context, req *TextStructureFindMessageSpecRequest) (json.RawMessage, error)
+}
+
+var _ TextStructureServiceSpecExtensions = (*DefaultTextStructureService)(nil)
+
+// AsTextStructureServiceSpecExtensions adapts a TextStructureService to its
+// extension interface.
+func AsTextStructureServiceSpecExtensions(service TextStructureService) (TextStructureServiceSpecExtensions, error) {
+	return asSpecExtensions[TextStructureServiceSpecExtensions]("text_structure", service)
+}
+
+func (s *DefaultTextStructureService) FindFieldStructureWithRequest(ctx context.Context, req *TextStructureFindFieldSpecRequest) (json.RawMessage, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+	r, err := buildRequest(s.client, ctx, nil, req.Params)
+	if err != nil {
+		return nil, err
+	}
+	// Required selectors are applied last so a Params carrier cannot drop them.
+	r.SetQueryParam("index", req.Index)
+	r.SetQueryParam("field", req.Field)
+	resp, err := r.Get("/_text_structure/find_field_structure")
+	if err != nil {
+		return nil, wrapNetworkError(s.logger, err)
+	}
+	if resp.IsError() {
+		return nil, logAndReturnError(s.logger, resp)
+	}
+	return json.RawMessage(resp.Body()), nil
+}
+
+func (s *DefaultTextStructureService) FindMessageStructureWithRequest(ctx context.Context, req *TextStructureFindMessageSpecRequest) (json.RawMessage, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+	r, err := buildRequest(s.client, ctx, map[string][]string{"messages": req.Messages}, req.Params)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := r.Post("/_text_structure/find_message_structure")
+	if err != nil {
+		return nil, wrapNetworkError(s.logger, err)
+	}
+	if resp.IsError() {
+		return nil, logAndReturnError(s.logger, resp)
+	}
+	return json.RawMessage(resp.Body()), nil
+}
