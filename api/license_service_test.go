@@ -258,3 +258,21 @@ func TestUnitLicensePostStartTrialNetworkError(t *testing.T) {
 	_, err := svc.PostStartTrial(context.Background(), nil)
 	assert.Error(t, err)
 }
+
+func TestUnitLicenseB3Timeouts(t *testing.T) {
+	var gotQuery map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotQuery = queryMap(r)
+		jsonResponse(w, 200, `{"acknowledged":true}`)
+	}))
+	defer srv.Close()
+	svc := NewLicenseService(restyClient(srv), testLogger())
+	_, err := svc.Post(context.Background(), map[string]any{"license": "x"}, &LicensePostParams{MasterTimeout: "m1", Timeout: "t1"})
+	require.NoError(t, err)
+	assert.Equal(t, "m1", gotQuery["master_timeout"])
+	assert.Equal(t, "t1", gotQuery["timeout"])
+
+	_, err = svc.PostStartBasic(context.Background(), &LicensePostParams{MasterTimeout: "m2"})
+	require.NoError(t, err)
+	assert.Equal(t, "m2", gotQuery["master_timeout"])
+}

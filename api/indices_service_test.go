@@ -1339,3 +1339,74 @@ func TestUnitIndicesResolveClusterEmpty(t *testing.T) {
 	_, err := svc.ResolveCluster(context.Background(), nil, &IndicesResolveClusterParams{})
 	assert.Error(t, err)
 }
+
+func TestUnitIndicesB3MasterTimeoutTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewIndicesService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"shrink", func() error {
+			_, err := svc.Shrink(ctx, &ShrinkRequest{Source: "src", Target: "tgt", Params: &ShrinkParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/src/_shrink/tgt", map[string]string{"master_timeout": "m1"}},
+		{"split", func() error {
+			_, err := svc.Split(ctx, &SplitRequest{Source: "src", Target: "tgt", Params: &SplitParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/src/_split/tgt", map[string]string{"master_timeout": "m1"}},
+		{"clone", func() error {
+			_, err := svc.Clone(ctx, &CloneRequest{Source: "src", Target: "tgt", Params: &CloneParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/src/_clone/tgt", map[string]string{"master_timeout": "m1"}},
+		{"open", func() error {
+			_, err := svc.Open(ctx, []string{"idx"}, &IndicesOpenParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/idx/_open", map[string]string{"master_timeout": "m1"}},
+		{"close", func() error {
+			_, err := svc.Close(ctx, []string{"idx"}, &IndicesCloseParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/idx/_close", map[string]string{"master_timeout": "m1"}},
+		{"put_alias", func() error {
+			_, err := svc.PutAlias(ctx, &PutAliasRequest{Index: "idx", Alias: "al", Params: &AliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"delete_alias", func() error {
+			_, err := svc.DeleteAlias(ctx, &DeleteAliasRequest{Indices: []string{"idx"}, Names: []string{"al"}, Params: &AliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "DELETE", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"get_alias", func() error {
+			_, err := svc.GetAlias(ctx, &GetAliasRequest{Indices: []string{"idx"}, Names: []string{"al"}, Params: &GetAliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "GET", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"exists_alias", func() error {
+			_, err := svc.ExistsAlias(ctx, &ExistsAliasRequest{Indices: []string{"idx"}, Names: []string{"al"}, Params: &GetAliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "HEAD", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"simulate_index_template", func() error {
+			_, err := svc.SimulateIndexTemplate(ctx, &SimulateIndexTemplateRequest{Name: "tpl", Params: &SimulateIndexTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(true)}})
+			return err
+		}, "POST", "/_index_template/_simulate_index/tpl", map[string]string{"master_timeout": "m1", "include_defaults": "true"}},
+		{"simulate_template", func() error {
+			_, err := svc.SimulateTemplate(ctx, &SimulateTemplateRequest{Name: "tpl", Params: &SimulateTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(false)}})
+			return err
+		}, "POST", "/_index_template/_simulate/tpl", map[string]string{"master_timeout": "m1", "include_defaults": "false"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}

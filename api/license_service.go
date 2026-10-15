@@ -29,8 +29,10 @@ func (p *LicenseGetParams) ToMap() map[string]string {
 
 // LicensePostParams are the query parameters for PUT /_license.
 type LicensePostParams struct {
-	Common      *CommonParams
-	Acknowledge *bool
+	Common        *CommonParams
+	Acknowledge   *bool
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts LicensePostParams to a query-parameter map.
@@ -40,6 +42,12 @@ func (p *LicensePostParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "acknowledge", p.Acknowledge)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	return mergeParams(m, p.Common)
 }
 

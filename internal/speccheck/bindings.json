@@ -647,6 +647,40 @@
     "evidence": "DefaultSearchService.Count route /%s/_count"
   },
   {
+    "name": "dangling_indices.delete_dangling_index",
+    "service": "DanglingIndicesService",
+    "method": "Delete",
+    "paramsStruct": "api.DanglingIndicesImportParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index_uuid": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultDanglingIndicesService.Delete DELETE /_dangling/{index_uuid}"
+  },
+  {
+    "name": "dangling_indices.import_dangling_index",
+    "service": "DanglingIndicesService",
+    "method": "Import",
+    "paramsStruct": "api.DanglingIndicesImportParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index_uuid": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultDanglingIndicesService.Import POST /_dangling/{index_uuid}"
+  },
+  {
     "name": "dangling_indices.list_dangling_indices",
     "service": "DanglingIndicesService",
     "method": "List",
@@ -1113,6 +1147,44 @@
     "evidence": "DefaultIndicesService.Analyze route /%s/_analyze"
   },
   {
+    "name": "indices.clone",
+    "service": "IndicesService",
+    "method": "Clone",
+    "paramsStruct": "api.CloneParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Source"
+      },
+      "target": {
+        "argument": 1,
+        "field": "Target"
+      }
+    },
+    "evidence": "DefaultIndicesService.Clone PUT /{index}/_clone/{target}"
+  },
+  {
+    "name": "indices.close",
+    "service": "IndicesService",
+    "method": "Close",
+    "paramsStruct": "api.IndicesCloseParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Close POST /{index}/_close"
+  },
+  {
     "name": "indices.data_streams_stats",
     "service": "IndicesService",
     "method": "DataStreamStats",
@@ -1123,6 +1195,27 @@
       }
     },
     "evidence": "DefaultIndicesService.DataStreamStats route /_data_stream/%s/_stats"
+  },
+  {
+    "name": "indices.delete_alias",
+    "service": "IndicesService",
+    "method": "DeleteAlias",
+    "paramsStruct": "api.AliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteAlias DELETE /{index}/_alias/{name}"
   },
   {
     "name": "indices.downsample",
@@ -1158,6 +1251,27 @@
     "evidence": "DefaultIndicesService.Exists route /"
   },
   {
+    "name": "indices.exists_alias",
+    "service": "IndicesService",
+    "method": "ExistsAlias",
+    "paramsStruct": "api.GetAliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.ExistsAlias HEAD /{index}/_alias/{name}"
+  },
+  {
     "name": "indices.flush",
     "service": "IndicesService",
     "method": "Flush",
@@ -1173,6 +1287,27 @@
       }
     },
     "evidence": "DefaultIndicesService.Flush"
+  },
+  {
+    "name": "indices.get_alias",
+    "service": "IndicesService",
+    "method": "GetAlias",
+    "paramsStruct": "api.GetAliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.GetAlias GET /{index}/_alias/{name}"
   },
   {
     "name": "indices.get_field_mapping",
@@ -1205,6 +1340,44 @@
       "field": "Params"
     },
     "evidence": "DefaultIndicesService.ModifyDataStream route /_data_stream/_modify"
+  },
+  {
+    "name": "indices.open",
+    "service": "IndicesService",
+    "method": "Open",
+    "paramsStruct": "api.IndicesOpenParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Open POST /{index}/_open"
+  },
+  {
+    "name": "indices.put_alias",
+    "service": "IndicesService",
+    "method": "PutAlias",
+    "paramsStruct": "api.AliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Alias"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutAlias PUT /{index}/_alias/{name}"
   },
   {
     "name": "indices.recovery",
@@ -1290,6 +1463,82 @@
       }
     },
     "evidence": "DefaultIndicesService.ShardStores route /%s/_shard_stores"
+  },
+  {
+    "name": "indices.shrink",
+    "service": "IndicesService",
+    "method": "Shrink",
+    "paramsStruct": "api.ShrinkParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Source"
+      },
+      "target": {
+        "argument": 1,
+        "field": "Target"
+      }
+    },
+    "evidence": "DefaultIndicesService.Shrink PUT /{index}/_shrink/{target}"
+  },
+  {
+    "name": "indices.simulate_index_template",
+    "service": "IndicesService",
+    "method": "SimulateIndexTemplate",
+    "paramsStruct": "api.SimulateIndexTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.SimulateIndexTemplate POST /_index_template/_simulate_index/{name}"
+  },
+  {
+    "name": "indices.simulate_template",
+    "service": "IndicesService",
+    "method": "SimulateTemplate",
+    "paramsStruct": "api.SimulateTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.SimulateTemplate POST /_index_template/_simulate/{name}"
+  },
+  {
+    "name": "indices.split",
+    "service": "IndicesService",
+    "method": "Split",
+    "paramsStruct": "api.SplitParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Source"
+      },
+      "target": {
+        "argument": 1,
+        "field": "Target"
+      }
+    },
+    "evidence": "DefaultIndicesService.Split PUT /{index}/_split/{target}"
   },
   {
     "name": "indices.stats",
@@ -1446,6 +1695,28 @@
     "service": "LicenseService",
     "method": "GetTrialStatus",
     "evidence": "DefaultLicenseService.GetTrialStatus route /_license/trial_status"
+  },
+  {
+    "name": "license.post",
+    "service": "LicenseService",
+    "method": "Post",
+    "paramsStruct": "api.LicensePostParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.Post PUT /_license"
+  },
+  {
+    "name": "license.post_start_basic",
+    "service": "LicenseService",
+    "method": "PostStartBasic",
+    "paramsStruct": "api.LicensePostParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.PostStartBasic POST /_license/start_basic"
   },
   {
     "name": "logstash.delete_pipeline",
