@@ -134,7 +134,7 @@ func (s *DefaultSynonymsService) GetSynonymRule(ctx context.Context, id, ruleId 
 		return nil, fmt.Errorf("id and rule_id are required")
 	}
 	var result SynonymRule
-	return &result, doReq(s.logger, ctx, s.client, "GET", fmt.Sprintf("/_synonyms/%s/_rule/%s", pathSegment(id), pathSegment(ruleId)), nil, nil, &result)
+	return &result, doReq(s.logger, ctx, s.client, "GET", fmt.Sprintf("/_synonyms/%s/%s", pathSegment(id), pathSegment(ruleId)), nil, nil, &result)
 }
 
 func (s *DefaultSynonymsService) PutSynonymRule(ctx context.Context, id, ruleId string, body any) (*types.AcknowledgedResponse, error) {
@@ -142,7 +142,7 @@ func (s *DefaultSynonymsService) PutSynonymRule(ctx context.Context, id, ruleId 
 		return nil, fmt.Errorf("id and rule_id are required")
 	}
 	var result types.AcknowledgedResponse
-	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_synonyms/%s/_rule/%s", pathSegment(id), pathSegment(ruleId)), body, nil, &result)
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_synonyms/%s/%s", pathSegment(id), pathSegment(ruleId)), body, nil, &result)
 }
 
 func (s *DefaultSynonymsService) DeleteSynonymRule(ctx context.Context, id, ruleId string) (*types.AcknowledgedResponse, error) {
@@ -150,5 +150,5 @@ func (s *DefaultSynonymsService) DeleteSynonymRule(ctx context.Context, id, rule
 		return nil, fmt.Errorf("id and rule_id are required")
 	}
 	var result types.AcknowledgedResponse
-	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_synonyms/%s/_rule/%s", pathSegment(id), pathSegment(ruleId)), nil, nil, &result)
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", fmt.Sprintf("/_synonyms/%s/%s", pathSegment(id), pathSegment(ruleId)), nil, nil, &result)
 }

@@ -98,7 +98,7 @@ func (s *DefaultInferenceService) Update(ctx context.Context, inferenceId string
 		return nil, fmt.Errorf("inference_id is required")
 	}
 	var result types.AcknowledgedResponse
-	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_inference/%s/_update", pathSegment(inferenceId)), body, nil, &result)
+	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_inference/%s/_update", pathSegment(inferenceId)), body, nil, &result)
 }
 
 func (s *DefaultInferenceService) Inference(ctx context.Context, inferenceId string, body any) (json.RawMessage, error) {

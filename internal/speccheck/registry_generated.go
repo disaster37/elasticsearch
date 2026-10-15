@@ -213,6 +213,14 @@ var Registry = map[string]EndpointImpl{
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultCatService.NodeAttrs route /_cat/nodeattrs",
 	},
+	"cat.nodes": {
+		Service:      "CatService",
+		Method:       "Nodes",
+		ParamsStruct: "api.CatNodesParams",
+		ParamsFields: []string{"Bytes", "Common", "FullId", "H", "Help", "IncludeUnloadedSegments", "Local", "MasterTimeout", "S", "Time", "V"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultCatService.Nodes GET /_cat/nodes",
+	},
 	"cat.pending_tasks": {
 		Service:      "CatService",
 		Method:       "PendingTasks",
@@ -220,6 +228,14 @@ var Registry = map[string]EndpointImpl{
 		ParamsFields: []string{"Common", "H", "Help", "Local", "MasterTimeout", "S", "Time", "V"},
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultCatService.PendingTasks route /_cat/pending_tasks",
+	},
+	"cat.plugins": {
+		Service:      "CatService",
+		Method:       "Plugins",
+		ParamsStruct: "api.CatPluginsParams",
+		ParamsFields: []string{"Common", "H", "Help", "IncludeBootstrap", "Local", "MasterTimeout", "S", "Time", "V"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultCatService.Plugins GET /_cat/plugins",
 	},
 	"cat.recovery": {
 		Service:      "CatService",
@@ -280,6 +296,14 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultCatService.Snapshots route /_cat/snapshots/%s",
 	},
+	"cat.tasks": {
+		Service:      "CatService",
+		Method:       "Tasks",
+		ParamsStruct: "api.CatTasksParams",
+		ParamsFields: []string{"Actions", "Common", "Detailed", "H", "Help", "Local", "MasterTimeout", "NodeId", "Nodes", "ParentTaskId", "S", "Time", "Timeout", "V", "WaitForCompletion"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultCatService.Tasks GET /_cat/tasks",
+	},
 	"cat.templates": {
 		Service:      "CatService",
 		Method:       "Templates",
@@ -291,6 +315,18 @@ var Registry = map[string]EndpointImpl{
 			"name": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultCatService.Templates route /_cat/templates/%s",
+	},
+	"cat.thread_pool": {
+		Service:      "CatService",
+		Method:       "ThreadPool",
+		ParamsStruct: "api.CatThreadPoolParams",
+		ParamsFields: []string{"Common", "H", "Help", "Local", "MasterTimeout", "S", "Size", "Time", "V"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"thread_pool_patterns"},
+		PathSources: map[string]ValueSource{
+			"thread_pool_patterns": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultCatService.ThreadPool GET /_cat/thread_pool/{thread_pool_patterns}",
 	},
 	"cat.transforms": {
 		Service:      "CatService",
@@ -1774,6 +1810,16 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultInferenceService.Rerank route /_inference/rerank/%s",
 	},
+	"inference.update": {
+		Service:   "InferenceServiceSpecExtensions",
+		Method:    "UpdateWithRequest",
+		PathParts: []string{"inference_id", "task_type"},
+		PathSources: map[string]ValueSource{
+			"inference_id": ValueSource{Argument: 1, Field: "InferenceId"},
+			"task_type":    ValueSource{Argument: 1, Field: "TaskType"},
+		},
+		Evidence: "DefaultInferenceService.UpdateWithRequest PUT /_inference/{task_type}/{inference_id}/_update",
+	},
 	"info": {
 		Service:  "InfoService",
 		Method:   "Info",
@@ -3077,6 +3123,16 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultSynonymsService.DeleteSynonym route /_synonyms/%s",
 	},
+	"synonyms.delete_synonym_rule": {
+		Service:   "SynonymsService",
+		Method:    "DeleteSynonymRule",
+		PathParts: []string{"rule_id", "set_id"},
+		PathSources: map[string]ValueSource{
+			"rule_id": ValueSource{Argument: 2},
+			"set_id":  ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultSynonymsService.DeleteSynonymRule DELETE /_synonyms/{set_id}/{rule_id}",
+	},
 	"synonyms.get_synonym": {
 		Service:      "SynonymsService",
 		Method:       "GetSynonym",
@@ -3088,6 +3144,16 @@ var Registry = map[string]EndpointImpl{
 			"id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultSynonymsService.GetSynonym route /_synonyms/%s",
+	},
+	"synonyms.get_synonym_rule": {
+		Service:   "SynonymsService",
+		Method:    "GetSynonymRule",
+		PathParts: []string{"rule_id", "set_id"},
+		PathSources: map[string]ValueSource{
+			"rule_id": ValueSource{Argument: 2},
+			"set_id":  ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultSynonymsService.GetSynonymRule GET /_synonyms/{set_id}/{rule_id}",
 	},
 	"synonyms.get_synonyms_sets": {
 		Service:      "SynonymsService",
@@ -3105,6 +3171,16 @@ var Registry = map[string]EndpointImpl{
 			"id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultSynonymsService.PutSynonym route /_synonyms/%s",
+	},
+	"synonyms.put_synonym_rule": {
+		Service:   "SynonymsService",
+		Method:    "PutSynonymRule",
+		PathParts: []string{"rule_id", "set_id"},
+		PathSources: map[string]ValueSource{
+			"rule_id": ValueSource{Argument: 2},
+			"set_id":  ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultSynonymsService.PutSynonymRule PUT /_synonyms/{set_id}/{rule_id}",
 	},
 	"tasks.cancel": {
 		Service:      "TasksService",
@@ -3337,6 +3413,34 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultDocumentService.UpdateByQueryRethrottle",
 	},
+	"watcher.ack_watch": {
+		Service:   "WatcherService",
+		Method:    "AckWatch",
+		PathParts: []string{"action_id", "watch_id"},
+		PathSources: map[string]ValueSource{
+			"action_id": ValueSource{Argument: 2},
+			"watch_id":  ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultWatcherService.AckWatch PUT /_watcher/watch/{watch_id}/_ack/{action_id}",
+	},
+	"watcher.activate_watch": {
+		Service:   "WatcherService",
+		Method:    "ActivateWatch",
+		PathParts: []string{"watch_id"},
+		PathSources: map[string]ValueSource{
+			"watch_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultWatcherService.ActivateWatch PUT /_watcher/watch/{watch_id}/_activate",
+	},
+	"watcher.deactivate_watch": {
+		Service:   "WatcherService",
+		Method:    "DeactivateWatch",
+		PathParts: []string{"watch_id"},
+		PathSources: map[string]ValueSource{
+			"watch_id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultWatcherService.DeactivateWatch PUT /_watcher/watch/{watch_id}/_deactivate",
+	},
 	"watcher.delete_watch": {
 		Service:   "WatcherService",
 		Method:    "DeleteWatch",
@@ -3366,6 +3470,18 @@ var Registry = map[string]EndpointImpl{
 			"id": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultWatcherService.GetWatch route /_watcher/watch/%s",
+	},
+	"watcher.put_watch": {
+		Service:      "WatcherService",
+		Method:       "PutWatch",
+		ParamsStruct: "api.WatcherPutWatchParams",
+		ParamsFields: []string{"Active", "Common", "IfPrimaryTerm", "IfSeqNo", "Version"},
+		ParamsSource: &ValueSource{Argument: 3},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultWatcherService.PutWatch PUT /_watcher/watch/{id} (carrier carries version)",
 	},
 	"watcher.query_watches": {
 		Service:  "WatcherService",

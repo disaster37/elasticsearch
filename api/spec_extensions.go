@@ -891,3 +891,29 @@ func (s *DefaultSearchApplicationService) SearchWithRequest(ctx context.Context,
 	var result querydsl.SearchResult
 	return &result, doReq(s.logger, ctx, s.client, "POST", fmt.Sprintf("/_application/search_application/%s/_search", pathSegment(req.Name)), req.Body, req.Params, &result)
 }
+
+// InferenceServiceSpecExtensions exposes the opt-in inference.update carrier.
+// Obtain it with [AsInferenceServiceSpecExtensions].
+type InferenceServiceSpecExtensions interface {
+	UpdateWithRequest(ctx context.Context, req *InferenceUpdateSpecRequest) (*types.AcknowledgedResponse, error)
+}
+
+var _ InferenceServiceSpecExtensions = (*DefaultInferenceService)(nil)
+
+// AsInferenceServiceSpecExtensions adapts an InferenceService to its extension
+// interface.
+func AsInferenceServiceSpecExtensions(service InferenceService) (InferenceServiceSpecExtensions, error) {
+	return asSpecExtensions[InferenceServiceSpecExtensions]("inference", service)
+}
+
+func (s *DefaultInferenceService) UpdateWithRequest(ctx context.Context, req *InferenceUpdateSpecRequest) (*types.AcknowledgedResponse, error) {
+	if req == nil || req.InferenceId == "" {
+		return nil, fmt.Errorf("inference_id is required")
+	}
+	path := fmt.Sprintf("/_inference/%s/_update", pathSegment(req.InferenceId))
+	if req.TaskType != "" {
+		path = fmt.Sprintf("/_inference/%s/%s/_update", pathSegment(req.TaskType), pathSegment(req.InferenceId))
+	}
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "PUT", path, req.Body, nil, &result)
+}

@@ -331,3 +331,10 @@ type SearchApplicationSearchSpecRequest struct {
 	Body   any
 	Params *SearchApplicationSearchSpecParams
 }
+
+// InferenceUpdateSpecRequest is the opt-in request for inference.update.
+type InferenceUpdateSpecRequest struct {
+	InferenceId string
+	TaskType    string
+	Body        any
+}

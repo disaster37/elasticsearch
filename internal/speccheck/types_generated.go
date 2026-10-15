@@ -239,6 +239,7 @@ var serviceTypes = map[string]reflect.Type{
 	"api.IndicesService":                           reflect.TypeOf((*api.IndicesService)(nil)).Elem(),
 	"api.IndicesServiceSpecExtensions":             reflect.TypeOf((*api.IndicesServiceSpecExtensions)(nil)).Elem(),
 	"api.InferenceService":                         reflect.TypeOf((*api.InferenceService)(nil)).Elem(),
+	"api.InferenceServiceSpecExtensions":           reflect.TypeOf((*api.InferenceServiceSpecExtensions)(nil)).Elem(),
 	"api.InfoService":                              reflect.TypeOf((*api.InfoService)(nil)).Elem(),
 	"api.IngestService":                            reflect.TypeOf((*api.IngestService)(nil)).Elem(),
 	"api.LicenseService":                           reflect.TypeOf((*api.LicenseService)(nil)).Elem(),

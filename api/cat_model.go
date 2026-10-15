@@ -323,9 +323,10 @@ func (p *CatNodeAttrsParams) ToMap() map[string]string {
 // CatNodesParams are the query parameters for cat.nodes.
 type CatNodesParams struct {
 	catCommonParams
-	Bytes  BytesFormat
-	FullId *bool
-	Time   string
+	Bytes                   BytesFormat
+	FullId                  *bool
+	IncludeUnloadedSegments *bool
+	Time                    string
 }
 
 // ToMap converts CatNodesParams to a query-parameter map.
@@ -338,6 +339,7 @@ func (p *CatNodesParams) ToMap() map[string]string {
 		m["bytes"] = string(p.Bytes)
 	}
 	setBoolParam(m, "full_id", p.FullId)
+	setBoolParam(m, "include_unloaded_segments", p.IncludeUnloadedSegments)
 	if p.Time != "" {
 		m["time"] = p.Time
 	}
@@ -360,6 +362,7 @@ func (p *CatPendingTasksParams) ToMap() map[string]string {
 // CatPluginsParams are the query parameters for cat.plugins.
 type CatPluginsParams struct {
 	catCommonParams
+	IncludeBootstrap *bool
 }
 
 // ToMap converts CatPluginsParams to a query-parameter map.
@@ -367,7 +370,9 @@ func (p *CatPluginsParams) ToMap() map[string]string {
 	if p == nil {
 		return nil
 	}
-	return p.toMap()
+	m := p.toMap()
+	setBoolParam(m, "include_bootstrap", p.IncludeBootstrap)
+	return m
 }
 
 // CatRecoveryParams are the query parameters for cat.recovery.
@@ -466,10 +471,13 @@ func (p *CatSnapshotsParams) ToMap() map[string]string {
 // CatTasksParams are the query parameters for cat.tasks.
 type CatTasksParams struct {
 	catCommonParams
-	Actions      []string
-	Detailed     *bool
-	NodeId       []string
-	ParentTaskId string
+	Actions           []string
+	Detailed          *bool
+	NodeId            []string
+	Nodes             []string
+	ParentTaskId      string
+	Timeout           string
+	WaitForCompletion *bool
 }
 
 // ToMap converts CatTasksParams to a query-parameter map.
@@ -481,9 +489,14 @@ func (p *CatTasksParams) ToMap() map[string]string {
 	setListParam(m, "actions", p.Actions)
 	setBoolParam(m, "detailed", p.Detailed)
 	setListParam(m, "node_id", p.NodeId)
+	setListParam(m, "nodes", p.Nodes)
 	if p.ParentTaskId != "" {
 		m["parent_task_id"] = p.ParentTaskId
 	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
+	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return m
 }
 

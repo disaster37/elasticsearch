@@ -295,6 +295,17 @@
     "evidence": "DefaultCatService.NodeAttrs route /_cat/nodeattrs"
   },
   {
+    "name": "cat.nodes",
+    "service": "CatService",
+    "method": "Nodes",
+    "paramsStruct": "api.CatNodesParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Nodes GET /_cat/nodes"
+  },
+  {
     "name": "cat.pending_tasks",
     "service": "CatService",
     "method": "PendingTasks",
@@ -304,6 +315,17 @@
       "field": ""
     },
     "evidence": "DefaultCatService.PendingTasks route /_cat/pending_tasks"
+  },
+  {
+    "name": "cat.plugins",
+    "service": "CatService",
+    "method": "Plugins",
+    "paramsStruct": "api.CatPluginsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Plugins GET /_cat/plugins"
   },
   {
     "name": "cat.recovery",
@@ -391,6 +413,17 @@
     "evidence": "DefaultCatService.Snapshots route /_cat/snapshots/%s"
   },
   {
+    "name": "cat.tasks",
+    "service": "CatService",
+    "method": "Tasks",
+    "paramsStruct": "api.CatTasksParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Tasks GET /_cat/tasks"
+  },
+  {
     "name": "cat.templates",
     "service": "CatService",
     "method": "Templates",
@@ -406,6 +439,23 @@
       }
     },
     "evidence": "DefaultCatService.Templates route /_cat/templates/%s"
+  },
+  {
+    "name": "cat.thread_pool",
+    "service": "CatService",
+    "method": "ThreadPool",
+    "paramsStruct": "api.CatThreadPoolParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "thread_pool_patterns": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.ThreadPool GET /_cat/thread_pool/{thread_pool_patterns}"
   },
   {
     "name": "cat.transforms",
@@ -2555,6 +2605,22 @@
     "evidence": "DefaultInferenceService.Rerank route /_inference/rerank/%s"
   },
   {
+    "name": "inference.update",
+    "service": "InferenceServiceSpecExtensions",
+    "method": "UpdateWithRequest",
+    "pathSources": {
+      "inference_id": {
+        "argument": 1,
+        "field": "InferenceId"
+      },
+      "task_type": {
+        "argument": 1,
+        "field": "TaskType"
+      }
+    },
+    "evidence": "DefaultInferenceService.UpdateWithRequest PUT /_inference/{task_type}/{inference_id}/_update"
+  },
+  {
     "name": "info",
     "service": "InfoService",
     "method": "Info",
@@ -4411,6 +4477,22 @@
     "evidence": "DefaultSynonymsService.DeleteSynonym route /_synonyms/%s"
   },
   {
+    "name": "synonyms.delete_synonym_rule",
+    "service": "SynonymsService",
+    "method": "DeleteSynonymRule",
+    "pathSources": {
+      "set_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "rule_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.DeleteSynonymRule DELETE /_synonyms/{set_id}/{rule_id}"
+  },
+  {
     "name": "synonyms.get_synonym",
     "service": "SynonymsService",
     "method": "GetSynonym",
@@ -4426,6 +4508,22 @@
       }
     },
     "evidence": "DefaultSynonymsService.GetSynonym route /_synonyms/%s"
+  },
+  {
+    "name": "synonyms.get_synonym_rule",
+    "service": "SynonymsService",
+    "method": "GetSynonymRule",
+    "pathSources": {
+      "set_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "rule_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.GetSynonymRule GET /_synonyms/{set_id}/{rule_id}"
   },
   {
     "name": "synonyms.get_synonyms_sets",
@@ -4449,6 +4547,22 @@
       }
     },
     "evidence": "DefaultSynonymsService.PutSynonym route /_synonyms/%s"
+  },
+  {
+    "name": "synonyms.put_synonym_rule",
+    "service": "SynonymsService",
+    "method": "PutSynonymRule",
+    "pathSources": {
+      "set_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "rule_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.PutSynonymRule PUT /_synonyms/{set_id}/{rule_id}"
   },
   {
     "name": "tasks.cancel",
@@ -4781,6 +4895,46 @@
     "evidence": "DefaultDocumentService.UpdateByQueryRethrottle"
   },
   {
+    "name": "watcher.ack_watch",
+    "service": "WatcherService",
+    "method": "AckWatch",
+    "pathSources": {
+      "watch_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "action_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.AckWatch PUT /_watcher/watch/{watch_id}/_ack/{action_id}"
+  },
+  {
+    "name": "watcher.activate_watch",
+    "service": "WatcherService",
+    "method": "ActivateWatch",
+    "pathSources": {
+      "watch_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.ActivateWatch PUT /_watcher/watch/{watch_id}/_activate"
+  },
+  {
+    "name": "watcher.deactivate_watch",
+    "service": "WatcherService",
+    "method": "DeactivateWatch",
+    "pathSources": {
+      "watch_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.DeactivateWatch PUT /_watcher/watch/{watch_id}/_deactivate"
+  },
+  {
     "name": "watcher.delete_watch",
     "service": "WatcherService",
     "method": "DeleteWatch",
@@ -4820,6 +4974,23 @@
       }
     },
     "evidence": "DefaultWatcherService.GetWatch route /_watcher/watch/%s"
+  },
+  {
+    "name": "watcher.put_watch",
+    "service": "WatcherService",
+    "method": "PutWatch",
+    "paramsStruct": "api.WatcherPutWatchParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.PutWatch PUT /_watcher/watch/{id} (carrier carries version)"
   },
   {
     "name": "watcher.query_watches",

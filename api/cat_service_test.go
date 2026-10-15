@@ -858,3 +858,62 @@ func TestUnitCatCommonParamsSerialization(t *testing.T) {
 	assert.Equal(t, "true", gotQuery["local"])
 	assert.Equal(t, "true", gotQuery["pretty"])
 }
+
+func TestUnitCatB10Transport(t *testing.T) {
+	got := &capturedSpecRequest{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		*got = capturedSpecRequest{
+			method:      r.Method,
+			path:        r.URL.Path,
+			escapedPath: r.URL.EscapedPath(),
+			query:       queryMap(r),
+			body:        readBody(r),
+		}
+		jsonResponse(w, 200, `[]`)
+	}))
+	defer srv.Close()
+	svc := NewCatService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	cases := []struct {
+		name  string
+		call  func() error
+		path  string
+		query map[string]string
+	}{
+		{"nodes", func() error {
+			_, err := svc.Nodes(ctx, &CatNodesParams{IncludeUnloadedSegments: ptrBool(true)})
+			return err
+		}, "/_cat/nodes", map[string]string{"include_unloaded_segments": "true", "format": "json"}},
+		{"plugins", func() error {
+			_, err := svc.Plugins(ctx, &CatPluginsParams{IncludeBootstrap: ptrBool(false)})
+			return err
+		}, "/_cat/plugins", map[string]string{"include_bootstrap": "false", "format": "json"}},
+		{"tasks", func() error {
+			_, err := svc.Tasks(ctx, &CatTasksParams{Nodes: []string{"n1", "n2"}, Timeout: "t1", WaitForCompletion: ptrBool(true)})
+			return err
+		}, "/_cat/tasks", map[string]string{"nodes": "n1,n2", "timeout": "t1", "wait_for_completion": "true", "format": "json"}},
+		{"thread_pool", func() error {
+			_, err := svc.ThreadPool(ctx, []string{"write", "search"}, &CatThreadPoolParams{})
+			return err
+		}, "/_cat/thread_pool/write,search", map[string]string{"format": "json"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, "GET", got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}
+
+func TestCatB10ToMapFormatJSON(t *testing.T) {
+	assert.Equal(t, "json", (&CatNodesParams{}).ToMap()["format"])
+	assert.Equal(t, "json", (&CatPluginsParams{}).ToMap()["format"])
+	assert.Equal(t, "json", (&CatTasksParams{}).ToMap()["format"])
+	assert.Equal(t, "json", (&CatThreadPoolParams{}).ToMap()["format"])
+}

@@ -48,9 +48,9 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 319 |
-| Known-missing (baselined) endpoints | 193 |
-| Controlled-ignored parameters | 21 |
+| Registered implementations | 331 |
+| Known-missing (baselined) endpoints | 181 |
+| Controlled-ignored parameters | 25 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
 was provisional: it skipped embedded fields, positional query carriers, and
@@ -79,6 +79,7 @@ number, not a claim of full REST implementation equivalence.
 | document/search/async/eql carriers; `DocumentService.Create` | direct fields added; `Create` route corrected to `PUT /{index}/_create/{id}`; new `DocumentServiceSpecExtensions.MultiTermVectorsWithRequest` and `EqlServiceSpecExtensions.GetWithParams` (B7) | `routing`, `require_data_stream`, `include_source_on_error`, `wait_for_active_shards`, `allow_no_indices`, `ids`, `docvalue_fields`, etc. |
 | ingest/script/license/health carriers; `ScriptService.Put` | direct `MasterTimeout` additions; optional path `/{context}`; new `LicenseServiceSpecExtensions.DeleteWithParams` (B8) | `master_timeout`, `accept_enterprise`, `timeout` |
 | ml/searchable_snapshots/transform/search_application/nodes/xpack carriers | direct fields added; new `MlServiceSpecExtensions`, `SearchableSnapshotsServiceSpecExtensions`, `TransformServiceSpecExtensions`, `SearchApplicationServiceSpecExtensions` (B9) | `delete_user_annotations`, `storage`, `typed_keys`, `from`, `include_unloaded_segments`, `human` |
+| cat/nodes/tasks/plugins; watcher.put_watch; inference.update; synonyms rules | direct fields; `inference.update` verb corrected to PUT; `synonyms.*_synonym_rule` paths corrected to the pinned `/_synonyms/{set_id}/{rule_id}`; new `InferenceServiceSpecExtensions.UpdateWithRequest`; four more Cat `format` controlled ignores (B10) | `include_unloaded_segments`, `include_bootstrap`, `nodes`, `wait_for_completion`, `version` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -164,10 +165,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `cat.nodes` | not-implemented | stable | public | CatService.Nodes exists but binding is incomplete (missing params: include_unloaded_segments,format) |
-| `cat.plugins` | not-implemented | stable | public | CatService.Plugins exists but binding is incomplete (missing params: format,include_bootstrap) |
-| `cat.tasks` | not-implemented | experimental | public | CatService.Tasks exists but binding is incomplete (missing params: format,nodes,timeout,wait_for_completion) |
-| `cat.thread_pool` | not-implemented | stable | public | CatService.ThreadPool exists but binding is incomplete (unmapped parts: thread_pool_patterns) |
 
 ### ccr
 
@@ -316,7 +313,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 | `inference.sparse_embedding` | not-implemented | stable | public | no InferenceService.SparseEmbedding method |
 | `inference.stream_completion` | not-implemented | stable | public | no InferenceService.StreamCompletion method |
 | `inference.text_embedding` | not-implemented | stable | public | no InferenceService.TextEmbedding method |
-| `inference.update` | not-implemented | stable | public | InferenceService.Update exists but binding is incomplete (unmapped parts: task_type) |
 
 ### ingest
 
@@ -527,9 +523,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `synonyms.delete_synonym_rule` | not-implemented | stable | public | SynonymsService.DeleteSynonymRule exists but binding is incomplete (unmapped parts: set_id) |
-| `synonyms.get_synonym_rule` | not-implemented | stable | public | SynonymsService.GetSynonymRule exists but binding is incomplete (unmapped parts: set_id) |
-| `synonyms.put_synonym_rule` | not-implemented | stable | public | SynonymsService.PutSynonymRule exists but binding is incomplete (unmapped parts: set_id) |
 
 ### text_structure
 
@@ -554,11 +547,7 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `watcher.ack_watch` | not-implemented | stable | public | WatcherService.AckWatch exists but binding is incomplete (unmapped parts: watch_id) |
-| `watcher.activate_watch` | not-implemented | stable | public | WatcherService.ActivateWatch exists but binding is incomplete (unmapped parts: watch_id) |
-| `watcher.deactivate_watch` | not-implemented | stable | public | WatcherService.DeactivateWatch exists but binding is incomplete (unmapped parts: watch_id) |
 | `watcher.get_settings` | not-implemented | stable | public | no WatcherService.GetSettings method |
-| `watcher.put_watch` | not-implemented | stable | public | WatcherService.PutWatch exists but binding is incomplete (missing params: version) |
 | `watcher.update_settings` | not-implemented | stable | public | no WatcherService.UpdateSettings method |
 
 ### xpack

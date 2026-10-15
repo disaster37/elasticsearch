@@ -15,6 +15,7 @@ type WatcherPutWatchParams struct {
 	Active        *bool
 	IfPrimaryTerm *int64
 	IfSeqNo       *int64
+	Version       *int64
 }
 
 // ToMap converts WatcherPutWatchParams to a query-parameter map.
@@ -29,6 +30,9 @@ func (p *WatcherPutWatchParams) ToMap() map[string]string {
 	}
 	if p.IfSeqNo != nil {
 		m["if_seq_no"] = int64Str(*p.IfSeqNo)
+	}
+	if p.Version != nil {
+		m["version"] = int64Str(*p.Version)
 	}
 	return mergeParams(m, p.Common)
 }
