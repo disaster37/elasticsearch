@@ -716,6 +716,18 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultDocumentService.DeleteByQueryRethrottle",
 	},
+	"delete_script": {
+		Service:      "ScriptService",
+		Method:       "Delete",
+		ParamsStruct: "api.ScriptDeleteParams",
+		ParamsFields: []string{"Common", "MasterTimeout", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultScriptService.Delete DELETE /_scripts/{id}",
+	},
 	"enrich.delete_policy": {
 		Service:      "EnrichServiceSpecExtensions",
 		Method:       "DeletePolicyWithParams",
@@ -906,6 +918,18 @@ var Registry = map[string]EndpointImpl{
 		},
 		Evidence: "DefaultDocumentService.Get route /%s/_doc/%s",
 	},
+	"get_script": {
+		Service:      "ScriptService",
+		Method:       "Get",
+		ParamsStruct: "api.ScriptGetParams",
+		ParamsFields: []string{"Common", "MasterTimeout", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultScriptService.Get GET /_scripts/{id}",
+	},
 	"get_script_context": {
 		Service:  "ScriptService",
 		Method:   "GetContext",
@@ -940,6 +964,18 @@ var Registry = map[string]EndpointImpl{
 			"index": ValueSource{Argument: 1},
 		},
 		Evidence: "DefaultGraphService.Explore route /%s/_graph/explore",
+	},
+	"health_report": {
+		Service:      "HealthReportService",
+		Method:       "Get",
+		ParamsStruct: "api.HealthReportParams",
+		ParamsFields: []string{"Common", "Size", "Time", "Timeout", "Verbose"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"feature"},
+		PathSources: map[string]ValueSource{
+			"feature": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultHealthReportService.Get GET /_health_report/{feature}",
 	},
 	"ilm.delete_lifecycle": {
 		Service:      "IlmServiceSpecExtensions",
@@ -1743,10 +1779,46 @@ var Registry = map[string]EndpointImpl{
 		Method:   "Info",
 		Evidence: "DefaultInfoService.Info route /",
 	},
+	"ingest.delete_pipeline": {
+		Service:      "IngestService",
+		Method:       "DeletePipeline",
+		ParamsStruct: "api.IngestDeletePipelineParams",
+		ParamsFields: []string{"Common", "MasterTimeout", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultIngestService.DeletePipeline DELETE /_ingest/pipeline/{id}",
+	},
+	"ingest.get_pipeline": {
+		Service:      "IngestService",
+		Method:       "GetPipeline",
+		ParamsStruct: "api.IngestGetPipelineParams",
+		ParamsFields: []string{"Common", "MasterTimeout", "Summary"},
+		ParamsSource: &ValueSource{Argument: 2},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1},
+		},
+		Evidence: "DefaultIngestService.GetPipeline GET /_ingest/pipeline/{id}",
+	},
 	"ingest.processor_grok": {
 		Service:  "IngestService",
 		Method:   "ProcessorGrok",
 		Evidence: "DefaultIngestService.ProcessorGrok route /_ingest/processor/grok",
+	},
+	"ingest.put_pipeline": {
+		Service:      "IngestService",
+		Method:       "PutPipeline",
+		ParamsStruct: "api.IngestPutPipelineParams",
+		ParamsFields: []string{"Common", "IfVersion", "MasterTimeout", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"id"},
+		PathSources: map[string]ValueSource{
+			"id": ValueSource{Argument: 1, Field: "Id"},
+		},
+		Evidence: "DefaultIngestService.PutPipeline PUT /_ingest/pipeline/{id}",
 	},
 	"ingest.simulate": {
 		Service:      "IngestService",
@@ -1759,6 +1831,22 @@ var Registry = map[string]EndpointImpl{
 			"id": ValueSource{Argument: -1, Field: "Id"},
 		},
 		Evidence: "DefaultIngestService.Simulate route /_ingest/pipeline/%s/_simulate",
+	},
+	"license.delete": {
+		Service:      "LicenseServiceSpecExtensions",
+		Method:       "DeleteWithParams",
+		ParamsStruct: "api.MasterTimeoutAndTimeoutSpecParams",
+		ParamsFields: []string{"Common", "MasterTimeout", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultLicenseService.DeleteWithParams DELETE /_license",
+	},
+	"license.get": {
+		Service:      "LicenseService",
+		Method:       "Get",
+		ParamsStruct: "api.LicenseGetParams",
+		ParamsFields: []string{"AcceptEnterprise", "Common", "Local"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultLicenseService.Get GET /_license",
 	},
 	"license.get_basic_status": {
 		Service:  "LicenseService",
@@ -1785,6 +1873,14 @@ var Registry = map[string]EndpointImpl{
 		ParamsFields: []string{"Acknowledge", "Common", "MasterTimeout", "Timeout"},
 		ParamsSource: &ValueSource{Argument: 1},
 		Evidence:     "DefaultLicenseService.PostStartBasic POST /_license/start_basic",
+	},
+	"license.post_start_trial": {
+		Service:      "LicenseService",
+		Method:       "PostStartTrial",
+		ParamsStruct: "api.LicenseStartTrialParams",
+		ParamsFields: []string{"Acknowledge", "Common", "MasterTimeout", "Type"},
+		ParamsSource: &ValueSource{Argument: 1},
+		Evidence:     "DefaultLicenseService.PostStartTrial POST /_license/start_trial",
 	},
 	"logstash.delete_pipeline": {
 		Service:   "LogstashService",
@@ -2078,6 +2174,19 @@ var Registry = map[string]EndpointImpl{
 		Service:  "InfoService",
 		Method:   "Ping",
 		Evidence: "DefaultInfoService.Ping route /",
+	},
+	"put_script": {
+		Service:      "ScriptService",
+		Method:       "Put",
+		ParamsStruct: "api.ScriptPutParams",
+		ParamsFields: []string{"Common", "Context", "MasterTimeout", "Timeout"},
+		ParamsSource: &ValueSource{Argument: 1, Field: "Params"},
+		PathParts:    []string{"context", "id"},
+		PathSources: map[string]ValueSource{
+			"context": ValueSource{Argument: 1, Field: "Context"},
+			"id":      ValueSource{Argument: 1, Field: "Id"},
+		},
+		Evidence: "DefaultScriptService.Put PUT /_scripts/{id}/{context}",
 	},
 	"query_rules.delete_ruleset": {
 		Service:   "QueryRulesService",

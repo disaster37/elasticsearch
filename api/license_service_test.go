@@ -276,3 +276,49 @@ func TestUnitLicenseB3Timeouts(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "m2", gotQuery["master_timeout"])
 }
+
+type customLicense struct{ LicenseService }
+
+func TestLicenseSpecExtensionAdapters(t *testing.T) {
+	svc := NewLicenseService(nil, testLogger())
+	if _, err := AsLicenseServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("license default: %v", err)
+	}
+	if _, err := AsLicenseServiceSpecExtensions(nil); err == nil {
+		t.Error("license nil: want error")
+	}
+	var typedNil LicenseService = (*DefaultLicenseService)(nil)
+	if _, err := AsLicenseServiceSpecExtensions(typedNil); err == nil {
+		t.Error("license typed-nil: want error")
+	}
+	if _, err := AsLicenseServiceSpecExtensions(customLicense{svc}); err == nil {
+		t.Error("license custom: want error")
+	}
+}
+
+func TestUnitLicenseB8Transport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewLicenseService(restyClient(srv), testLogger())
+	ext, err := AsLicenseServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+
+	_, err = ext.DeleteWithParams(ctx, &MasterTimeoutAndTimeoutSpecParams{MasterTimeout: "m1", Timeout: "t1"})
+	assert.NoError(t, err)
+	assert.Equal(t, "DELETE", got.method)
+	assert.Equal(t, "/_license", got.path)
+	assert.Equal(t, "m1", got.query["master_timeout"])
+	assert.Equal(t, "t1", got.query["timeout"])
+
+	*got = capturedSpecRequest{}
+	_, err = svc.Get(ctx, &LicenseGetParams{AcceptEnterprise: ptrBool(true)})
+	assert.NoError(t, err)
+	assert.Equal(t, "true", got.query["accept_enterprise"])
+
+	*got = capturedSpecRequest{}
+	_, err = svc.PostStartTrial(ctx, &LicenseStartTrialParams{MasterTimeout: "m1"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_license/start_trial", got.path)
+	assert.Equal(t, "m1", got.query["master_timeout"])
+}

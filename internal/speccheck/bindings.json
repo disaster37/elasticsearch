@@ -1009,6 +1009,23 @@
     "evidence": "DefaultDocumentService.DeleteByQueryRethrottle"
   },
   {
+    "name": "delete_script",
+    "service": "ScriptService",
+    "method": "Delete",
+    "paramsStruct": "api.ScriptDeleteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultScriptService.Delete DELETE /_scripts/{id}"
+  },
+  {
     "name": "enrich.delete_policy",
     "service": "EnrichServiceSpecExtensions",
     "method": "DeletePolicyWithParams",
@@ -1286,6 +1303,23 @@
     "evidence": "DefaultDocumentService.Get route /%s/_doc/%s"
   },
   {
+    "name": "get_script",
+    "service": "ScriptService",
+    "method": "Get",
+    "paramsStruct": "api.ScriptGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultScriptService.Get GET /_scripts/{id}"
+  },
+  {
     "name": "get_script_context",
     "service": "ScriptService",
     "method": "GetContext",
@@ -1334,6 +1368,23 @@
       }
     },
     "evidence": "DefaultGraphService.Explore route /%s/_graph/explore"
+  },
+  {
+    "name": "health_report",
+    "service": "HealthReportService",
+    "method": "Get",
+    "paramsStruct": "api.HealthReportParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "feature": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultHealthReportService.Get GET /_health_report/{feature}"
   },
   {
     "name": "ilm.delete_lifecycle",
@@ -2510,10 +2561,61 @@
     "evidence": "DefaultInfoService.Info route /"
   },
   {
+    "name": "ingest.delete_pipeline",
+    "service": "IngestService",
+    "method": "DeletePipeline",
+    "paramsStruct": "api.IngestDeletePipelineParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIngestService.DeletePipeline DELETE /_ingest/pipeline/{id}"
+  },
+  {
+    "name": "ingest.get_pipeline",
+    "service": "IngestService",
+    "method": "GetPipeline",
+    "paramsStruct": "api.IngestGetPipelineParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIngestService.GetPipeline GET /_ingest/pipeline/{id}"
+  },
+  {
     "name": "ingest.processor_grok",
     "service": "IngestService",
     "method": "ProcessorGrok",
     "evidence": "DefaultIngestService.ProcessorGrok route /_ingest/processor/grok"
+  },
+  {
+    "name": "ingest.put_pipeline",
+    "service": "IngestService",
+    "method": "PutPipeline",
+    "paramsStruct": "api.IngestPutPipelineParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultIngestService.PutPipeline PUT /_ingest/pipeline/{id}"
   },
   {
     "name": "ingest.simulate",
@@ -2531,6 +2633,28 @@
       }
     },
     "evidence": "DefaultIngestService.Simulate route /_ingest/pipeline/%s/_simulate"
+  },
+  {
+    "name": "license.delete",
+    "service": "LicenseServiceSpecExtensions",
+    "method": "DeleteWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.DeleteWithParams DELETE /_license"
+  },
+  {
+    "name": "license.get",
+    "service": "LicenseService",
+    "method": "Get",
+    "paramsStruct": "api.LicenseGetParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.Get GET /_license"
   },
   {
     "name": "license.get_basic_status",
@@ -2565,6 +2689,17 @@
       "field": ""
     },
     "evidence": "DefaultLicenseService.PostStartBasic POST /_license/start_basic"
+  },
+  {
+    "name": "license.post_start_trial",
+    "service": "LicenseService",
+    "method": "PostStartTrial",
+    "paramsStruct": "api.LicenseStartTrialParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.PostStartTrial POST /_license/start_trial"
   },
   {
     "name": "logstash.delete_pipeline",
@@ -2979,6 +3114,27 @@
     "service": "InfoService",
     "method": "Ping",
     "evidence": "DefaultInfoService.Ping route /"
+  },
+  {
+    "name": "put_script",
+    "service": "ScriptService",
+    "method": "Put",
+    "paramsStruct": "api.ScriptPutParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      },
+      "context": {
+        "argument": 1,
+        "field": "Context"
+      }
+    },
+    "evidence": "DefaultScriptService.Put PUT /_scripts/{id}/{context}"
   },
   {
     "name": "query_rules.delete_ruleset",

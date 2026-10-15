@@ -2,8 +2,9 @@ package api
 
 // IngestGetPipelineParams are the query parameters for GET /_ingest/pipeline.
 type IngestGetPipelineParams struct {
-	Common  *CommonParams
-	Summary *bool
+	Common        *CommonParams
+	MasterTimeout string
+	Summary       *bool
 }
 
 // ToMap converts IngestGetPipelineParams to a query-parameter map.
@@ -12,6 +13,9 @@ func (p *IngestGetPipelineParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "summary", p.Summary)
 	return mergeParams(m, p.Common)
 }
@@ -28,9 +32,10 @@ func (r *IngestPutPipelineRequest) Validate() error { return validationError(val
 
 // IngestPutPipelineParams are the query parameters for put pipeline.
 type IngestPutPipelineParams struct {
-	Common    *CommonParams
-	IfVersion *int
-	Timeout   string
+	Common        *CommonParams
+	IfVersion     *int
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts IngestPutPipelineParams to a query-parameter map.
@@ -42,6 +47,9 @@ func (p *IngestPutPipelineParams) ToMap() map[string]string {
 	if p.IfVersion != nil {
 		m["if_version"] = intStr(*p.IfVersion)
 	}
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -50,8 +58,9 @@ func (p *IngestPutPipelineParams) ToMap() map[string]string {
 
 // IngestDeletePipelineParams are the query parameters for delete pipeline.
 type IngestDeletePipelineParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts IngestDeletePipelineParams to a query-parameter map.
@@ -60,6 +69,9 @@ func (p *IngestDeletePipelineParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}

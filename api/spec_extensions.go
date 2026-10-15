@@ -758,3 +758,22 @@ func (s *DefaultEqlService) GetWithParams(ctx context.Context, id string, params
 	var result EqlSearchResponse
 	return &result, doReq(s.logger, ctx, s.client, "GET", fmt.Sprintf("/_eql/search/%s", pathSegment(id)), nil, params, &result)
 }
+
+// LicenseServiceSpecExtensions exposes the opt-in license query carriers.
+// Obtain it with [AsLicenseServiceSpecExtensions].
+type LicenseServiceSpecExtensions interface {
+	DeleteWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error)
+}
+
+var _ LicenseServiceSpecExtensions = (*DefaultLicenseService)(nil)
+
+// AsLicenseServiceSpecExtensions adapts a LicenseService to its extension
+// interface.
+func AsLicenseServiceSpecExtensions(service LicenseService) (LicenseServiceSpecExtensions, error) {
+	return asSpecExtensions[LicenseServiceSpecExtensions]("license", service)
+}
+
+func (s *DefaultLicenseService) DeleteWithParams(ctx context.Context, params *MasterTimeoutAndTimeoutSpecParams) (*types.AcknowledgedResponse, error) {
+	var result types.AcknowledgedResponse
+	return &result, doReq(s.logger, ctx, s.client, "DELETE", "/_license", nil, params, &result)
+}

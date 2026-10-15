@@ -60,8 +60,12 @@ func (s *DefaultScriptService) Put(ctx context.Context, req *ScriptPutRequest) (
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
+	path := fmt.Sprintf("/_scripts/%s", pathSegment(req.Id))
+	if req.Context != "" {
+		path = fmt.Sprintf("/_scripts/%s/%s", pathSegment(req.Id), pathSegment(req.Context))
+	}
 	var result types.AcknowledgedResponse
-	return &result, doReq(s.logger, ctx, s.client, "PUT", fmt.Sprintf("/_scripts/%s", pathSegment(req.Id)), req.Body, req.Params, &result)
+	return &result, doReq(s.logger, ctx, s.client, "PUT", path, req.Body, req.Params, &result)
 }
 
 func (s *DefaultScriptService) Delete(ctx context.Context, id string, params *ScriptDeleteParams) (*types.AcknowledgedResponse, error) {

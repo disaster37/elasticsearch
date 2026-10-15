@@ -246,13 +246,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-connector",
 	},
-	"delete_script": {
-		Status:     "not-implemented",
-		Reason:     "ScriptService.Delete exists but binding is incomplete (missing params: master_timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-root",
-	},
 	"esql.async_query": {
 		Status:     "not-implemented",
 		Reason:     "no service in client for namespace esql",
@@ -301,20 +294,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Stability:  "experimental",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-fleet",
-	},
-	"get_script": {
-		Status:     "not-implemented",
-		Reason:     "ScriptService.Get exists but binding is incomplete (missing params: master_timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-root",
-	},
-	"health_report": {
-		Status:     "not-implemented",
-		Reason:     "HealthReportService.Get exists but binding is incomplete (missing params: timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-root",
 	},
 	"indices.delete_data_lifecycle": {
 		Status:     "not-implemented",
@@ -526,13 +505,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ingest",
 	},
-	"ingest.delete_pipeline": {
-		Status:     "not-implemented",
-		Reason:     "IngestService.DeletePipeline exists but binding is incomplete (missing params: master_timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ingest",
-	},
 	"ingest.geo_ip_stats": {
 		Status:     "not-implemented",
 		Reason:     "no IngestService.GeoIpStats method",
@@ -554,13 +526,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ingest",
 	},
-	"ingest.get_pipeline": {
-		Status:     "not-implemented",
-		Reason:     "IngestService.GetPipeline exists but binding is incomplete (missing params: master_timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ingest",
-	},
 	"ingest.put_geoip_database": {
 		Status:     "not-implemented",
 		Reason:     "no IngestService.PutGeoipDatabase method",
@@ -575,40 +540,12 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-ingest",
 	},
-	"ingest.put_pipeline": {
-		Status:     "not-implemented",
-		Reason:     "IngestService.PutPipeline exists but binding is incomplete (missing params: master_timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-ingest",
-	},
 	"knn_search": {
 		Status:     "not-implemented",
 		Reason:     "no service in client for namespace ",
 		Stability:  "experimental",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-root",
-	},
-	"license.delete": {
-		Status:     "not-implemented",
-		Reason:     "LicenseService.Delete exists but binding is incomplete (missing params: master_timeout,timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-license",
-	},
-	"license.get": {
-		Status:     "not-implemented",
-		Reason:     "LicenseService.Get exists but binding is incomplete (missing params: accept_enterprise)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-license",
-	},
-	"license.post_start_trial": {
-		Status:     "not-implemented",
-		Reason:     "LicenseService.PostStartTrial exists but binding is incomplete (missing params: master_timeout)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-license",
 	},
 	"ml.clear_trained_model_deployment_cache": {
 		Status:     "not-implemented",
@@ -1050,13 +987,6 @@ var knownMissingEndpoints = map[string]MissingEndpoint{
 		Stability:  "stable",
 		Visibility: "public",
 		Tracking:   "internal/speccheck/README.md#backlog-nodes",
-	},
-	"put_script": {
-		Status:     "not-implemented",
-		Reason:     "ScriptService.Put exists but binding is incomplete (missing params: master_timeout; unmapped parts: context)",
-		Stability:  "stable",
-		Visibility: "public",
-		Tracking:   "internal/speccheck/README.md#backlog-root",
 	},
 	"query_rules.delete_rule": {
 		Status:     "not-implemented",

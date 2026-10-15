@@ -224,3 +224,47 @@ func TestUnitScriptGetLanguagesNetworkError(t *testing.T) {
 	_, err := svc.GetLanguages(context.Background())
 	assert.Error(t, err)
 }
+
+func TestUnitScriptB8Transport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewScriptService(restyClient(srv), testLogger())
+	ctx := context.Background()
+	body := map[string]any{"script": map[string]any{}}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"get", func() error {
+			_, err := svc.Get(ctx, "s1", &ScriptGetParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/_scripts/s1", map[string]string{"master_timeout": "m1"}},
+		{"delete", func() error {
+			_, err := svc.Delete(ctx, "s1", &ScriptDeleteParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_scripts/s1", map[string]string{"master_timeout": "m1"}},
+		{"put", func() error {
+			_, err := svc.Put(ctx, &ScriptPutRequest{Id: "s1", Body: body, Params: &ScriptPutParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/_scripts/s1", map[string]string{"master_timeout": "m1"}},
+		{"put_context_path", func() error {
+			_, err := svc.Put(ctx, &ScriptPutRequest{Id: "s1", Context: "ctx1", Body: body, Params: &ScriptPutParams{Context: "qctx"}})
+			return err
+		}, "PUT", "/_scripts/s1/ctx1", map[string]string{"context": "qctx"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}

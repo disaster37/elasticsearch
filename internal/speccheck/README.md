@@ -48,8 +48,8 @@ or unreadable/malformed input.
 | Auxiliary files (`_common.json`) | 1 |
 | Parsed endpoint objects | 552 |
 | Checked endpoints | 512 |
-| Registered implementations | 296 |
-| Known-missing (baselined) endpoints | 216 |
+| Registered implementations | 306 |
+| Known-missing (baselined) endpoints | 206 |
 | Controlled-ignored parameters | 21 |
 
 The reconnaissance heuristic (349 "covered", 163 "missing", 322 field gaps)
@@ -77,6 +77,7 @@ number, not a claim of full REST implementation equivalence.
 | cluster carriers + `ClusterService.Info` | direct `MasterTimeout`/`ExpandWildcards`/`IncludeDefaults`/`IncludeRemotes` additions; Info route corrected to `GET /_info/{target}` with `_all` default | `master_timeout`, `include_defaults`, `include_remotes` |
 | snapshot carriers + `SnapshotService.Get` | direct `MasterTimeout`/paging additions; `snapshot.get` empty selector now routes to `/_snapshot/{repository}/_all` (B6) | `master_timeout`, `order`, `sort`, `size`, `offset`, `after`, `from_sort_value`, `verbose`, `index_names`, `slm_policy_filter` |
 | document/search/async/eql carriers; `DocumentService.Create` | direct fields added; `Create` route corrected to `PUT /{index}/_create/{id}`; new `DocumentServiceSpecExtensions.MultiTermVectorsWithRequest` and `EqlServiceSpecExtensions.GetWithParams` (B7) | `routing`, `require_data_stream`, `include_source_on_error`, `wait_for_active_shards`, `allow_no_indices`, `ids`, `docvalue_fields`, etc. |
+| ingest/script/license/health carriers; `ScriptService.Put` | direct `MasterTimeout` additions; optional path `/{context}`; new `LicenseServiceSpecExtensions.DeleteWithParams` (B8) | `master_timeout`, `accept_enterprise`, `timeout` |
 
 Note: `find_structure` and `test_grok_pattern` are registered and use the added
 `ecs_compatibility`/`timeout` fields. `text_structure.find_field_structure` and
@@ -324,14 +325,11 @@ with its exact reason. The authoritative map is `baseline.go`.
 | --- | --- | --- | --- | --- |
 | `ingest.delete_geoip_database` | not-implemented | stable | public | no IngestService.DeleteGeoipDatabase method |
 | `ingest.delete_ip_location_database` | not-implemented | stable | public | no IngestService.DeleteIpLocationDatabase method |
-| `ingest.delete_pipeline` | not-implemented | stable | public | IngestService.DeletePipeline exists but binding is incomplete (missing params: master_timeout) |
 | `ingest.geo_ip_stats` | not-implemented | stable | public | no IngestService.GeoIpStats method |
 | `ingest.get_geoip_database` | not-implemented | stable | public | no IngestService.GetGeoipDatabase method |
 | `ingest.get_ip_location_database` | not-implemented | stable | public | no IngestService.GetIpLocationDatabase method |
-| `ingest.get_pipeline` | not-implemented | stable | public | IngestService.GetPipeline exists but binding is incomplete (missing params: master_timeout) |
 | `ingest.put_geoip_database` | not-implemented | stable | public | no IngestService.PutGeoipDatabase method |
 | `ingest.put_ip_location_database` | not-implemented | stable | public | no IngestService.PutIpLocationDatabase method |
-| `ingest.put_pipeline` | not-implemented | stable | public | IngestService.PutPipeline exists but binding is incomplete (missing params: master_timeout) |
 
 ### license
 
@@ -339,9 +337,6 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `license.delete` | not-implemented | stable | public | LicenseService.Delete exists but binding is incomplete (missing params: master_timeout,timeout) |
-| `license.get` | not-implemented | stable | public | LicenseService.Get exists but binding is incomplete (missing params: accept_enterprise) |
-| `license.post_start_trial` | not-implemented | stable | public | LicenseService.PostStartTrial exists but binding is incomplete (missing params: master_timeout) |
 
 ### ml
 
@@ -451,11 +446,7 @@ with its exact reason. The authoritative map is `baseline.go`.
 
 | Endpoint | Status | Stability | Visibility | Reason |
 | --- | --- | --- | --- | --- |
-| `delete_script` | not-implemented | stable | public | ScriptService.Delete exists but binding is incomplete (missing params: master_timeout) |
-| `get_script` | not-implemented | stable | public | ScriptService.Get exists but binding is incomplete (missing params: master_timeout) |
-| `health_report` | not-implemented | stable | public | HealthReportService.Get exists but binding is incomplete (missing params: timeout) |
 | `knn_search` | not-implemented | experimental | public | no service in client for namespace  |
-| `put_script` | not-implemented | stable | public | ScriptService.Put exists but binding is incomplete (missing params: master_timeout; unmapped parts: context) |
 
 ### search_application
 
