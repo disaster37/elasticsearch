@@ -36,12 +36,15 @@ type customAsyncSearchService struct{}
 func (customAsyncSearchService) Submit(context.Context, *AsyncSearchSubmitRequest) (*AsyncSearchResponse, error) {
 	return nil, nil
 }
+
 func (customAsyncSearchService) Get(context.Context, string, *AsyncSearchGetParams) (*AsyncSearchResponse, error) {
 	return nil, nil
 }
+
 func (customAsyncSearchService) Status(context.Context, string) (*AsyncSearchStatusResponse, error) {
 	return nil, nil
 }
+
 func (customAsyncSearchService) Delete(context.Context, string) (*types.AcknowledgedResponse, error) {
 	return nil, nil
 }
@@ -252,8 +255,10 @@ func TestB1SpecExtensionAdapters(t *testing.T) {
 	}
 }
 
-type customCcr struct{ CcrService }
-type customIlm struct{ IlmService }
+type (
+	customCcr struct{ CcrService }
+	customIlm struct{ IlmService }
+)
 
 func TestCcrSpecExtensionsTransport(t *testing.T) {
 	srv, got := captureSpecServer(t)

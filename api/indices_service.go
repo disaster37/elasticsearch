@@ -162,9 +162,11 @@ func (s *DefaultIndicesService) Rollover(ctx context.Context, req *RolloverReque
 func (s *DefaultIndicesService) Shrink(ctx context.Context, req *ShrinkRequest) (*types.AcknowledgedResponse, error) {
 	return s.cloneOp(ctx, "shrink", req.Source, req.Target, req.Body, req.Params)
 }
+
 func (s *DefaultIndicesService) Split(ctx context.Context, req *SplitRequest) (*types.AcknowledgedResponse, error) {
 	return s.cloneOp(ctx, "split", req.Source, req.Target, req.Body, req.Params)
 }
+
 func (s *DefaultIndicesService) Clone(ctx context.Context, req *CloneRequest) (*types.AcknowledgedResponse, error) {
 	return s.cloneOp(ctx, "clone", req.Source, req.Target, req.Body, req.Params)
 }
