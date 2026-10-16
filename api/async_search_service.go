@@ -81,21 +81,7 @@ func (s *DefaultAsyncSearchService) Get(ctx context.Context, id string, params *
 }
 
 func (s *DefaultAsyncSearchService) Status(ctx context.Context, id string) (*AsyncSearchStatusResponse, error) {
-	if id == "" {
-		return nil, fmt.Errorf("id is required")
-	}
-	resp, err := s.client.R().SetContext(ctx).Get(fmt.Sprintf("/_async_search/status/%s", pathSegment(id)))
-	if err != nil {
-		return nil, wrapNetworkError(s.logger, err)
-	}
-	if resp.IsError() {
-		return nil, logAndReturnError(s.logger, resp)
-	}
-	var result AsyncSearchStatusResponse
-	if err := json.Unmarshal(resp.Body(), &result); err != nil {
-		return nil, wrapUnmarshalError(s.logger, resp, err)
-	}
-	return &result, nil
+	return s.StatusWithParams(ctx, id, nil)
 }
 
 func (s *DefaultAsyncSearchService) Delete(ctx context.Context, id string) (*types.AcknowledgedResponse, error) {

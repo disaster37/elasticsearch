@@ -13,8 +13,9 @@ import (
 
 // LicenseGetParams are the query parameters for GET /_license.
 type LicenseGetParams struct {
-	Common *CommonParams
-	Local  *bool
+	Common           *CommonParams
+	AcceptEnterprise *bool
+	Local            *bool
 }
 
 // ToMap converts LicenseGetParams to a query-parameter map.
@@ -23,14 +24,17 @@ func (p *LicenseGetParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "accept_enterprise", p.AcceptEnterprise)
 	setBoolParam(m, "local", p.Local)
 	return mergeParams(m, p.Common)
 }
 
 // LicensePostParams are the query parameters for PUT /_license.
 type LicensePostParams struct {
-	Common      *CommonParams
-	Acknowledge *bool
+	Common        *CommonParams
+	Acknowledge   *bool
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts LicensePostParams to a query-parameter map.
@@ -40,14 +44,21 @@ func (p *LicensePostParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "acknowledge", p.Acknowledge)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	return mergeParams(m, p.Common)
 }
 
 // LicenseStartTrialParams are the query parameters for start trial.
 type LicenseStartTrialParams struct {
-	Common      *CommonParams
-	Acknowledge *bool
-	Type        string
+	Common        *CommonParams
+	Acknowledge   *bool
+	MasterTimeout string
+	Type          string
 }
 
 // ToMap converts LicenseStartTrialParams to a query-parameter map.
@@ -57,6 +68,9 @@ func (p *LicenseStartTrialParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "acknowledge", p.Acknowledge)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Type != "" {
 		m["type"] = p.Type
 	}

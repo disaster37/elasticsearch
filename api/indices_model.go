@@ -5,6 +5,8 @@ import "github.com/disaster37/elasticsearch/v9/types"
 // IndicesCreateParams are the query parameters for PUT /{index}.
 type IndicesCreateParams struct {
 	Common              *CommonParams
+	MasterTimeout       string
+	Timeout             string
 	WaitForActiveShards string
 }
 
@@ -14,6 +16,12 @@ func (p *IndicesCreateParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	if p.WaitForActiveShards != "" {
 		m["wait_for_active_shards"] = p.WaitForActiveShards
 	}
@@ -26,6 +34,8 @@ type IndicesDeleteParams struct {
 	AllowNoIndices    *bool
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
+	MasterTimeout     string
+	Timeout           string
 }
 
 // ToMap converts IndicesDeleteParams to a query-parameter map.
@@ -39,6 +49,12 @@ func (p *IndicesDeleteParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -52,6 +68,7 @@ type IndicesGetParams struct {
 	IgnoreUnavailable *bool
 	IncludeDefaults   *bool
 	Local             *bool
+	MasterTimeout     string
 }
 
 // ToMap converts IndicesGetParams to a query-parameter map.
@@ -69,6 +86,9 @@ func (p *IndicesGetParams) ToMap() map[string]string {
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "include_defaults", p.IncludeDefaults)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -106,6 +126,7 @@ type IndicesOpenParams struct {
 	AllowNoIndices      *bool
 	ExpandWildcards     ExpandWildcards
 	IgnoreUnavailable   *bool
+	MasterTimeout       string
 	Timeout             string
 	WaitForActiveShards string
 }
@@ -121,6 +142,9 @@ func (p *IndicesOpenParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -148,6 +172,8 @@ func (r *RolloverRequest) Validate() error { return validationError(validate.Str
 type RolloverParams struct {
 	Common              *CommonParams
 	DryRun              *bool
+	Lazy                *bool
+	MasterTimeout       string
 	Timeout             string
 	WaitForActiveShards string
 }
@@ -159,6 +185,10 @@ func (p *RolloverParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "dry_run", p.DryRun)
+	setBoolParam(m, "lazy", p.Lazy)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -182,6 +212,7 @@ func (r *ShrinkRequest) Validate() error { return validationError(validate.Struc
 // ShrinkParams are the query parameters for shrink/split/clone.
 type ShrinkParams struct {
 	Common              *CommonParams
+	MasterTimeout       string
 	Timeout             string
 	WaitForActiveShards string
 }
@@ -192,6 +223,9 @@ func (p *ShrinkParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -286,6 +320,7 @@ type IndicesForceMergeParams struct {
 	IgnoreUnavailable  *bool
 	MaxNumSegments     *int
 	OnlyExpungeDeletes *bool
+	WaitForCompletion  *bool
 }
 
 // ToMap converts IndicesForceMergeParams to a query-parameter map.
@@ -304,6 +339,7 @@ func (p *IndicesForceMergeParams) ToMap() map[string]string {
 		m["max_num_segments"] = intStr(*p.MaxNumSegments)
 	}
 	setBoolParam(m, "only_expunge_deletes", p.OnlyExpungeDeletes)
+	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
 }
 
@@ -316,6 +352,7 @@ type IndicesClearCacheParams struct {
 	Fields            []string
 	IgnoreUnavailable *bool
 	Query             *bool
+	Request           *bool
 }
 
 // ToMap converts IndicesClearCacheParams to a query-parameter map.
@@ -332,6 +369,7 @@ func (p *IndicesClearCacheParams) ToMap() map[string]string {
 	setListParam(m, "fields", p.Fields)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "query", p.Query)
+	setBoolParam(m, "request", p.Request)
 	return mergeParams(m, p.Common)
 }
 
@@ -450,6 +488,7 @@ type IndicesReloadAnalyzersParams struct {
 	AllowNoIndices    *bool
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
+	Resource          string
 }
 
 // ToMap converts IndicesReloadAnalyzersParams to a query-parameter map.
@@ -463,6 +502,9 @@ func (p *IndicesReloadAnalyzersParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.Resource != "" {
+		m["resource"] = p.Resource
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -482,6 +524,7 @@ type AddBlockParams struct {
 	AllowNoIndices    *bool
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
+	MasterTimeout     string
 	Timeout           string
 }
 
@@ -496,6 +539,9 @@ func (p *AddBlockParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -515,8 +561,9 @@ func (r *PutAliasRequest) Validate() error { return validationError(validate.Str
 
 // AliasParams are the query parameters for put/delete alias.
 type AliasParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts AliasParams to a query-parameter map.
@@ -525,6 +572,9 @@ func (p *AliasParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -545,6 +595,7 @@ type GetAliasParams struct {
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
 	Local             *bool
+	MasterTimeout     string
 }
 
 // ToMap converts GetAliasParams to a query-parameter map.
@@ -559,6 +610,9 @@ func (p *GetAliasParams) ToMap() map[string]string {
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -584,8 +638,9 @@ func (r *DeleteAliasRequest) Validate() error { return validationError(validate.
 
 // IndicesUpdateAliasesParams are the query parameters for POST /_aliases.
 type IndicesUpdateAliasesParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts IndicesUpdateAliasesParams to a query-parameter map.
@@ -594,6 +649,9 @@ func (p *IndicesUpdateAliasesParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -616,6 +674,7 @@ type GetSettingsParams struct {
 	IgnoreUnavailable *bool
 	IncludeDefaults   *bool
 	Local             *bool
+	MasterTimeout     string
 }
 
 // ToMap converts GetSettingsParams to a query-parameter map.
@@ -632,6 +691,9 @@ func (p *GetSettingsParams) ToMap() map[string]string {
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "include_defaults", p.IncludeDefaults)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -642,7 +704,9 @@ type IndicesPutSettingsParams struct {
 	ExpandWildcards   ExpandWildcards
 	FlatSettings      *bool
 	IgnoreUnavailable *bool
+	MasterTimeout     string
 	PreserveExisting  *bool
+	Reopen            *bool
 	Timeout           string
 }
 
@@ -658,7 +722,11 @@ func (p *IndicesPutSettingsParams) ToMap() map[string]string {
 	}
 	setBoolParam(m, "flat_settings", p.FlatSettings)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	setBoolParam(m, "preserve_existing", p.PreserveExisting)
+	setBoolParam(m, "reopen", p.Reopen)
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -672,6 +740,7 @@ type IndicesGetMappingParams struct {
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
 	Local             *bool
+	MasterTimeout     string
 }
 
 // ToMap converts IndicesGetMappingParams to a query-parameter map.
@@ -686,6 +755,9 @@ func (p *IndicesGetMappingParams) ToMap() map[string]string {
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -705,6 +777,7 @@ type PutMappingParams struct {
 	AllowNoIndices    *bool
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
+	MasterTimeout     string
 	Timeout           string
 	WriteIndexOnly    *bool
 }
@@ -720,6 +793,9 @@ func (p *PutMappingParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -765,9 +841,10 @@ func (p *GetFieldMappingParams) ToMap() map[string]string {
 
 // IndicesGetTemplateParams are the query parameters for the legacy get_template.
 type IndicesGetTemplateParams struct {
-	Common       *CommonParams
-	FlatSettings *bool
-	Local        *bool
+	Common        *CommonParams
+	FlatSettings  *bool
+	Local         *bool
+	MasterTimeout string
 }
 
 // ToMap converts IndicesGetTemplateParams to a query-parameter map.
@@ -778,6 +855,9 @@ func (p *IndicesGetTemplateParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -793,11 +873,13 @@ func (r *PutTemplateRequest) Validate() error { return validationError(validate.
 
 // PutTemplateParams are the query parameters for the legacy put_template.
 type PutTemplateParams struct {
-	Common       *CommonParams
-	Create       *bool
-	FlatSettings *bool
-	Order        *int
-	Timeout      string
+	Common        *CommonParams
+	Cause         string
+	Create        *bool
+	FlatSettings  *bool
+	MasterTimeout string
+	Order         *int
+	Timeout       string
 }
 
 // ToMap converts PutTemplateParams to a query-parameter map.
@@ -806,8 +888,14 @@ func (p *PutTemplateParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.Cause != "" {
+		m["cause"] = p.Cause
+	}
 	setBoolParam(m, "create", p.Create)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Order != nil {
 		m["order"] = intStr(*p.Order)
 	}
@@ -819,8 +907,9 @@ func (p *PutTemplateParams) ToMap() map[string]string {
 
 // IndicesDeleteTemplateParams are the query parameters for delete legacy template.
 type IndicesDeleteTemplateParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts IndicesDeleteTemplateParams to a query-parameter map.
@@ -829,6 +918,9 @@ func (p *IndicesDeleteTemplateParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -837,9 +929,11 @@ func (p *IndicesDeleteTemplateParams) ToMap() map[string]string {
 
 // IndicesGetIndexTemplateParams are the query parameters for get_index_template.
 type IndicesGetIndexTemplateParams struct {
-	Common       *CommonParams
-	FlatSettings *bool
-	Local        *bool
+	Common          *CommonParams
+	FlatSettings    *bool
+	IncludeDefaults *bool
+	Local           *bool
+	MasterTimeout   string
 }
 
 // ToMap converts IndicesGetIndexTemplateParams to a query-parameter map.
@@ -849,7 +943,11 @@ func (p *IndicesGetIndexTemplateParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "flat_settings", p.FlatSettings)
+	setBoolParam(m, "include_defaults", p.IncludeDefaults)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -865,9 +963,10 @@ func (r *PutIndexTemplateRequest) Validate() error { return validationError(vali
 
 // PutIndexTemplateParams are the query parameters for put_index_template.
 type PutIndexTemplateParams struct {
-	Common *CommonParams
-	Cause  string
-	Create *bool
+	Common        *CommonParams
+	Cause         string
+	Create        *bool
+	MasterTimeout string
 }
 
 // ToMap converts PutIndexTemplateParams to a query-parameter map.
@@ -880,13 +979,17 @@ func (p *PutIndexTemplateParams) ToMap() map[string]string {
 		m["cause"] = p.Cause
 	}
 	setBoolParam(m, "create", p.Create)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
 // IndicesDeleteIndexTemplateParams are the query parameters for delete_index_template.
 type IndicesDeleteIndexTemplateParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts IndicesDeleteIndexTemplateParams to a query-parameter map.
@@ -895,6 +998,9 @@ func (p *IndicesDeleteIndexTemplateParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -913,9 +1019,11 @@ func (r *SimulateIndexTemplateRequest) Validate() error { return validationError
 
 // SimulateIndexTemplateParams are the query parameters for simulate_index_template.
 type SimulateIndexTemplateParams struct {
-	Common *CommonParams
-	Cause  string
-	Create *bool
+	Common          *CommonParams
+	Cause           string
+	Create          *bool
+	IncludeDefaults *bool
+	MasterTimeout   string
 }
 
 // ToMap converts SimulateIndexTemplateParams to a query-parameter map.
@@ -928,6 +1036,10 @@ func (p *SimulateIndexTemplateParams) ToMap() map[string]string {
 		m["cause"] = p.Cause
 	}
 	setBoolParam(m, "create", p.Create)
+	setBoolParam(m, "include_defaults", p.IncludeDefaults)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	return mergeParams(m, p.Common)
 }
 
@@ -943,8 +1055,9 @@ type SimulateTemplateParams = SimulateIndexTemplateParams
 
 // IndicesCreateDataStreamParams are the query parameters for create_data_stream.
 type IndicesCreateDataStreamParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts IndicesCreateDataStreamParams to a query-parameter map.
@@ -953,6 +1066,9 @@ func (p *IndicesCreateDataStreamParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -964,6 +1080,8 @@ type IndicesGetDataStreamParams struct {
 	Common          *CommonParams
 	ExpandWildcards ExpandWildcards
 	IncludeDefaults *bool
+	MasterTimeout   string
+	Verbose         *bool
 }
 
 // ToMap converts IndicesGetDataStreamParams to a query-parameter map.
@@ -976,6 +1094,10 @@ func (p *IndicesGetDataStreamParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "include_defaults", p.IncludeDefaults)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	setBoolParam(m, "verbose", p.Verbose)
 	return mergeParams(m, p.Common)
 }
 
@@ -983,6 +1105,7 @@ func (p *IndicesGetDataStreamParams) ToMap() map[string]string {
 type IndicesDeleteDataStreamParams struct {
 	Common          *CommonParams
 	ExpandWildcards ExpandWildcards
+	MasterTimeout   string
 }
 
 // ToMap converts IndicesDeleteDataStreamParams to a query-parameter map.
@@ -993,6 +1116,9 @@ func (p *IndicesDeleteDataStreamParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	if p.ExpandWildcards != "" {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
+	}
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
 	}
 	return mergeParams(m, p.Common)
 }
@@ -1058,7 +1184,9 @@ type IndicesResolveClusterParams struct {
 	Common            *CommonParams
 	AllowNoIndices    *bool
 	ExpandWildcards   ExpandWildcards
+	IgnoreThrottled   *bool
 	IgnoreUnavailable *bool
+	Timeout           string
 }
 
 // ToMap converts IndicesResolveClusterParams to a query-parameter map.
@@ -1071,7 +1199,11 @@ func (p *IndicesResolveClusterParams) ToMap() map[string]string {
 	if p.ExpandWildcards != "" {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
+	setBoolParam(m, "ignore_throttled", p.IgnoreThrottled)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	return mergeParams(m, p.Common)
 }
 

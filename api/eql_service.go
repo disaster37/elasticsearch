@@ -13,10 +13,12 @@ import (
 
 // EqlSearchParams are the query parameters for EQL search.
 type EqlSearchParams struct {
-	Common                   *CommonParams
-	KeepAlive                string
-	KeepOnCompletion         *bool
-	WaitForCompletionTimeout string
+	Common                      *CommonParams
+	AllowPartialSearchResults   *bool
+	AllowPartialSequenceResults *bool
+	KeepAlive                   string
+	KeepOnCompletion            *bool
+	WaitForCompletionTimeout    string
 }
 
 // ToMap converts EqlSearchParams to a query-parameter map.
@@ -25,10 +27,34 @@ func (p *EqlSearchParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "allow_partial_search_results", p.AllowPartialSearchResults)
+	setBoolParam(m, "allow_partial_sequence_results", p.AllowPartialSequenceResults)
 	if p.KeepAlive != "" {
 		m["keep_alive"] = p.KeepAlive
 	}
 	setBoolParam(m, "keep_on_completion", p.KeepOnCompletion)
+	if p.WaitForCompletionTimeout != "" {
+		m["wait_for_completion_timeout"] = p.WaitForCompletionTimeout
+	}
+	return mergeParams(m, p.Common)
+}
+
+// EqlGetSpecParams are the opt-in query parameters for EQL get.
+type EqlGetSpecParams struct {
+	Common                   *CommonParams
+	KeepAlive                string
+	WaitForCompletionTimeout string
+}
+
+// ToMap converts EqlGetSpecParams to a query-parameter map.
+func (p *EqlGetSpecParams) ToMap() map[string]string {
+	if p == nil {
+		return nil
+	}
+	m := make(map[string]string)
+	if p.KeepAlive != "" {
+		m["keep_alive"] = p.KeepAlive
+	}
 	if p.WaitForCompletionTimeout != "" {
 		m["wait_for_completion_timeout"] = p.WaitForCompletionTimeout
 	}

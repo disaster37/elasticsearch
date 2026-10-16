@@ -16,6 +16,8 @@ type TextStructureFindParams struct {
 	Charset            string
 	ColumnNames        []string
 	Delimiter          string
+	DocumentsToSample  *int
+	EcsCompatibility   string
 	Explain            *bool
 	Format             string
 	GrokPattern        string
@@ -24,6 +26,7 @@ type TextStructureFindParams struct {
 	LinesToSample      *int
 	Quote              string
 	ShouldTrimFields   *bool
+	Timeout            string
 	TimestampField     string
 	TimestampFormat    string
 }
@@ -40,6 +43,12 @@ func (p *TextStructureFindParams) ToMap() map[string]string {
 	setListParam(m, "column_names", p.ColumnNames)
 	if p.Delimiter != "" {
 		m["delimiter"] = p.Delimiter
+	}
+	if p.DocumentsToSample != nil {
+		m["documents_to_sample"] = intStr(*p.DocumentsToSample)
+	}
+	if p.EcsCompatibility != "" {
+		m["ecs_compatibility"] = p.EcsCompatibility
 	}
 	setBoolParam(m, "explain", p.Explain)
 	if p.Format != "" {
@@ -59,6 +68,9 @@ func (p *TextStructureFindParams) ToMap() map[string]string {
 		m["quote"] = p.Quote
 	}
 	setBoolParam(m, "should_trim_fields", p.ShouldTrimFields)
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	if p.TimestampField != "" {
 		m["timestamp_field"] = p.TimestampField
 	}

@@ -22,6 +22,8 @@ type DanglingIndicesListResponse struct {
 type DanglingIndicesImportParams struct {
 	Common         *CommonParams
 	AcceptDataLoss *bool `validate:"required"`
+	MasterTimeout  string
+	Timeout        string
 }
 
 // ToMap converts DanglingIndicesImportParams to a query-parameter map.
@@ -31,6 +33,12 @@ func (p *DanglingIndicesImportParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "accept_data_loss", p.AcceptDataLoss)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
+	}
 	return mergeParams(m, p.Common)
 }
 

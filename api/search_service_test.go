@@ -905,3 +905,47 @@ func TestUnitSearchScriptsPainlessExecNetworkError(t *testing.T) {
 	_, err := svc.ScriptsPainlessExec(context.Background(), map[string]any{})
 	assert.Error(t, err)
 }
+
+func TestUnitSearchB7CarrierTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewSearchService(restyClient(srv), testLogger())
+	ctx := context.Background()
+	body := map[string]any{"query": map[string]any{}}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"field_caps", func() error {
+			_, err := svc.FieldCaps(ctx, &FieldCapsRequest{Indices: []string{"idx"}, Params: &FieldCapsParams{Filters: []string{"f1", "f2"}, Types: []string{"keyword"}, IncludeEmptyFields: ptrBool(true)}})
+			return err
+		}, "GET", "/idx/_field_caps", map[string]string{"filters": "f1,f2", "types": "keyword", "include_empty_fields": "true"}},
+		{"open_point_in_time", func() error {
+			_, err := svc.OpenPointInTime(ctx, &OpenPITRequest{Indices: []string{"idx"}, Params: &OpenPITParams{KeepAlive: "1m", AllowPartialSearchResults: ptrBool(true)}})
+			return err
+		}, "POST", "/idx/_pit", map[string]string{"keep_alive": "1m", "allow_partial_search_results": "true"}},
+		{"search_shards", func() error {
+			_, err := svc.SearchShards(ctx, &SearchShardsRequest{Indices: []string{"idx"}, Params: &SearchShardsParams{MasterTimeout: "m1"}})
+			return err
+		}, "GET", "/idx/_search_shards", map[string]string{"master_timeout": "m1"}},
+		{"search_template", func() error {
+			_, err := svc.SearchTemplate(ctx, &SearchTemplateRequest{Indices: []string{"idx"}, Body: body, Params: &SearchTemplateParams{ExpandWildcards: ExpandWildcardOpen}})
+			return err
+		}, "POST", "/idx/_search/template", map[string]string{"expand_wildcards": "open"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}

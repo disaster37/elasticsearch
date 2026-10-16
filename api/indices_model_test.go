@@ -696,7 +696,7 @@ func TestUnitIndicesGetTemplateParamsToMapNil(t *testing.T) {
 func TestUnitPutTemplateParamsToMap(t *testing.T) {
 	p := &PutTemplateParams{
 		Create:       ptrBool(true),
-		FlatSettings:  ptrBool(true),
+		FlatSettings: ptrBool(true),
 		Order:        ptrInt(5),
 		Timeout:      "30s",
 	}

@@ -6,10 +6,13 @@ This document explains how to configure retry and backoff settings for the Elast
 
 The `Config` struct now includes the following retry-related fields:
 
-- `RetryCount`: Maximum number of retry attempts (default: 0 = no retries)
+- `RetryCount`: Maximum number of retry attempts (default: 0 = no retries for a
+  single address; automatically set to the number of addresses when more than one
+  address is configured)
 - `RetryWaitTime`: Minimum wait time between retries (default: 100ms)
 - `RetryMaxWaitTime`: Maximum wait time between retries (default: 2s)
-- `RetryConditions`: Custom retry conditions (optional)
+- `RetryConditions`: Custom retry conditions (optional; when retries are enabled
+  and this is empty, `DefaultRetryConditions()` is applied automatically)
 
 ## Default Retry Behavior
 
@@ -26,6 +29,10 @@ When `RetryCount > 0`, the client automatically retries on:
 2. **HTTP status codes**:
    - 429 Too Many Requests
    - 5xx server errors (except 501 Not Implemented)
+
+When retries are enabled and no custom `RetryConditions` are supplied — including
+when retries are auto-enabled because multiple addresses are configured — these
+default conditions are installed automatically.
 
 ## Usage Examples
 
@@ -80,20 +87,31 @@ client, err := elasticsearch.New(&elasticsearch.Config{
 ## Failover across multiple addresses
 
 When `Config.Addresses` contains more than one node URL, requests are distributed
-across the addresses in round-robin order. With `RetryCount > 0`, each retry
-attempt targets the next address in the round-robin cycle, so a request that
-fails against one node automatically fails over to the next:
+across the addresses in round-robin order and retry/failover is **enabled
+automatically**:
+
+- If `RetryCount` is left at its zero value (the default), `New` sets it to the
+  number of addresses. Each retry attempt targets the next address in the
+  round-robin cycle, so with N addresses the request makes up to N+1 attempts and
+  every node is tried at least once before the request gives up.
+- If `RetryConditions` is empty, `DefaultRetryConditions()` is installed
+  automatically (network errors, 429, and 5xx except 501).
 
 ```go
+// Failover is automatic: no RetryCount/RetryConditions required.
 client, err := elasticsearch.New(&elasticsearch.Config{
-    Addresses:       []string{"https://node1:9200", "https://node2:9200"},
-    RetryCount:       1,
-    RetryConditions:  elasticsearch.DefaultRetryConditions(),
+    Addresses: []string{"https://node1:9200", "https://node2:9200"},
 }, logger)
 ```
 
-With `RetryCount == 0` (the default) requests still round-robin for load
-balancing but do not fail over: a failed request is returned immediately.
+Explicit configuration always wins: an explicit `RetryCount > 0` is used as-is
+(it is not raised to the number of addresses), and caller-provided
+`RetryConditions` replace the defaults entirely.
+
+With a **single** address, retries remain opt-in: `RetryCount == 0` (the default)
+returns a failed request immediately. There is currently no opt-out field for
+multi-address configurations — configure a single address if you need strict
+no-retry semantics.
 
 ## Handling Your Specific Error
 
@@ -102,7 +120,7 @@ For the error you mentioned:
 ERROR HTTP request failed error=read tcp 172.18.0.2:54492->10.221.84.160:443: read: connection reset by peer service=search
 ```
 
-This will be automatically handled by the default retry conditions when you set `RetryCount > 0`. The client will retry the request up to the specified number of times with exponential backoff.
+This will be automatically handled by the default retry conditions when you set `RetryCount > 0`, or automatically when multiple addresses are configured. The client will retry the request up to the specified number of times with exponential backoff.
 
 ## Built-in Helper Functions
 

@@ -14,6 +14,8 @@ import (
 // SearchableSnapshotsMountParams are the query parameters for mount.
 type SearchableSnapshotsMountParams struct {
 	Common              *CommonParams
+	MasterTimeout       string
+	Storage             string
 	WaitForCompletion   *bool
 	WaitForActiveShards string
 }
@@ -24,6 +26,12 @@ func (p *SearchableSnapshotsMountParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
+	if p.Storage != "" {
+		m["storage"] = p.Storage
+	}
 	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	if p.WaitForActiveShards != "" {
 		m["wait_for_active_shards"] = p.WaitForActiveShards

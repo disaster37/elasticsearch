@@ -493,3 +493,49 @@ func TestUnitTransformGetNodeStatsNetworkError(t *testing.T) {
 	_, err := svc.GetNodeStats(context.Background())
 	assert.Error(t, err)
 }
+
+type customTransform struct{ TransformService }
+
+func TestTransformSpecExtensionAdapters(t *testing.T) {
+	svc := NewTransformService(nil, testLogger())
+	if _, err := AsTransformServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("transform default: %v", err)
+	}
+	if _, err := AsTransformServiceSpecExtensions(nil); err == nil {
+		t.Error("transform nil: want error")
+	}
+	var typedNil TransformService = (*DefaultTransformService)(nil)
+	if _, err := AsTransformServiceSpecExtensions(typedNil); err == nil {
+		t.Error("transform typed-nil: want error")
+	}
+	if _, err := AsTransformServiceSpecExtensions(customTransform{svc}); err == nil {
+		t.Error("transform custom: want error")
+	}
+}
+
+func TestUnitTransformB9Transport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewTransformService(restyClient(srv), testLogger())
+	ext, err := AsTransformServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+
+	_, err = svc.Delete(ctx, "t1", &TransformDeleteParams{DeleteDestIndex: ptrBool(false)})
+	assert.NoError(t, err)
+	assert.Equal(t, "DELETE", got.method)
+	assert.Equal(t, "/_transform/t1", got.path)
+	assert.Equal(t, "false", got.query["delete_dest_index"])
+
+	*got = capturedSpecRequest{}
+	_, err = svc.Start(ctx, "t1", &TransformStartParams{From: "now-1d", Timeout: "t1"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_transform/t1/_start", got.path)
+	assert.Equal(t, "now-1d", got.query["from"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.ScheduleNowWithParams(ctx, "t1", &TimeoutSpecParams{Timeout: "t2"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_transform/t1/_schedule_now", got.path)
+	assert.Equal(t, "t2", got.query["timeout"])
+}

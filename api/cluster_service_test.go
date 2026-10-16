@@ -220,7 +220,7 @@ func TestUnitClusterRemoteInfo(t *testing.T) {
 
 func TestUnitClusterInfo(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/_cluster/info", r.URL.Path)
+		assert.Equal(t, "/_info/_all", r.URL.Path)
 		assert.Equal(t, "GET", r.Method)
 		jsonResponse(w, 200, `{"version":{"number":"8.0.0"}}`)
 	}))
@@ -233,13 +233,26 @@ func TestUnitClusterInfo(t *testing.T) {
 
 func TestUnitClusterInfoFeatures(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/_cluster/info/version", r.URL.Path)
+		assert.Equal(t, "/_info/version", r.URL.Path)
 		jsonResponse(w, 200, `{"version":{"number":"8.0.0"}}`)
 	}))
 	defer srv.Close()
 	svc := NewClusterService(restyClient(srv), testLogger())
 	_, err := svc.Info(context.Background(), []string{"version"})
 	assert.NoError(t, err)
+}
+
+func TestUnitClusterInfoMultiTarget(t *testing.T) {
+	var gotPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.EscapedPath()
+		jsonResponse(w, 200, `{}`)
+	}))
+	defer srv.Close()
+	svc := NewClusterService(restyClient(srv), testLogger())
+	_, err := svc.Info(context.Background(), []string{"version", "http"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_info/version,http", gotPath)
 }
 
 func TestUnitClusterPostVotingConfigExclusions(t *testing.T) {
@@ -385,4 +398,109 @@ func TestUnitClusterDeleteComponentTemplateEmptyName(t *testing.T) {
 	svc := NewClusterService(restyClient(httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))), testLogger())
 	_, err := svc.DeleteComponentTemplate(context.Background(), "", &ClusterDeleteComponentTemplateParams{})
 	assert.Error(t, err)
+}
+
+type customCluster struct{ ClusterService }
+
+func TestClusterSpecExtensionAdapters(t *testing.T) {
+	svc := NewClusterService(nil, testLogger())
+	if _, err := AsClusterServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("cluster default: %v", err)
+	}
+	if _, err := AsClusterServiceSpecExtensions(nil); err == nil {
+		t.Error("cluster nil: want error")
+	}
+	var typedNil ClusterService = (*DefaultClusterService)(nil)
+	if _, err := AsClusterServiceSpecExtensions(typedNil); err == nil {
+		t.Error("cluster typed-nil: want error")
+	}
+	if _, err := AsClusterServiceSpecExtensions(customCluster{svc}); err == nil {
+		t.Error("cluster custom: want error")
+	}
+}
+
+func TestUnitClusterB5CarrierTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewClusterService(restyClient(srv), testLogger())
+	ext, err := AsClusterServiceSpecExtensions(svc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := context.Background()
+	body := map[string]any{"current_node": "n1"}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"health", func() error {
+			_, err := svc.Health(ctx, []string{"idx"}, &ClusterHealthParams{MasterTimeout: "m1", ExpandWildcards: ExpandWildcardOpen})
+			return err
+		}, "GET", "/_cluster/health/idx", map[string]string{"master_timeout": "m1", "expand_wildcards": "open"}},
+		{"state", func() error {
+			_, err := svc.State(ctx, &ClusterStateRequest{Metrics: []string{"metadata"}, Indices: []string{"idx"}, Params: &ClusterStateParams{MasterTimeout: "m1"}})
+			return err
+		}, "GET", "/_cluster/state/metadata/idx", map[string]string{"master_timeout": "m1"}},
+		{"stats", func() error {
+			_, err := svc.Stats(ctx, []string{"n1"}, &ClusterStatsParams{IncludeRemotes: ptrBool(true)})
+			return err
+		}, "GET", "/_cluster/stats/nodes/n1", map[string]string{"include_remotes": "true"}},
+		{"get_settings", func() error {
+			_, err := svc.GetSettings(ctx, &ClusterGetSettingsParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/_cluster/settings", map[string]string{"master_timeout": "m1"}},
+		{"put_settings", func() error {
+			_, err := svc.PutSettings(ctx, body, &ClusterPutSettingsParams{MasterTimeout: "m1"})
+			return err
+		}, "PUT", "/_cluster/settings", map[string]string{"master_timeout": "m1"}},
+		{"allocation_explain", func() error {
+			_, err := svc.AllocationExplain(ctx, body, &ClusterAllocationExplainParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/_cluster/allocation/explain", map[string]string{"master_timeout": "m1"}},
+		{"reroute", func() error {
+			_, err := svc.Reroute(ctx, body, &ClusterRerouteParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/_cluster/reroute", map[string]string{"master_timeout": "m1"}},
+		{"pending_tasks", func() error {
+			_, err := svc.PendingTasks(ctx, &ClusterPendingTasksParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/_cluster/pending_tasks", map[string]string{"master_timeout": "m1"}},
+		{"post_voting_config_exclusions", func() error {
+			return svc.PostVotingConfigExclusions(ctx, &ClusterVotingConfigExclusionsParams{MasterTimeout: "m1"})
+		}, "POST", "/_cluster/voting_config_exclusions", map[string]string{"master_timeout": "m1"}},
+		{"delete_voting_config_exclusions", func() error {
+			return svc.DeleteVotingConfigExclusions(ctx, &ClusterDeleteVotingConfigExclusionsParams{MasterTimeout: "m1"})
+		}, "DELETE", "/_cluster/voting_config_exclusions", map[string]string{"master_timeout": "m1"}},
+		{"get_component_template", func() error {
+			_, err := svc.GetComponentTemplate(ctx, []string{"c1"}, &ClusterGetComponentTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(true)})
+			return err
+		}, "GET", "/_component_template/c1", map[string]string{"master_timeout": "m1", "include_defaults": "true"}},
+		{"exists_component_template", func() error {
+			_, err := ext.ExistsComponentTemplateWithParams(ctx, "c1", &ClusterGetComponentTemplateParams{MasterTimeout: "m1"})
+			return err
+		}, "HEAD", "/_component_template/c1", map[string]string{"master_timeout": "m1"}},
+		{"put_component_template", func() error {
+			_, err := svc.PutComponentTemplate(ctx, &PutComponentTemplateRequest{Name: "c1", Body: body, Params: &PutComponentTemplateParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/_component_template/c1", map[string]string{"master_timeout": "m1"}},
+		{"delete_component_template", func() error {
+			_, err := svc.DeleteComponentTemplate(ctx, "c1", &ClusterDeleteComponentTemplateParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_component_template/c1", map[string]string{"master_timeout": "m1"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
 }

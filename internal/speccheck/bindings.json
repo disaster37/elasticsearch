@@ -1,0 +1,5100 @@
+[
+  {
+    "name": "async_search.delete",
+    "service": "AsyncSearchService",
+    "method": "Delete",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultAsyncSearchService.Delete route /_async_search/%s"
+  },
+  {
+    "name": "async_search.get",
+    "service": "AsyncSearchService",
+    "method": "Get",
+    "paramsStruct": "api.AsyncSearchGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultAsyncSearchService.Get route /_async_search/%s"
+  },
+  {
+    "name": "async_search.status",
+    "service": "AsyncSearchServiceSpecExtensions",
+    "method": "StatusWithParams",
+    "paramsStruct": "api.AsyncSearchStatusParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultAsyncSearchService.StatusWithParams GET /_async_search/status/{id} (extension carries keep_alive)"
+  },
+  {
+    "name": "async_search.submit",
+    "service": "AsyncSearchService",
+    "method": "Submit",
+    "paramsStruct": "api.AsyncSearchSubmitParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultAsyncSearchService.Submit POST /{index}/_async_search"
+  },
+  {
+    "name": "bulk",
+    "service": "DocumentService",
+    "method": "Bulk",
+    "paramsStruct": "api.BulkParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.Bulk POST /{index}/_bulk"
+  },
+  {
+    "name": "cat.aliases",
+    "service": "CatService",
+    "method": "Aliases",
+    "paramsStruct": "api.CatAliasesParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Aliases route /_cat/aliases/%s"
+  },
+  {
+    "name": "cat.allocation",
+    "service": "CatService",
+    "method": "Allocation",
+    "paramsStruct": "api.CatAllocationParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Allocation route /_cat/allocation/%s"
+  },
+  {
+    "name": "cat.component_templates",
+    "service": "CatService",
+    "method": "ComponentTemplates",
+    "paramsStruct": "api.CatComponentTemplatesParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.ComponentTemplates route /_cat/component_templates/%s"
+  },
+  {
+    "name": "cat.count",
+    "service": "CatService",
+    "method": "Count",
+    "paramsStruct": "api.CatCountParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Count route /_cat/count/%s"
+  },
+  {
+    "name": "cat.fielddata",
+    "service": "CatService",
+    "method": "Fielddata",
+    "paramsStruct": "api.CatFielddataParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "fields": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "fields": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Fielddata route /_cat/fielddata/%s"
+  },
+  {
+    "name": "cat.health",
+    "service": "CatService",
+    "method": "Health",
+    "paramsStruct": "api.CatHealthParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Health route /_cat/health"
+  },
+  {
+    "name": "cat.help",
+    "service": "CatService",
+    "method": "Help",
+    "evidence": "DefaultCatService.Help route /_cat"
+  },
+  {
+    "name": "cat.indices",
+    "service": "CatService",
+    "method": "Indices",
+    "paramsStruct": "api.CatIndicesParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Indices route /_cat/indices/%s"
+  },
+  {
+    "name": "cat.master",
+    "service": "CatService",
+    "method": "Master",
+    "paramsStruct": "api.CatMasterParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Master route /_cat/master"
+  },
+  {
+    "name": "cat.ml_data_frame_analytics",
+    "service": "CatService",
+    "method": "MLDataFrameAnalytics",
+    "paramsStruct": "api.CatMLDataFrameAnalyticsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.MLDataFrameAnalytics route /_cat/ml/data_frame/analytics/%s"
+  },
+  {
+    "name": "cat.ml_datafeeds",
+    "service": "CatService",
+    "method": "MLDatafeeds",
+    "paramsStruct": "api.CatMLDatafeedsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.MLDatafeeds route /_cat/ml/datafeeds/%s"
+  },
+  {
+    "name": "cat.ml_jobs",
+    "service": "CatService",
+    "method": "MLJobs",
+    "paramsStruct": "api.CatMLJobsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.MLJobs route /_cat/ml/jobs/%s"
+  },
+  {
+    "name": "cat.ml_trained_models",
+    "service": "CatService",
+    "method": "MLTrainedModels",
+    "paramsStruct": "api.CatMLTrainedModelsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "model_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.MLTrainedModels route /_cat/ml/trained_models/%s"
+  },
+  {
+    "name": "cat.nodeattrs",
+    "service": "CatService",
+    "method": "NodeAttrs",
+    "paramsStruct": "api.CatNodeAttrsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.NodeAttrs route /_cat/nodeattrs"
+  },
+  {
+    "name": "cat.nodes",
+    "service": "CatService",
+    "method": "Nodes",
+    "paramsStruct": "api.CatNodesParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Nodes GET /_cat/nodes"
+  },
+  {
+    "name": "cat.pending_tasks",
+    "service": "CatService",
+    "method": "PendingTasks",
+    "paramsStruct": "api.CatPendingTasksParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.PendingTasks route /_cat/pending_tasks"
+  },
+  {
+    "name": "cat.plugins",
+    "service": "CatService",
+    "method": "Plugins",
+    "paramsStruct": "api.CatPluginsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Plugins GET /_cat/plugins"
+  },
+  {
+    "name": "cat.recovery",
+    "service": "CatService",
+    "method": "Recovery",
+    "paramsStruct": "api.CatRecoveryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Recovery route /_cat/recovery/%s"
+  },
+  {
+    "name": "cat.repositories",
+    "service": "CatService",
+    "method": "Repositories",
+    "paramsStruct": "api.CatRepositoriesParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Repositories route /_cat/repositories"
+  },
+  {
+    "name": "cat.segments",
+    "service": "CatService",
+    "method": "Segments",
+    "paramsStruct": "api.CatSegmentsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Segments route /_cat/segments/%s"
+  },
+  {
+    "name": "cat.shards",
+    "service": "CatService",
+    "method": "Shards",
+    "paramsStruct": "api.CatShardsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Shards route /_cat/shards/%s"
+  },
+  {
+    "name": "cat.snapshots",
+    "service": "CatService",
+    "method": "Snapshots",
+    "paramsStruct": "api.CatSnapshotsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Snapshots route /_cat/snapshots/%s"
+  },
+  {
+    "name": "cat.tasks",
+    "service": "CatService",
+    "method": "Tasks",
+    "paramsStruct": "api.CatTasksParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCatService.Tasks GET /_cat/tasks"
+  },
+  {
+    "name": "cat.templates",
+    "service": "CatService",
+    "method": "Templates",
+    "paramsStruct": "api.CatTemplatesParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Templates route /_cat/templates/%s"
+  },
+  {
+    "name": "cat.thread_pool",
+    "service": "CatService",
+    "method": "ThreadPool",
+    "paramsStruct": "api.CatThreadPoolParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "thread_pool_patterns": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.ThreadPool GET /_cat/thread_pool/{thread_pool_patterns}"
+  },
+  {
+    "name": "cat.transforms",
+    "service": "CatService",
+    "method": "Transforms",
+    "paramsStruct": "api.CatTransformsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCatService.Transforms route /_cat/transforms/%s"
+  },
+  {
+    "name": "ccr.delete_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "DeleteAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.DeleteAutoFollowPatternWithParams DELETE /_ccr/auto_follow/{name}"
+  },
+  {
+    "name": "ccr.follow",
+    "service": "CcrService",
+    "method": "Follow",
+    "paramsStruct": "api.CcrFollowParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.Follow POST /{index}/_ccr/follow (CcrFollowParams carries master_timeout)"
+  },
+  {
+    "name": "ccr.follow_info",
+    "service": "CcrServiceSpecExtensions",
+    "method": "FollowInfoWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.FollowInfoWithParams GET /{indices}/_ccr/info"
+  },
+  {
+    "name": "ccr.follow_stats",
+    "service": "CcrServiceSpecExtensions",
+    "method": "FollowStatsWithParams",
+    "paramsStruct": "api.TimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.FollowStatsWithParams GET /{indices}/_ccr/stats"
+  },
+  {
+    "name": "ccr.forget_follower",
+    "service": "CcrServiceSpecExtensions",
+    "method": "ForgetFollowerWithRequest",
+    "paramsStruct": "api.TimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultCcrService.ForgetFollowerWithRequest POST /{index}/_ccr/forget_follower"
+  },
+  {
+    "name": "ccr.get_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "GetAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.GetAutoFollowPatternWithParams GET /_ccr/auto_follow/{name}"
+  },
+  {
+    "name": "ccr.pause_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "PauseAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.PauseAutoFollowPatternWithParams POST /_ccr/auto_follow/{name}/pause"
+  },
+  {
+    "name": "ccr.pause_follow",
+    "service": "CcrServiceSpecExtensions",
+    "method": "PauseFollowWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.PauseFollowWithParams POST /{index}/_ccr/pause_follow"
+  },
+  {
+    "name": "ccr.put_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "PutAutoFollowPatternWithRequest",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultCcrService.PutAutoFollowPatternWithRequest PUT /_ccr/auto_follow/{name}"
+  },
+  {
+    "name": "ccr.resume_auto_follow_pattern",
+    "service": "CcrServiceSpecExtensions",
+    "method": "ResumeAutoFollowPatternWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.ResumeAutoFollowPatternWithParams POST /_ccr/auto_follow/{name}/resume"
+  },
+  {
+    "name": "ccr.resume_follow",
+    "service": "CcrServiceSpecExtensions",
+    "method": "ResumeFollowWithRequest",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultCcrService.ResumeFollowWithRequest POST /{index}/_ccr/resume_follow"
+  },
+  {
+    "name": "ccr.stats",
+    "service": "CcrServiceSpecExtensions",
+    "method": "StatsWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultCcrService.StatsWithParams GET /_ccr/stats"
+  },
+  {
+    "name": "ccr.unfollow",
+    "service": "CcrServiceSpecExtensions",
+    "method": "UnfollowWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultCcrService.UnfollowWithParams POST /{index}/_ccr/unfollow"
+  },
+  {
+    "name": "clear_scroll",
+    "service": "SearchService",
+    "method": "ClearScroll",
+    "pathSources": {
+      "scroll_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchService.ClearScroll route /_search/scroll"
+  },
+  {
+    "name": "close_point_in_time",
+    "service": "SearchService",
+    "method": "ClosePointInTime",
+    "evidence": "DefaultSearchService.ClosePointInTime route /_pit"
+  },
+  {
+    "name": "cluster.allocation_explain",
+    "service": "ClusterService",
+    "method": "AllocationExplain",
+    "paramsStruct": "api.ClusterAllocationExplainParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.AllocationExplain POST /_cluster/allocation/explain"
+  },
+  {
+    "name": "cluster.delete_component_template",
+    "service": "ClusterService",
+    "method": "DeleteComponentTemplate",
+    "paramsStruct": "api.ClusterDeleteComponentTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.DeleteComponentTemplate DELETE /_component_template/{name}"
+  },
+  {
+    "name": "cluster.delete_voting_config_exclusions",
+    "service": "ClusterService",
+    "method": "DeleteVotingConfigExclusions",
+    "paramsStruct": "api.ClusterDeleteVotingConfigExclusionsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.DeleteVotingConfigExclusions DELETE /_cluster/voting_config_exclusions"
+  },
+  {
+    "name": "cluster.exists_component_template",
+    "service": "ClusterServiceSpecExtensions",
+    "method": "ExistsComponentTemplateWithParams",
+    "paramsStruct": "api.ClusterGetComponentTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.ExistsComponentTemplateWithParams HEAD /_component_template/{name}"
+  },
+  {
+    "name": "cluster.get_component_template",
+    "service": "ClusterService",
+    "method": "GetComponentTemplate",
+    "paramsStruct": "api.ClusterGetComponentTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.GetComponentTemplate GET /_component_template/{name}"
+  },
+  {
+    "name": "cluster.get_settings",
+    "service": "ClusterService",
+    "method": "GetSettings",
+    "paramsStruct": "api.ClusterGetSettingsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.GetSettings GET /_cluster/settings"
+  },
+  {
+    "name": "cluster.health",
+    "service": "ClusterService",
+    "method": "Health",
+    "paramsStruct": "api.ClusterHealthParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.Health GET /_cluster/health/{index}"
+  },
+  {
+    "name": "cluster.info",
+    "service": "ClusterService",
+    "method": "Info",
+    "pathSources": {
+      "target": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.Info GET /_info/{target} (empty features selects /_info/_all)"
+  },
+  {
+    "name": "cluster.pending_tasks",
+    "service": "ClusterService",
+    "method": "PendingTasks",
+    "paramsStruct": "api.ClusterPendingTasksParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.PendingTasks GET /_cluster/pending_tasks"
+  },
+  {
+    "name": "cluster.post_voting_config_exclusions",
+    "service": "ClusterService",
+    "method": "PostVotingConfigExclusions",
+    "paramsStruct": "api.ClusterVotingConfigExclusionsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.PostVotingConfigExclusions POST /_cluster/voting_config_exclusions"
+  },
+  {
+    "name": "cluster.put_component_template",
+    "service": "ClusterService",
+    "method": "PutComponentTemplate",
+    "paramsStruct": "api.PutComponentTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultClusterService.PutComponentTemplate PUT /_component_template/{name}"
+  },
+  {
+    "name": "cluster.put_settings",
+    "service": "ClusterService",
+    "method": "PutSettings",
+    "paramsStruct": "api.ClusterPutSettingsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.PutSettings PUT /_cluster/settings"
+  },
+  {
+    "name": "cluster.remote_info",
+    "service": "ClusterService",
+    "method": "RemoteInfo",
+    "evidence": "DefaultClusterService.RemoteInfo route /_remote/info"
+  },
+  {
+    "name": "cluster.reroute",
+    "service": "ClusterService",
+    "method": "Reroute",
+    "paramsStruct": "api.ClusterRerouteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultClusterService.Reroute POST /_cluster/reroute"
+  },
+  {
+    "name": "cluster.state",
+    "service": "ClusterService",
+    "method": "State",
+    "paramsStruct": "api.ClusterStateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "metric": {
+        "argument": 1,
+        "field": "Metrics"
+      },
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultClusterService.State GET /_cluster/state/{metric}/{index}"
+  },
+  {
+    "name": "cluster.stats",
+    "service": "ClusterService",
+    "method": "Stats",
+    "paramsStruct": "api.ClusterStatsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultClusterService.Stats GET /_cluster/stats/nodes/{node_id}"
+  },
+  {
+    "name": "count",
+    "service": "SearchService",
+    "method": "Count",
+    "paramsStruct": "api.CountParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.Count route /%s/_count"
+  },
+  {
+    "name": "create",
+    "service": "DocumentService",
+    "method": "Create",
+    "paramsStruct": "api.CreateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Create PUT /{index}/_create/{id}"
+  },
+  {
+    "name": "dangling_indices.delete_dangling_index",
+    "service": "DanglingIndicesService",
+    "method": "Delete",
+    "paramsStruct": "api.DanglingIndicesImportParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index_uuid": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultDanglingIndicesService.Delete DELETE /_dangling/{index_uuid}"
+  },
+  {
+    "name": "dangling_indices.import_dangling_index",
+    "service": "DanglingIndicesService",
+    "method": "Import",
+    "paramsStruct": "api.DanglingIndicesImportParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index_uuid": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultDanglingIndicesService.Import POST /_dangling/{index_uuid}"
+  },
+  {
+    "name": "dangling_indices.list_dangling_indices",
+    "service": "DanglingIndicesService",
+    "method": "List",
+    "evidence": "DefaultDanglingIndicesService.List route /_dangling"
+  },
+  {
+    "name": "delete",
+    "service": "DocumentService",
+    "method": "Delete",
+    "paramsStruct": "api.DeleteParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Delete DELETE /{index}/_doc/{id}"
+  },
+  {
+    "name": "delete_by_query",
+    "service": "DocumentService",
+    "method": "DeleteByQuery",
+    "paramsStruct": "api.DeleteByQueryParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultDocumentService.DeleteByQuery POST /{index}/_delete_by_query"
+  },
+  {
+    "name": "delete_by_query_rethrottle",
+    "service": "DocumentService",
+    "method": "DeleteByQueryRethrottle",
+    "paramsStruct": "api.RethrottleParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "task_id": {
+        "argument": -1,
+        "field": "TaskId"
+      }
+    },
+    "evidence": "DefaultDocumentService.DeleteByQueryRethrottle"
+  },
+  {
+    "name": "delete_script",
+    "service": "ScriptService",
+    "method": "Delete",
+    "paramsStruct": "api.ScriptDeleteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultScriptService.Delete DELETE /_scripts/{id}"
+  },
+  {
+    "name": "enrich.delete_policy",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "DeletePolicyWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEnrichService.DeletePolicyWithParams DELETE /_enrich/policy/{name}"
+  },
+  {
+    "name": "enrich.execute_policy",
+    "service": "EnrichService",
+    "method": "ExecutePolicy",
+    "paramsStruct": "api.EnrichWaitForCompletionParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEnrichService.ExecutePolicy PUT /_enrich/policy/{name}/_execute (carrier carries master_timeout)"
+  },
+  {
+    "name": "enrich.get_policy",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "GetPolicyWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEnrichService.GetPolicyWithParams GET /_enrich/policy/{name}"
+  },
+  {
+    "name": "enrich.put_policy",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "PutPolicyWithRequest",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultEnrichService.PutPolicyWithRequest PUT /_enrich/policy/{name}"
+  },
+  {
+    "name": "enrich.stats",
+    "service": "EnrichServiceSpecExtensions",
+    "method": "StatsWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultEnrichService.StatsWithParams GET /_enrich/_stats"
+  },
+  {
+    "name": "eql.delete",
+    "service": "EqlService",
+    "method": "Delete",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEqlService.Delete route /_eql/search/%s"
+  },
+  {
+    "name": "eql.get",
+    "service": "EqlServiceSpecExtensions",
+    "method": "GetWithParams",
+    "paramsStruct": "api.EqlGetSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEqlService.GetWithParams GET /_eql/search/{id}"
+  },
+  {
+    "name": "eql.get_status",
+    "service": "EqlService",
+    "method": "GetStatus",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEqlService.GetStatus route /_eql/search/status/%s"
+  },
+  {
+    "name": "eql.search",
+    "service": "EqlService",
+    "method": "Search",
+    "paramsStruct": "api.EqlSearchParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultEqlService.Search POST /{index}/_eql/search"
+  },
+  {
+    "name": "exists",
+    "service": "DocumentService",
+    "method": "Exists",
+    "paramsStruct": "api.GetParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 2,
+        "field": ""
+      },
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultDocumentService.Exists route /%s/_doc/%s"
+  },
+  {
+    "name": "exists_source",
+    "service": "DocumentService",
+    "method": "ExistsSource",
+    "paramsStruct": "api.GetSourceParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 2,
+        "field": ""
+      },
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultDocumentService.ExistsSource route /%s/_source/%s"
+  },
+  {
+    "name": "explain",
+    "service": "DocumentService",
+    "method": "Explain",
+    "paramsStruct": "api.ExplainParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": -1,
+        "field": "Id"
+      },
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.Explain route /%s/_explain/%s"
+  },
+  {
+    "name": "features.get_features",
+    "service": "FeaturesServiceSpecExtensions",
+    "method": "GetFeaturesWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultFeaturesService.GetFeaturesWithParams GET /_features"
+  },
+  {
+    "name": "features.reset_features",
+    "service": "FeaturesServiceSpecExtensions",
+    "method": "ResetFeaturesWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultFeaturesService.ResetFeaturesWithParams POST /_features/_reset"
+  },
+  {
+    "name": "field_caps",
+    "service": "SearchService",
+    "method": "FieldCaps",
+    "paramsStruct": "api.FieldCapsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.FieldCaps POST /{index}/_field_caps"
+  },
+  {
+    "name": "fleet.global_checkpoints",
+    "service": "FleetService",
+    "method": "GlobalCheckpoints",
+    "paramsStruct": "api.FleetGlobalCheckpointsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultFleetService.GlobalCheckpoints route /%s/_fleet/global_checkpoints"
+  },
+  {
+    "name": "get",
+    "service": "DocumentService",
+    "method": "Get",
+    "paramsStruct": "api.GetParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": -1,
+        "field": "Id"
+      },
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.Get route /%s/_doc/%s"
+  },
+  {
+    "name": "get_script",
+    "service": "ScriptService",
+    "method": "Get",
+    "paramsStruct": "api.ScriptGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultScriptService.Get GET /_scripts/{id}"
+  },
+  {
+    "name": "get_script_context",
+    "service": "ScriptService",
+    "method": "GetContext",
+    "evidence": "DefaultScriptService.GetContext route /_script_context"
+  },
+  {
+    "name": "get_script_languages",
+    "service": "ScriptService",
+    "method": "GetLanguages",
+    "evidence": "DefaultScriptService.GetLanguages route /_script_language"
+  },
+  {
+    "name": "get_source",
+    "service": "DocumentService",
+    "method": "GetSource",
+    "paramsStruct": "api.GetSourceParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": -1,
+        "field": "Id"
+      },
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.GetSource route /%s/_source/%s"
+  },
+  {
+    "name": "graph.explore",
+    "service": "GraphService",
+    "method": "Explore",
+    "paramsStruct": "api.GraphExploreParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultGraphService.Explore route /%s/_graph/explore"
+  },
+  {
+    "name": "health_report",
+    "service": "HealthReportService",
+    "method": "Get",
+    "paramsStruct": "api.HealthReportParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "feature": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultHealthReportService.Get GET /_health_report/{feature}"
+  },
+  {
+    "name": "ilm.delete_lifecycle",
+    "service": "IlmServiceSpecExtensions",
+    "method": "DeleteLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.DeleteLifecycleWithParams DELETE /_ilm/policy/{policy}"
+  },
+  {
+    "name": "ilm.explain_lifecycle",
+    "service": "IlmService",
+    "method": "ExplainLifecycle",
+    "paramsStruct": "api.IlmExplainParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.ExplainLifecycle GET /{index}/_ilm/explain (IlmExplainParams carries master_timeout)"
+  },
+  {
+    "name": "ilm.get_lifecycle",
+    "service": "IlmServiceSpecExtensions",
+    "method": "GetLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.GetLifecycleWithParams GET /_ilm/policy/{policy}"
+  },
+  {
+    "name": "ilm.get_status",
+    "service": "IlmService",
+    "method": "GetStatus",
+    "evidence": "DefaultIlmService.GetStatus route /_ilm/status"
+  },
+  {
+    "name": "ilm.migrate_to_data_tiers",
+    "service": "IlmServiceSpecExtensions",
+    "method": "MigrateToDataTiersWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "dry_run": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.MigrateToDataTiersWithParams POST /_ilm/migrate_to_data_tiers"
+  },
+  {
+    "name": "ilm.move_to_step",
+    "service": "IlmService",
+    "method": "MoveToStep",
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.MoveToStep route /_ilm/move/%s"
+  },
+  {
+    "name": "ilm.put_lifecycle",
+    "service": "IlmServiceSpecExtensions",
+    "method": "PutLifecycleWithRequest",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "policy": {
+        "argument": 1,
+        "field": "Policy"
+      }
+    },
+    "evidence": "DefaultIlmService.PutLifecycleWithRequest PUT /_ilm/policy/{policy}"
+  },
+  {
+    "name": "ilm.remove_policy",
+    "service": "IlmService",
+    "method": "RemovePolicy",
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.RemovePolicy route /%s/_ilm/remove"
+  },
+  {
+    "name": "ilm.retry",
+    "service": "IlmService",
+    "method": "Retry",
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIlmService.Retry route /%s/_ilm/retry"
+  },
+  {
+    "name": "ilm.start",
+    "service": "IlmServiceSpecExtensions",
+    "method": "StartWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultIlmService.StartWithParams POST /_ilm/start"
+  },
+  {
+    "name": "ilm.stop",
+    "service": "IlmServiceSpecExtensions",
+    "method": "StopWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultIlmService.StopWithParams POST /_ilm/stop"
+  },
+  {
+    "name": "index",
+    "service": "DocumentService",
+    "method": "Index",
+    "paramsStruct": "api.IndexParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Index PUT /{index}/_doc/{id}"
+  },
+  {
+    "name": "indices.add_block",
+    "service": "IndicesService",
+    "method": "AddBlock",
+    "paramsStruct": "api.AddBlockParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "block": {
+        "argument": 1,
+        "field": "Block"
+      }
+    },
+    "evidence": "DefaultIndicesService.AddBlock PUT /{index}/_block/{block}"
+  },
+  {
+    "name": "indices.analyze",
+    "service": "IndicesService",
+    "method": "Analyze",
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Analyze route /%s/_analyze"
+  },
+  {
+    "name": "indices.clear_cache",
+    "service": "IndicesService",
+    "method": "ClearCache",
+    "paramsStruct": "api.IndicesClearCacheParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ClearCache POST /{index}/_cache/clear (index also emitted as query)"
+  },
+  {
+    "name": "indices.clone",
+    "service": "IndicesService",
+    "method": "Clone",
+    "paramsStruct": "api.CloneParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Source"
+      },
+      "target": {
+        "argument": 1,
+        "field": "Target"
+      }
+    },
+    "evidence": "DefaultIndicesService.Clone PUT /{index}/_clone/{target}"
+  },
+  {
+    "name": "indices.close",
+    "service": "IndicesService",
+    "method": "Close",
+    "paramsStruct": "api.IndicesCloseParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Close POST /{index}/_close"
+  },
+  {
+    "name": "indices.create",
+    "service": "IndicesService",
+    "method": "Create",
+    "paramsStruct": "api.IndicesCreateParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Create PUT /{index}"
+  },
+  {
+    "name": "indices.create_data_stream",
+    "service": "IndicesService",
+    "method": "CreateDataStream",
+    "paramsStruct": "api.IndicesCreateDataStreamParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.CreateDataStream PUT /_data_stream/{name}"
+  },
+  {
+    "name": "indices.data_streams_stats",
+    "service": "IndicesService",
+    "method": "DataStreamStats",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DataStreamStats route /_data_stream/%s/_stats"
+  },
+  {
+    "name": "indices.delete",
+    "service": "IndicesService",
+    "method": "Delete",
+    "paramsStruct": "api.IndicesDeleteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Delete DELETE /{index}"
+  },
+  {
+    "name": "indices.delete_alias",
+    "service": "IndicesService",
+    "method": "DeleteAlias",
+    "paramsStruct": "api.AliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteAlias DELETE /{index}/_alias/{name}"
+  },
+  {
+    "name": "indices.delete_data_stream",
+    "service": "IndicesService",
+    "method": "DeleteDataStream",
+    "paramsStruct": "api.IndicesDeleteDataStreamParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteDataStream DELETE /_data_stream/{name}"
+  },
+  {
+    "name": "indices.delete_index_template",
+    "service": "IndicesService",
+    "method": "DeleteIndexTemplate",
+    "paramsStruct": "api.IndicesDeleteIndexTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteIndexTemplate DELETE /_index_template/{name}"
+  },
+  {
+    "name": "indices.delete_template",
+    "service": "IndicesService",
+    "method": "DeleteTemplate",
+    "paramsStruct": "api.IndicesDeleteTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.DeleteTemplate DELETE /_template/{name}"
+  },
+  {
+    "name": "indices.downsample",
+    "service": "IndicesService",
+    "method": "Downsample",
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      },
+      "target_index": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Downsample route /%s/_downsample/%s"
+  },
+  {
+    "name": "indices.exists",
+    "service": "IndicesService",
+    "method": "Exists",
+    "paramsStruct": "api.IndicesExistsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Exists route /"
+  },
+  {
+    "name": "indices.exists_alias",
+    "service": "IndicesService",
+    "method": "ExistsAlias",
+    "paramsStruct": "api.GetAliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.ExistsAlias HEAD /{index}/_alias/{name}"
+  },
+  {
+    "name": "indices.exists_index_template",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "ExistsIndexTemplateWithParams",
+    "paramsStruct": "api.IndicesGetIndexTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ExistsIndexTemplateWithParams HEAD /_index_template/{name}"
+  },
+  {
+    "name": "indices.exists_template",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "ExistsTemplateWithParams",
+    "paramsStruct": "api.IndicesGetTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ExistsTemplateWithParams HEAD /_template/{name}"
+  },
+  {
+    "name": "indices.flush",
+    "service": "IndicesService",
+    "method": "Flush",
+    "paramsStruct": "api.IndicesFlushParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Flush"
+  },
+  {
+    "name": "indices.forcemerge",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "ForceMergeWithRequest",
+    "paramsStruct": "api.IndicesForceMergeParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultIndicesService.ForceMergeWithRequest POST /{index}/_forcemerge (sync+async response)"
+  },
+  {
+    "name": "indices.get",
+    "service": "IndicesService",
+    "method": "Get",
+    "paramsStruct": "api.IndicesGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Get GET /{index}"
+  },
+  {
+    "name": "indices.get_alias",
+    "service": "IndicesService",
+    "method": "GetAlias",
+    "paramsStruct": "api.GetAliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.GetAlias GET /{index}/_alias/{name}"
+  },
+  {
+    "name": "indices.get_data_stream",
+    "service": "IndicesService",
+    "method": "GetDataStream",
+    "paramsStruct": "api.IndicesGetDataStreamParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetDataStream GET /_data_stream/{name}"
+  },
+  {
+    "name": "indices.get_field_mapping",
+    "service": "IndicesService",
+    "method": "GetFieldMapping",
+    "paramsStruct": "api.GetFieldMappingParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "fields": {
+        "argument": -1,
+        "field": "Fields"
+      },
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultIndicesService.GetFieldMapping route /%s/_mapping/field/%s"
+  },
+  {
+    "name": "indices.get_index_template",
+    "service": "IndicesService",
+    "method": "GetIndexTemplate",
+    "paramsStruct": "api.IndicesGetIndexTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetIndexTemplate GET /_index_template/{name}"
+  },
+  {
+    "name": "indices.get_mapping",
+    "service": "IndicesService",
+    "method": "GetMapping",
+    "paramsStruct": "api.IndicesGetMappingParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetMapping GET /{index}/_mapping"
+  },
+  {
+    "name": "indices.get_settings",
+    "service": "IndicesService",
+    "method": "GetSettings",
+    "paramsStruct": "api.GetSettingsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Names"
+      }
+    },
+    "evidence": "DefaultIndicesService.GetSettings GET /{index}/_settings/{name}"
+  },
+  {
+    "name": "indices.get_template",
+    "service": "IndicesService",
+    "method": "GetTemplate",
+    "paramsStruct": "api.IndicesGetTemplateParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.GetTemplate GET /_template/{name}"
+  },
+  {
+    "name": "indices.migrate_to_data_stream",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "MigrateToDataStreamWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.MigrateToDataStreamWithParams POST /_data_stream/_migrate/{name}"
+  },
+  {
+    "name": "indices.modify_data_stream",
+    "service": "IndicesService",
+    "method": "ModifyDataStream",
+    "paramsStruct": "api.ModifyDataStreamParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "evidence": "DefaultIndicesService.ModifyDataStream route /_data_stream/_modify"
+  },
+  {
+    "name": "indices.open",
+    "service": "IndicesService",
+    "method": "Open",
+    "paramsStruct": "api.IndicesOpenParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Open POST /{index}/_open"
+  },
+  {
+    "name": "indices.promote_data_stream",
+    "service": "IndicesServiceSpecExtensions",
+    "method": "PromoteDataStreamWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.PromoteDataStreamWithParams POST /_data_stream/_promote/{name}"
+  },
+  {
+    "name": "indices.put_alias",
+    "service": "IndicesService",
+    "method": "PutAlias",
+    "paramsStruct": "api.AliasParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Alias"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutAlias PUT /{index}/_alias/{name}"
+  },
+  {
+    "name": "indices.put_index_template",
+    "service": "IndicesService",
+    "method": "PutIndexTemplate",
+    "paramsStruct": "api.PutIndexTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutIndexTemplate PUT /_index_template/{name}"
+  },
+  {
+    "name": "indices.put_mapping",
+    "service": "IndicesService",
+    "method": "PutMapping",
+    "paramsStruct": "api.PutMappingParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutMapping PUT /{index}/_mapping"
+  },
+  {
+    "name": "indices.put_settings",
+    "service": "IndicesService",
+    "method": "PutSettings",
+    "paramsStruct": "api.IndicesPutSettingsParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.PutSettings PUT /{index}/_settings"
+  },
+  {
+    "name": "indices.put_template",
+    "service": "IndicesService",
+    "method": "PutTemplate",
+    "paramsStruct": "api.PutTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.PutTemplate PUT /_template/{name}"
+  },
+  {
+    "name": "indices.recovery",
+    "service": "IndicesService",
+    "method": "Recovery",
+    "paramsStruct": "api.IndicesRecoveryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Recovery route /%s/_recovery"
+  },
+  {
+    "name": "indices.refresh",
+    "service": "IndicesService",
+    "method": "Refresh",
+    "paramsStruct": "api.IndicesRefreshParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Refresh route /%s/_refresh"
+  },
+  {
+    "name": "indices.reload_search_analyzers",
+    "service": "IndicesService",
+    "method": "ReloadSearchAnalyzers",
+    "paramsStruct": "api.IndicesReloadAnalyzersParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ReloadSearchAnalyzers POST /{index}/_reload_search_analyzers"
+  },
+  {
+    "name": "indices.resolve_cluster",
+    "service": "IndicesService",
+    "method": "ResolveCluster",
+    "paramsStruct": "api.IndicesResolveClusterParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ResolveCluster GET /_resolve/cluster/{name}"
+  },
+  {
+    "name": "indices.resolve_index",
+    "service": "IndicesService",
+    "method": "ResolveIndex",
+    "paramsStruct": "api.IndicesResolveIndexParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ResolveIndex route /_resolve/index/%s"
+  },
+  {
+    "name": "indices.rollover",
+    "service": "IndicesService",
+    "method": "Rollover",
+    "paramsStruct": "api.RolloverParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "alias": {
+        "argument": 1,
+        "field": "Alias"
+      },
+      "new_index": {
+        "argument": 1,
+        "field": "NewIndex"
+      }
+    },
+    "evidence": "DefaultIndicesService.Rollover POST /{alias}/_rollover/{new_index}"
+  },
+  {
+    "name": "indices.segments",
+    "service": "IndicesService",
+    "method": "Segments",
+    "paramsStruct": "api.IndicesSegmentsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.Segments route /%s/_segments"
+  },
+  {
+    "name": "indices.shard_stores",
+    "service": "IndicesService",
+    "method": "ShardStores",
+    "paramsStruct": "api.IndicesShardStoresParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIndicesService.ShardStores route /%s/_shard_stores"
+  },
+  {
+    "name": "indices.shrink",
+    "service": "IndicesService",
+    "method": "Shrink",
+    "paramsStruct": "api.ShrinkParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Source"
+      },
+      "target": {
+        "argument": 1,
+        "field": "Target"
+      }
+    },
+    "evidence": "DefaultIndicesService.Shrink PUT /{index}/_shrink/{target}"
+  },
+  {
+    "name": "indices.simulate_index_template",
+    "service": "IndicesService",
+    "method": "SimulateIndexTemplate",
+    "paramsStruct": "api.SimulateIndexTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.SimulateIndexTemplate POST /_index_template/_simulate_index/{name}"
+  },
+  {
+    "name": "indices.simulate_template",
+    "service": "IndicesService",
+    "method": "SimulateTemplate",
+    "paramsStruct": "api.SimulateTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultIndicesService.SimulateTemplate POST /_index_template/_simulate/{name}"
+  },
+  {
+    "name": "indices.split",
+    "service": "IndicesService",
+    "method": "Split",
+    "paramsStruct": "api.SplitParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Source"
+      },
+      "target": {
+        "argument": 1,
+        "field": "Target"
+      }
+    },
+    "evidence": "DefaultIndicesService.Split PUT /{index}/_split/{target}"
+  },
+  {
+    "name": "indices.stats",
+    "service": "IndicesService",
+    "method": "Stats",
+    "paramsStruct": "api.IndicesStatsParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      },
+      "metric": {
+        "argument": -1,
+        "field": "Metrics"
+      }
+    },
+    "evidence": "DefaultIndicesService.Stats route /%s/_stats/%s"
+  },
+  {
+    "name": "indices.update_aliases",
+    "service": "IndicesService",
+    "method": "UpdateAliases",
+    "paramsStruct": "api.IndicesUpdateAliasesParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultIndicesService.UpdateAliases POST /_aliases"
+  },
+  {
+    "name": "indices.validate_query",
+    "service": "SearchService",
+    "method": "Validate",
+    "paramsStruct": "api.ValidateQueryParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.Validate route /%s/_validate/query"
+  },
+  {
+    "name": "inference.completion",
+    "service": "InferenceService",
+    "method": "Completion",
+    "pathSources": {
+      "inference_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultInferenceService.Completion route /_inference/completion/%s"
+  },
+  {
+    "name": "inference.delete",
+    "service": "InferenceService",
+    "method": "Delete",
+    "paramsStruct": "api.InferenceDeleteParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "inference_id": {
+        "argument": 2,
+        "field": ""
+      },
+      "task_type": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultInferenceService.Delete route /_inference/%s/%s"
+  },
+  {
+    "name": "inference.get",
+    "service": "InferenceService",
+    "method": "Get",
+    "pathSources": {
+      "inference_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "task_type": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultInferenceService.Get route /_inference/%s/%s"
+  },
+  {
+    "name": "inference.put",
+    "service": "InferenceService",
+    "method": "Put",
+    "pathSources": {
+      "inference_id": {
+        "argument": 2,
+        "field": ""
+      },
+      "task_type": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultInferenceService.Put route /_inference/%s/%s"
+  },
+  {
+    "name": "inference.rerank",
+    "service": "InferenceService",
+    "method": "Rerank",
+    "pathSources": {
+      "inference_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultInferenceService.Rerank route /_inference/rerank/%s"
+  },
+  {
+    "name": "inference.update",
+    "service": "InferenceServiceSpecExtensions",
+    "method": "UpdateWithRequest",
+    "pathSources": {
+      "inference_id": {
+        "argument": 1,
+        "field": "InferenceId"
+      },
+      "task_type": {
+        "argument": 1,
+        "field": "TaskType"
+      }
+    },
+    "evidence": "DefaultInferenceService.UpdateWithRequest PUT /_inference/{task_type}/{inference_id}/_update"
+  },
+  {
+    "name": "info",
+    "service": "InfoService",
+    "method": "Info",
+    "evidence": "DefaultInfoService.Info route /"
+  },
+  {
+    "name": "ingest.delete_pipeline",
+    "service": "IngestService",
+    "method": "DeletePipeline",
+    "paramsStruct": "api.IngestDeletePipelineParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIngestService.DeletePipeline DELETE /_ingest/pipeline/{id}"
+  },
+  {
+    "name": "ingest.get_pipeline",
+    "service": "IngestService",
+    "method": "GetPipeline",
+    "paramsStruct": "api.IngestGetPipelineParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultIngestService.GetPipeline GET /_ingest/pipeline/{id}"
+  },
+  {
+    "name": "ingest.processor_grok",
+    "service": "IngestService",
+    "method": "ProcessorGrok",
+    "evidence": "DefaultIngestService.ProcessorGrok route /_ingest/processor/grok"
+  },
+  {
+    "name": "ingest.put_pipeline",
+    "service": "IngestService",
+    "method": "PutPipeline",
+    "paramsStruct": "api.IngestPutPipelineParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultIngestService.PutPipeline PUT /_ingest/pipeline/{id}"
+  },
+  {
+    "name": "ingest.simulate",
+    "service": "IngestService",
+    "method": "Simulate",
+    "paramsStruct": "api.IngestSimulatePipelineParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": -1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultIngestService.Simulate route /_ingest/pipeline/%s/_simulate"
+  },
+  {
+    "name": "license.delete",
+    "service": "LicenseServiceSpecExtensions",
+    "method": "DeleteWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.DeleteWithParams DELETE /_license"
+  },
+  {
+    "name": "license.get",
+    "service": "LicenseService",
+    "method": "Get",
+    "paramsStruct": "api.LicenseGetParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.Get GET /_license"
+  },
+  {
+    "name": "license.get_basic_status",
+    "service": "LicenseService",
+    "method": "GetBasicStatus",
+    "evidence": "DefaultLicenseService.GetBasicStatus route /_license/basic_status"
+  },
+  {
+    "name": "license.get_trial_status",
+    "service": "LicenseService",
+    "method": "GetTrialStatus",
+    "evidence": "DefaultLicenseService.GetTrialStatus route /_license/trial_status"
+  },
+  {
+    "name": "license.post",
+    "service": "LicenseService",
+    "method": "Post",
+    "paramsStruct": "api.LicensePostParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.Post PUT /_license"
+  },
+  {
+    "name": "license.post_start_basic",
+    "service": "LicenseService",
+    "method": "PostStartBasic",
+    "paramsStruct": "api.LicensePostParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.PostStartBasic POST /_license/start_basic"
+  },
+  {
+    "name": "license.post_start_trial",
+    "service": "LicenseService",
+    "method": "PostStartTrial",
+    "paramsStruct": "api.LicenseStartTrialParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultLicenseService.PostStartTrial POST /_license/start_trial"
+  },
+  {
+    "name": "logstash.delete_pipeline",
+    "service": "LogstashService",
+    "method": "DeletePipeline",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultLogstashService.DeletePipeline route /_logstash/pipeline/%s"
+  },
+  {
+    "name": "logstash.get_pipeline",
+    "service": "LogstashService",
+    "method": "GetPipeline",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultLogstashService.GetPipeline route /_logstash/pipeline/%s"
+  },
+  {
+    "name": "logstash.put_pipeline",
+    "service": "LogstashService",
+    "method": "PutPipeline",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultLogstashService.PutPipeline route /_logstash/pipeline/%s"
+  },
+  {
+    "name": "mget",
+    "service": "DocumentService",
+    "method": "MultiGet",
+    "paramsStruct": "api.MgetParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.MultiGet route /%s/_mget"
+  },
+  {
+    "name": "migration.deprecations",
+    "service": "MigrationService",
+    "method": "Deprecations",
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMigrationService.Deprecations route /%s/_migration/deprecations"
+  },
+  {
+    "name": "migration.get_feature_upgrade_status",
+    "service": "MigrationService",
+    "method": "GetFeatureUpgradeStatus",
+    "evidence": "DefaultMigrationService.GetFeatureUpgradeStatus route /_migration/feature_upgrade"
+  },
+  {
+    "name": "migration.post_feature_upgrade",
+    "service": "MigrationService",
+    "method": "PostFeatureUpgrade",
+    "evidence": "DefaultMigrationService.PostFeatureUpgrade route /_migration/feature_upgrade"
+  },
+  {
+    "name": "ml.close_job",
+    "service": "MlService",
+    "method": "CloseJob",
+    "paramsStruct": "api.MlCloseJobParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.CloseJob route /_ml/anomaly_detectors/%s/_close"
+  },
+  {
+    "name": "ml.delete_datafeed",
+    "service": "MlService",
+    "method": "DeleteDatafeed",
+    "paramsStruct": "api.MlDeleteDatafeedParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.DeleteDatafeed route /_ml/datafeeds/%s"
+  },
+  {
+    "name": "ml.delete_job",
+    "service": "MlService",
+    "method": "DeleteJob",
+    "paramsStruct": "api.MlDeleteJobParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.DeleteJob DELETE /_ml/anomaly_detectors/{job_id}"
+  },
+  {
+    "name": "ml.flush_job",
+    "service": "MlService",
+    "method": "FlushJob",
+    "paramsStruct": "api.MlFlushJobParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.FlushJob route /_ml/anomaly_detectors/%s/_flush"
+  },
+  {
+    "name": "ml.get_datafeeds",
+    "service": "MlService",
+    "method": "GetDatafeeds",
+    "paramsStruct": "api.MlGetDatafeedsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.GetDatafeeds route /_ml/datafeeds/%s"
+  },
+  {
+    "name": "ml.get_filters",
+    "service": "MlService",
+    "method": "GetFilters",
+    "paramsStruct": "api.MlGetFiltersParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "filter_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.GetFilters route /_ml/filters/%s"
+  },
+  {
+    "name": "ml.get_jobs",
+    "service": "MlService",
+    "method": "GetJobs",
+    "paramsStruct": "api.MlGetJobsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.GetJobs route /_ml/anomaly_detectors/%s"
+  },
+  {
+    "name": "ml.get_trained_models",
+    "service": "MlService",
+    "method": "GetTrainedModels",
+    "paramsStruct": "api.MlGetTrainedModelsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "model_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.GetTrainedModels route /_ml/trained_models/%s"
+  },
+  {
+    "name": "ml.infer_trained_model",
+    "service": "MlService",
+    "method": "InferTrainedModel",
+    "paramsStruct": "api.MlInferTrainedModelParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "model_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.InferTrainedModel route /_ml/trained_models/%s/_infer"
+  },
+  {
+    "name": "ml.open_job",
+    "service": "MlService",
+    "method": "OpenJob",
+    "paramsStruct": "api.MlOpenJobParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.OpenJob route /_ml/anomaly_detectors/%s/_open"
+  },
+  {
+    "name": "ml.put_datafeed",
+    "service": "MlServiceSpecExtensions",
+    "method": "PutDatafeedWithRequest",
+    "paramsStruct": "api.MlPutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": "DatafeedID"
+      }
+    },
+    "evidence": "DefaultMlService.PutDatafeedWithRequest PUT /_ml/datafeeds/{datafeed_id}"
+  },
+  {
+    "name": "ml.put_job",
+    "service": "MlServiceSpecExtensions",
+    "method": "PutJobWithRequest",
+    "paramsStruct": "api.MlPutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": "JobID"
+      }
+    },
+    "evidence": "DefaultMlService.PutJobWithRequest PUT /_ml/anomaly_detectors/{job_id}"
+  },
+  {
+    "name": "ml.reset_job",
+    "service": "MlService",
+    "method": "ResetJob",
+    "paramsStruct": "api.MlResetJobParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "job_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.ResetJob POST /_ml/anomaly_detectors/{job_id}/_reset"
+  },
+  {
+    "name": "ml.start_datafeed",
+    "service": "MlService",
+    "method": "StartDatafeed",
+    "paramsStruct": "api.MlStartDatafeedParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.StartDatafeed route /_ml/datafeeds/%s/_start"
+  },
+  {
+    "name": "ml.stop_datafeed",
+    "service": "MlService",
+    "method": "StopDatafeed",
+    "paramsStruct": "api.MlStopDatafeedParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "datafeed_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultMlService.StopDatafeed route /_ml/datafeeds/%s/_stop"
+  },
+  {
+    "name": "msearch",
+    "service": "SearchService",
+    "method": "MultiSearch",
+    "paramsStruct": "api.MultiSearchParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.MultiSearch route /%s/_msearch"
+  },
+  {
+    "name": "msearch_template",
+    "service": "SearchService",
+    "method": "MultiSearchTemplate",
+    "paramsStruct": "api.MultiSearchTemplateParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.MultiSearchTemplate route /%s/_msearch/template"
+  },
+  {
+    "name": "mtermvectors",
+    "service": "DocumentServiceSpecExtensions",
+    "method": "MultiTermVectorsWithRequest",
+    "paramsStruct": "api.MtermvectorsSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.MultiTermVectorsWithRequest POST /{index}/_mtermvectors (dedicated carrier)"
+  },
+  {
+    "name": "nodes.hot_threads",
+    "service": "NodesService",
+    "method": "HotThreads",
+    "paramsStruct": "api.NodesHotThreadsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultNodesService.HotThreads route /_nodes/%s/hot_threads"
+  },
+  {
+    "name": "nodes.info",
+    "service": "NodesService",
+    "method": "Info",
+    "paramsStruct": "api.NodesInfoParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "metric": {
+        "argument": -1,
+        "field": "Metrics"
+      },
+      "node_id": {
+        "argument": -1,
+        "field": "NodeIds"
+      }
+    },
+    "evidence": "DefaultNodesService.Info route /_nodes"
+  },
+  {
+    "name": "nodes.reload_secure_settings",
+    "service": "NodesService",
+    "method": "ReloadSecureSettings",
+    "paramsStruct": "api.NodesReloadSecureSettingsParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultNodesService.ReloadSecureSettings route /_nodes/%s/reload_secure_settings"
+  },
+  {
+    "name": "nodes.stats",
+    "service": "NodesService",
+    "method": "Stats",
+    "paramsStruct": "api.NodesStatsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": "NodeIds"
+      },
+      "metric": {
+        "argument": 1,
+        "field": "Metrics"
+      },
+      "index_metric": {
+        "argument": 1,
+        "field": "IndexMetrics"
+      }
+    },
+    "evidence": "DefaultNodesService.Stats GET /_nodes/{node_id}/stats/{metric}/{index_metric}"
+  },
+  {
+    "name": "nodes.usage",
+    "service": "NodesService",
+    "method": "Usage",
+    "paramsStruct": "api.NodesUsageParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "metric": {
+        "argument": -1,
+        "field": "Metrics"
+      },
+      "node_id": {
+        "argument": -1,
+        "field": "NodeIds"
+      }
+    },
+    "evidence": "DefaultNodesService.Usage route /_nodes/usage"
+  },
+  {
+    "name": "open_point_in_time",
+    "service": "SearchService",
+    "method": "OpenPointInTime",
+    "paramsStruct": "api.OpenPITParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.OpenPointInTime POST /{index}/_pit"
+  },
+  {
+    "name": "ping",
+    "service": "InfoService",
+    "method": "Ping",
+    "evidence": "DefaultInfoService.Ping route /"
+  },
+  {
+    "name": "put_script",
+    "service": "ScriptService",
+    "method": "Put",
+    "paramsStruct": "api.ScriptPutParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      },
+      "context": {
+        "argument": 1,
+        "field": "Context"
+      }
+    },
+    "evidence": "DefaultScriptService.Put PUT /_scripts/{id}/{context}"
+  },
+  {
+    "name": "query_rules.delete_ruleset",
+    "service": "QueryRulesService",
+    "method": "DeleteRuleset",
+    "pathSources": {
+      "ruleset_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultQueryRulesService.DeleteRuleset route /_query_ruleset/%s"
+  },
+  {
+    "name": "query_rules.get_ruleset",
+    "service": "QueryRulesService",
+    "method": "GetRuleset",
+    "pathSources": {
+      "ruleset_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultQueryRulesService.GetRuleset route /_query_ruleset/%s"
+  },
+  {
+    "name": "query_rules.list_rulesets",
+    "service": "QueryRulesService",
+    "method": "ListRulesets",
+    "paramsStruct": "api.QueryRulesListParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultQueryRulesService.ListRulesets route /_query_ruleset"
+  },
+  {
+    "name": "query_rules.put_ruleset",
+    "service": "QueryRulesService",
+    "method": "PutRuleset",
+    "pathSources": {
+      "ruleset_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultQueryRulesService.PutRuleset route /_query_ruleset/%s"
+  },
+  {
+    "name": "query_rules.test",
+    "service": "QueryRulesService",
+    "method": "Test",
+    "paramsStruct": "api.QueryRulesTestParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "ruleset_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultQueryRulesService.Test route /_query_ruleset/%s/_test"
+  },
+  {
+    "name": "rank_eval",
+    "service": "SearchService",
+    "method": "RankEval",
+    "paramsStruct": "api.RankEvalParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.RankEval route /%s/_rank_eval"
+  },
+  {
+    "name": "reindex",
+    "service": "DocumentService",
+    "method": "Reindex",
+    "paramsStruct": "api.ReindexParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "evidence": "DefaultDocumentService.Reindex route /_reindex"
+  },
+  {
+    "name": "reindex_rethrottle",
+    "service": "DocumentService",
+    "method": "ReindexRethrottle",
+    "paramsStruct": "api.RethrottleParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "task_id": {
+        "argument": -1,
+        "field": "TaskId"
+      }
+    },
+    "evidence": "DefaultDocumentService.ReindexRethrottle"
+  },
+  {
+    "name": "render_search_template",
+    "service": "SearchService",
+    "method": "RenderSearchTemplate",
+    "pathSources": {
+      "id": {
+        "argument": -1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultSearchService.RenderSearchTemplate route /_render/template/%s"
+  },
+  {
+    "name": "scripts_painless_execute",
+    "service": "SearchService",
+    "method": "ScriptsPainlessExec",
+    "evidence": "DefaultSearchService.ScriptsPainlessExec route /_scripts/painless/_execute"
+  },
+  {
+    "name": "scroll",
+    "service": "SearchService",
+    "method": "Scroll",
+    "paramsStruct": "api.ScrollParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "scroll_id": {
+        "argument": -1,
+        "field": "ScrollId"
+      }
+    },
+    "evidence": "DefaultSearchService.Scroll route /_search/scroll"
+  },
+  {
+    "name": "search",
+    "service": "SearchService",
+    "method": "Search",
+    "paramsStruct": "api.SearchParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.Search route /%s/_search"
+  },
+  {
+    "name": "search_application.delete",
+    "service": "SearchApplicationService",
+    "method": "Delete",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.Delete route /_application/search_application/%s"
+  },
+  {
+    "name": "search_application.delete_behavioral_analytics",
+    "service": "SearchApplicationService",
+    "method": "DeleteBehavioralAnalytics",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.DeleteBehavioralAnalytics route /_application/analytics/%s"
+  },
+  {
+    "name": "search_application.get",
+    "service": "SearchApplicationService",
+    "method": "Get",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.Get route /_application/search_application/%s"
+  },
+  {
+    "name": "search_application.get_behavioral_analytics",
+    "service": "SearchApplicationService",
+    "method": "GetBehavioralAnalytics",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.GetBehavioralAnalytics route /_application/analytics/%s"
+  },
+  {
+    "name": "search_application.list",
+    "service": "SearchApplicationService",
+    "method": "List",
+    "paramsStruct": "api.SearchApplicationListParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSearchApplicationService.List GET /_application/search_application"
+  },
+  {
+    "name": "search_application.put",
+    "service": "SearchApplicationService",
+    "method": "Put",
+    "paramsStruct": "api.SearchApplicationPutParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.Put route /_application/search_application/%s"
+  },
+  {
+    "name": "search_application.put_behavioral_analytics",
+    "service": "SearchApplicationService",
+    "method": "PutBehavioralAnalytics",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.PutBehavioralAnalytics route /_application/analytics/%s"
+  },
+  {
+    "name": "search_application.search",
+    "service": "SearchApplicationServiceSpecExtensions",
+    "method": "SearchWithRequest",
+    "paramsStruct": "api.SearchApplicationSearchSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSearchApplicationService.SearchWithRequest POST /_application/search_application/{name}/_search"
+  },
+  {
+    "name": "search_mvt",
+    "service": "SearchService",
+    "method": "SearchMVT",
+    "paramsStruct": "api.SearchMVTParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "field": {
+        "argument": -1,
+        "field": "Field"
+      },
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      },
+      "x": {
+        "argument": -1,
+        "field": "X"
+      },
+      "y": {
+        "argument": -1,
+        "field": "Y"
+      },
+      "zoom": {
+        "argument": -1,
+        "field": "Zoom"
+      }
+    },
+    "evidence": "DefaultSearchService.SearchMVT route /%s/_mvt/%s/%d/%d/%d"
+  },
+  {
+    "name": "search_shards",
+    "service": "SearchService",
+    "method": "SearchShards",
+    "paramsStruct": "api.SearchShardsParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.SearchShards POST /{index}/_search_shards"
+  },
+  {
+    "name": "search_template",
+    "service": "SearchService",
+    "method": "SearchTemplate",
+    "paramsStruct": "api.SearchTemplateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultSearchService.SearchTemplate POST /{index}/_search/template"
+  },
+  {
+    "name": "searchable_snapshots.cache_stats",
+    "service": "SearchableSnapshotsService",
+    "method": "CacheStats",
+    "pathSources": {
+      "node_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchableSnapshotsService.CacheStats route /_searchable_snapshots/cache/stats/%s"
+  },
+  {
+    "name": "searchable_snapshots.clear_cache",
+    "service": "SearchableSnapshotsServiceSpecExtensions",
+    "method": "ClearCacheWithParams",
+    "paramsStruct": "api.SearchableSnapshotsClearCacheSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchableSnapshotsService.ClearCacheWithParams POST /{index}/_searchable_snapshots/cache/clear (index also emitted as query)"
+  },
+  {
+    "name": "searchable_snapshots.mount",
+    "service": "SearchableSnapshotsService",
+    "method": "Mount",
+    "paramsStruct": "api.SearchableSnapshotsMountParams",
+    "paramsSource": {
+      "argument": 4,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      },
+      "snapshot": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchableSnapshotsService.Mount POST /_snapshot/{repository}/{snapshot}/_mount"
+  },
+  {
+    "name": "searchable_snapshots.stats",
+    "service": "SearchableSnapshotsService",
+    "method": "Stats",
+    "paramsStruct": "api.SearchableSnapshotsStatsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSearchableSnapshotsService.Stats route /%s/_searchable_snapshots/stats"
+  },
+  {
+    "name": "security.authenticate",
+    "service": "SecurityService",
+    "method": "Authenticate",
+    "evidence": "DefaultSecurityService.Authenticate route /_security/_authenticate"
+  },
+  {
+    "name": "security.change_password",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "ChangePasswordWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": "Username"
+      }
+    },
+    "evidence": "DefaultSecurityService.ChangePasswordWithRequest POST /_security/user/{username}/_password"
+  },
+  {
+    "name": "security.clear_cached_realms",
+    "service": "SecurityService",
+    "method": "ClearRealmCache",
+    "paramsStruct": "api.SecurityClearRealmCacheParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "realms": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.ClearRealmCache route /_security/realm/%s/_clear_cache"
+  },
+  {
+    "name": "security.create_api_key",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "CreateAPIKeyWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultSecurityService.CreateAPIKeyWithParams POST /_security/api_key"
+  },
+  {
+    "name": "security.delete_privileges",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeletePrivilegesWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "application": {
+        "argument": 1,
+        "field": "Application"
+      },
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSecurityService.DeletePrivilegesWithRequest DELETE /_security/privilege/{application}/{name}"
+  },
+  {
+    "name": "security.delete_role",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeleteRoleWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DeleteRoleWithParams DELETE /_security/role/{name}"
+  },
+  {
+    "name": "security.delete_role_mapping",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeleteRoleMappingWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DeleteRoleMappingWithParams DELETE /_security/role_mapping/{name}"
+  },
+  {
+    "name": "security.delete_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DeleteUserWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DeleteUserWithParams DELETE /_security/user/{username}"
+  },
+  {
+    "name": "security.disable_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "DisableUserWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.DisableUserWithParams PUT /_security/user/{username}/_disable"
+  },
+  {
+    "name": "security.enable_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "EnableUserWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.EnableUserWithParams PUT /_security/user/{username}/_enable"
+  },
+  {
+    "name": "security.get_api_key",
+    "service": "SecurityService",
+    "method": "GetAPIKey",
+    "paramsStruct": "api.SecurityGetAPIKeyParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "queryFields": {
+      "id": "ID"
+    },
+    "evidence": "DefaultSecurityService.GetAPIKey GET /_security/api_key (ID override)"
+  },
+  {
+    "name": "security.get_privileges",
+    "service": "SecurityService",
+    "method": "GetPrivileges",
+    "pathSources": {
+      "application": {
+        "argument": 1,
+        "field": ""
+      },
+      "name": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.GetPrivileges route /_security/privilege/%s/%s"
+  },
+  {
+    "name": "security.get_role",
+    "service": "SecurityService",
+    "method": "GetRole",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.GetRole route /_security/role/%s"
+  },
+  {
+    "name": "security.get_role_mapping",
+    "service": "SecurityService",
+    "method": "GetRoleMapping",
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.GetRoleMapping route /_security/role_mapping/%s"
+  },
+  {
+    "name": "security.get_token",
+    "service": "SecurityService",
+    "method": "GetToken",
+    "evidence": "DefaultSecurityService.GetToken route /_security/oauth2/token"
+  },
+  {
+    "name": "security.get_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "GetUserWithParams",
+    "paramsStruct": "api.SecurityGetUserSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.GetUserWithParams GET /_security/user/{username}"
+  },
+  {
+    "name": "security.get_user_privileges",
+    "service": "SecurityService",
+    "method": "GetUserPrivileges",
+    "evidence": "DefaultSecurityService.GetUserPrivileges route /_security/user/_privileges"
+  },
+  {
+    "name": "security.has_privileges",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "HasPrivilegesWithRequest",
+    "pathSources": {
+      "user": {
+        "argument": 1,
+        "field": "User"
+      }
+    },
+    "evidence": "DefaultSecurityService.HasPrivilegesWithRequest POST /_security/user/{user}/_has_privileges"
+  },
+  {
+    "name": "security.invalidate_api_key",
+    "service": "SecurityService",
+    "method": "InvalidateAPIKey",
+    "evidence": "DefaultSecurityService.InvalidateAPIKey route /_security/api_key"
+  },
+  {
+    "name": "security.invalidate_token",
+    "service": "SecurityService",
+    "method": "InvalidateToken",
+    "evidence": "DefaultSecurityService.InvalidateToken route /_security/oauth2/token"
+  },
+  {
+    "name": "security.put_privileges",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutPrivilegesWithParams",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultSecurityService.PutPrivilegesWithParams PUT /_security/privilege"
+  },
+  {
+    "name": "security.put_role",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutRoleWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSecurityService.PutRoleWithRequest PUT /_security/role/{name}"
+  },
+  {
+    "name": "security.put_role_mapping",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutRoleMappingWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "name": {
+        "argument": 1,
+        "field": "Name"
+      }
+    },
+    "evidence": "DefaultSecurityService.PutRoleMappingWithRequest PUT /_security/role_mapping/{name}"
+  },
+  {
+    "name": "security.put_user",
+    "service": "SecurityServiceSpecExtensions",
+    "method": "PutUserWithRequest",
+    "paramsStruct": "api.SecurityRefreshSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "username": {
+        "argument": 1,
+        "field": "Username"
+      }
+    },
+    "evidence": "DefaultSecurityService.PutUserWithRequest PUT /_security/user/{username}"
+  },
+  {
+    "name": "security.update_api_key",
+    "service": "SecurityService",
+    "method": "UpdateAPIKey",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSecurityService.UpdateAPIKey route /_security/api_key/%s"
+  },
+  {
+    "name": "slm.delete_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "DeleteLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSlmService.DeleteLifecycleWithParams DELETE /_slm/policy/{policy_id}"
+  },
+  {
+    "name": "slm.execute_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "ExecuteLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSlmService.ExecuteLifecycleWithParams PUT /_slm/policy/{policy_id}/_execute"
+  },
+  {
+    "name": "slm.execute_retention",
+    "service": "SlmServiceSpecExtensions",
+    "method": "ExecuteRetentionWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.ExecuteRetentionWithParams POST /_slm/_execute_retention"
+  },
+  {
+    "name": "slm.get_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "GetLifecycleWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSlmService.GetLifecycleWithParams GET /_slm/policy/{policy_id}"
+  },
+  {
+    "name": "slm.get_stats",
+    "service": "SlmServiceSpecExtensions",
+    "method": "GetStatsWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.GetStatsWithParams GET /_slm/stats"
+  },
+  {
+    "name": "slm.get_status",
+    "service": "SlmServiceSpecExtensions",
+    "method": "GetStatusWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.GetStatusWithParams GET /_slm/status"
+  },
+  {
+    "name": "slm.put_lifecycle",
+    "service": "SlmServiceSpecExtensions",
+    "method": "PutLifecycleWithRequest",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "policy_id": {
+        "argument": 1,
+        "field": "PolicyID"
+      }
+    },
+    "evidence": "DefaultSlmService.PutLifecycleWithRequest PUT /_slm/policy/{policy_id}"
+  },
+  {
+    "name": "slm.start",
+    "service": "SlmServiceSpecExtensions",
+    "method": "StartWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.StartWithParams POST /_slm/start"
+  },
+  {
+    "name": "slm.stop",
+    "service": "SlmServiceSpecExtensions",
+    "method": "StopWithParams",
+    "paramsStruct": "api.MasterTimeoutAndTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSlmService.StopWithParams POST /_slm/stop"
+  },
+  {
+    "name": "snapshot.cleanup_repository",
+    "service": "SnapshotService",
+    "method": "CleanupRepository",
+    "paramsStruct": "api.SnapshotCleanupRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.CleanupRepository POST /_snapshot/{repository}/_cleanup"
+  },
+  {
+    "name": "snapshot.clone",
+    "service": "SnapshotService",
+    "method": "Clone",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      },
+      "target_snapshot": {
+        "argument": 1,
+        "field": "TargetSnapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Clone PUT /_snapshot/{repository}/{snapshot}/_clone/{target_snapshot}"
+  },
+  {
+    "name": "snapshot.create",
+    "service": "SnapshotService",
+    "method": "Create",
+    "paramsStruct": "api.SnapshotCreateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Create PUT /_snapshot/{repository}/{snapshot}"
+  },
+  {
+    "name": "snapshot.create_repository",
+    "service": "SnapshotService",
+    "method": "CreateRepository",
+    "paramsStruct": "api.SnapshotCreateRepositoryParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.CreateRepository PUT /_snapshot/{repository}"
+  },
+  {
+    "name": "snapshot.delete",
+    "service": "SnapshotService",
+    "method": "Delete",
+    "paramsStruct": "api.SnapshotDeleteSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Delete DELETE /_snapshot/{repository}/{snapshot}"
+  },
+  {
+    "name": "snapshot.delete_repository",
+    "service": "SnapshotService",
+    "method": "DeleteRepository",
+    "paramsStruct": "api.SnapshotDeleteRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.DeleteRepository DELETE /_snapshot/{repository}"
+  },
+  {
+    "name": "snapshot.get",
+    "service": "SnapshotService",
+    "method": "Get",
+    "paramsStruct": "api.SnapshotGetParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshots"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Get GET /_snapshot/{repository}/{snapshot} (empty snapshots selects /_all)"
+  },
+  {
+    "name": "snapshot.get_repository",
+    "service": "SnapshotService",
+    "method": "GetRepository",
+    "paramsStruct": "api.SnapshotGetRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.GetRepository GET /_snapshot/{repository}"
+  },
+  {
+    "name": "snapshot.repository_analyze",
+    "service": "SnapshotService",
+    "method": "RepositoryAnalyze",
+    "paramsStruct": "api.SnapshotRepositoryAnalyzeParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.RepositoryAnalyze POST /_snapshot/{repository}/_analyze"
+  },
+  {
+    "name": "snapshot.restore",
+    "service": "SnapshotService",
+    "method": "Restore",
+    "paramsStruct": "api.SnapshotRestoreParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshot"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Restore POST /_snapshot/{repository}/{snapshot}/_restore"
+  },
+  {
+    "name": "snapshot.status",
+    "service": "SnapshotService",
+    "method": "Status",
+    "paramsStruct": "api.SnapshotStatusParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": "Repository"
+      },
+      "snapshot": {
+        "argument": 1,
+        "field": "Snapshots"
+      }
+    },
+    "evidence": "DefaultSnapshotService.Status GET /_snapshot/{repository}/{snapshot}/_status"
+  },
+  {
+    "name": "snapshot.verify_repository",
+    "service": "SnapshotService",
+    "method": "VerifyRepository",
+    "paramsStruct": "api.SnapshotVerifyRepositoryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "repository": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSnapshotService.VerifyRepository POST /_snapshot/{repository}/_verify"
+  },
+  {
+    "name": "sql.clear_cursor",
+    "service": "SqlService",
+    "method": "ClearCursor",
+    "evidence": "DefaultSqlService.ClearCursor route /_sql/close"
+  },
+  {
+    "name": "sql.delete_async",
+    "service": "SqlService",
+    "method": "DeleteAsync",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSqlService.DeleteAsync route /_sql/async/%s"
+  },
+  {
+    "name": "sql.get_async",
+    "service": "SqlService",
+    "method": "GetAsync",
+    "paramsStruct": "api.SqlGetAsyncParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSqlService.GetAsync route /_sql/async/%s"
+  },
+  {
+    "name": "sql.get_async_status",
+    "service": "SqlService",
+    "method": "GetAsyncStatus",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSqlService.GetAsyncStatus route /_sql/async/status/%s"
+  },
+  {
+    "name": "sql.query",
+    "service": "SqlService",
+    "method": "Query",
+    "paramsStruct": "api.SqlQueryParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultSqlService.Query route /_sql"
+  },
+  {
+    "name": "sql.translate",
+    "service": "SqlService",
+    "method": "Translate",
+    "evidence": "DefaultSqlService.Translate route /_sql/translate"
+  },
+  {
+    "name": "ssl.certificates",
+    "service": "SslService",
+    "method": "Certificates",
+    "evidence": "DefaultSslService.Certificates route /_ssl/certificates"
+  },
+  {
+    "name": "synonyms.delete_synonym",
+    "service": "SynonymsService",
+    "method": "DeleteSynonym",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.DeleteSynonym route /_synonyms/%s"
+  },
+  {
+    "name": "synonyms.delete_synonym_rule",
+    "service": "SynonymsService",
+    "method": "DeleteSynonymRule",
+    "pathSources": {
+      "set_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "rule_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.DeleteSynonymRule DELETE /_synonyms/{set_id}/{rule_id}"
+  },
+  {
+    "name": "synonyms.get_synonym",
+    "service": "SynonymsService",
+    "method": "GetSynonym",
+    "paramsStruct": "api.SynonymsGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.GetSynonym route /_synonyms/%s"
+  },
+  {
+    "name": "synonyms.get_synonym_rule",
+    "service": "SynonymsService",
+    "method": "GetSynonymRule",
+    "pathSources": {
+      "set_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "rule_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.GetSynonymRule GET /_synonyms/{set_id}/{rule_id}"
+  },
+  {
+    "name": "synonyms.get_synonyms_sets",
+    "service": "SynonymsService",
+    "method": "GetSynonymsSets",
+    "paramsStruct": "api.SynonymsListParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultSynonymsService.GetSynonymsSets route /_synonyms"
+  },
+  {
+    "name": "synonyms.put_synonym",
+    "service": "SynonymsService",
+    "method": "PutSynonym",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.PutSynonym route /_synonyms/%s"
+  },
+  {
+    "name": "synonyms.put_synonym_rule",
+    "service": "SynonymsService",
+    "method": "PutSynonymRule",
+    "pathSources": {
+      "set_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "rule_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultSynonymsService.PutSynonymRule PUT /_synonyms/{set_id}/{rule_id}"
+  },
+  {
+    "name": "tasks.cancel",
+    "service": "TasksService",
+    "method": "Cancel",
+    "paramsStruct": "api.TasksCancelParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "task_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTasksService.Cancel route /_tasks/%s/_cancel"
+  },
+  {
+    "name": "tasks.get",
+    "service": "TasksService",
+    "method": "Get",
+    "paramsStruct": "api.TasksGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "task_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTasksService.Get route /_tasks/%s"
+  },
+  {
+    "name": "tasks.list",
+    "service": "TasksService",
+    "method": "List",
+    "paramsStruct": "api.TasksListParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultTasksService.List route /_tasks"
+  },
+  {
+    "name": "terms_enum",
+    "service": "DocumentService",
+    "method": "TermsEnum",
+    "paramsStruct": "api.TermsEnumParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.TermsEnum route /%s/_terms_enum"
+  },
+  {
+    "name": "termvectors",
+    "service": "DocumentService",
+    "method": "TermVectors",
+    "paramsStruct": "api.TermVectorsParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "id": {
+        "argument": -1,
+        "field": "Id"
+      },
+      "index": {
+        "argument": -1,
+        "field": "Index"
+      }
+    },
+    "evidence": "DefaultDocumentService.TermVectors route /%s/_termvectors/%s"
+  },
+  {
+    "name": "text_structure.find_field_structure",
+    "service": "TextStructureServiceSpecExtensions",
+    "method": "FindFieldStructureWithRequest",
+    "paramsStruct": "api.TextStructureFindParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "queryArgs": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "field": {
+        "argument": 1,
+        "field": "Field"
+      }
+    },
+    "evidence": "DefaultTextStructureService.FindFieldStructureWithRequest GET /_text_structure/find_field_structure (index/field emitted as query)"
+  },
+  {
+    "name": "text_structure.find_message_structure",
+    "service": "TextStructureServiceSpecExtensions",
+    "method": "FindMessageStructureWithRequest",
+    "paramsStruct": "api.TextStructureFindParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "evidence": "DefaultTextStructureService.FindMessageStructureWithRequest POST /_text_structure/find_message_structure (messages JSON body)"
+  },
+  {
+    "name": "text_structure.find_structure",
+    "service": "TextStructureService",
+    "method": "FindStructure",
+    "paramsStruct": "api.TextStructureFindParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultTextStructureService.FindStructure route /_text_structure/find_structure"
+  },
+  {
+    "name": "text_structure.test_grok_pattern",
+    "service": "TextStructureService",
+    "method": "TestGrokPattern",
+    "paramsStruct": "api.TextStructureFindParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "evidence": "DefaultTextStructureService.TestGrokPattern route /_text_structure/test_grok_pattern"
+  },
+  {
+    "name": "transform.delete_transform",
+    "service": "TransformService",
+    "method": "Delete",
+    "paramsStruct": "api.TransformDeleteParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Delete DELETE /_transform/{transform_id}"
+  },
+  {
+    "name": "transform.get_node_stats",
+    "service": "TransformService",
+    "method": "GetNodeStats",
+    "evidence": "DefaultTransformService.GetNodeStats route /_transform/_node_stats"
+  },
+  {
+    "name": "transform.get_transform",
+    "service": "TransformService",
+    "method": "Get",
+    "paramsStruct": "api.TransformGetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Get route /_transform/%s"
+  },
+  {
+    "name": "transform.get_transform_stats",
+    "service": "TransformService",
+    "method": "GetStats",
+    "paramsStruct": "api.TransformGetStatsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.GetStats route /_transform/%s/_stats"
+  },
+  {
+    "name": "transform.preview_transform",
+    "service": "TransformService",
+    "method": "Preview",
+    "paramsStruct": "api.TransformPreviewParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Preview route /_transform/%s/_preview"
+  },
+  {
+    "name": "transform.put_transform",
+    "service": "TransformService",
+    "method": "Put",
+    "paramsStruct": "api.TransformPutParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Put route /_transform/%s"
+  },
+  {
+    "name": "transform.reset_transform",
+    "service": "TransformService",
+    "method": "Reset",
+    "paramsStruct": "api.TransformResetParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Reset route /_transform/%s/_reset"
+  },
+  {
+    "name": "transform.schedule_now_transform",
+    "service": "TransformServiceSpecExtensions",
+    "method": "ScheduleNowWithParams",
+    "paramsStruct": "api.TimeoutSpecParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.ScheduleNowWithParams POST /_transform/{transform_id}/_schedule_now"
+  },
+  {
+    "name": "transform.start_transform",
+    "service": "TransformService",
+    "method": "Start",
+    "paramsStruct": "api.TransformStartParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Start POST /_transform/{transform_id}/_start"
+  },
+  {
+    "name": "transform.stop_transform",
+    "service": "TransformService",
+    "method": "Stop",
+    "paramsStruct": "api.TransformStopParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "pathSources": {
+      "transform_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultTransformService.Stop route /_transform/%s/_stop"
+  },
+  {
+    "name": "transform.upgrade_transforms",
+    "service": "TransformService",
+    "method": "Upgrade",
+    "paramsStruct": "api.TransformUpgradeParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultTransformService.Upgrade route /_transform/_upgrade"
+  },
+  {
+    "name": "update",
+    "service": "DocumentService",
+    "method": "Update",
+    "paramsStruct": "api.UpdateParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Index"
+      },
+      "id": {
+        "argument": 1,
+        "field": "Id"
+      }
+    },
+    "evidence": "DefaultDocumentService.Update POST /{index}/_update/{id}"
+  },
+  {
+    "name": "update_by_query",
+    "service": "DocumentService",
+    "method": "UpdateByQuery",
+    "paramsStruct": "api.UpdateByQueryParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "index": {
+        "argument": 1,
+        "field": "Indices"
+      }
+    },
+    "evidence": "DefaultDocumentService.UpdateByQuery POST /{index}/_update_by_query"
+  },
+  {
+    "name": "update_by_query_rethrottle",
+    "service": "DocumentService",
+    "method": "UpdateByQueryRethrottle",
+    "paramsStruct": "api.RethrottleParams",
+    "paramsSource": {
+      "argument": -1,
+      "field": "Params"
+    },
+    "pathSources": {
+      "task_id": {
+        "argument": -1,
+        "field": "TaskId"
+      }
+    },
+    "evidence": "DefaultDocumentService.UpdateByQueryRethrottle"
+  },
+  {
+    "name": "watcher.ack_watch",
+    "service": "WatcherService",
+    "method": "AckWatch",
+    "pathSources": {
+      "watch_id": {
+        "argument": 1,
+        "field": ""
+      },
+      "action_id": {
+        "argument": 2,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.AckWatch PUT /_watcher/watch/{watch_id}/_ack/{action_id}"
+  },
+  {
+    "name": "watcher.activate_watch",
+    "service": "WatcherService",
+    "method": "ActivateWatch",
+    "pathSources": {
+      "watch_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.ActivateWatch PUT /_watcher/watch/{watch_id}/_activate"
+  },
+  {
+    "name": "watcher.deactivate_watch",
+    "service": "WatcherService",
+    "method": "DeactivateWatch",
+    "pathSources": {
+      "watch_id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.DeactivateWatch PUT /_watcher/watch/{watch_id}/_deactivate"
+  },
+  {
+    "name": "watcher.delete_watch",
+    "service": "WatcherService",
+    "method": "DeleteWatch",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.DeleteWatch route /_watcher/watch/%s"
+  },
+  {
+    "name": "watcher.execute_watch",
+    "service": "WatcherService",
+    "method": "ExecuteWatch",
+    "paramsStruct": "api.WatcherExecuteWatchParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.ExecuteWatch route /_watcher/watch/%s/_execute"
+  },
+  {
+    "name": "watcher.get_watch",
+    "service": "WatcherService",
+    "method": "GetWatch",
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.GetWatch route /_watcher/watch/%s"
+  },
+  {
+    "name": "watcher.put_watch",
+    "service": "WatcherService",
+    "method": "PutWatch",
+    "paramsStruct": "api.WatcherPutWatchParams",
+    "paramsSource": {
+      "argument": 3,
+      "field": ""
+    },
+    "pathSources": {
+      "id": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.PutWatch PUT /_watcher/watch/{id} (carrier carries version)"
+  },
+  {
+    "name": "watcher.query_watches",
+    "service": "WatcherService",
+    "method": "QueryWatches",
+    "evidence": "DefaultWatcherService.QueryWatches route /_watcher/_query/watches"
+  },
+  {
+    "name": "watcher.start",
+    "service": "WatcherServiceSpecExtensions",
+    "method": "StartWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultWatcherService.StartWithParams POST /_watcher/_start"
+  },
+  {
+    "name": "watcher.stats",
+    "service": "WatcherService",
+    "method": "Stats",
+    "paramsStruct": "api.WatcherStatsParams",
+    "paramsSource": {
+      "argument": 2,
+      "field": ""
+    },
+    "queryArgs": {
+      "metric": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "pathSources": {
+      "metric": {
+        "argument": 1,
+        "field": ""
+      }
+    },
+    "evidence": "DefaultWatcherService.Stats route /_watcher/stats/%s"
+  },
+  {
+    "name": "watcher.stop",
+    "service": "WatcherServiceSpecExtensions",
+    "method": "StopWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultWatcherService.StopWithParams POST /_watcher/_stop"
+  },
+  {
+    "name": "xpack.info",
+    "service": "XpackService",
+    "method": "Info",
+    "paramsStruct": "api.XpackInfoParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultXpackService.Info GET /_xpack"
+  },
+  {
+    "name": "xpack.usage",
+    "service": "XpackServiceSpecExtensions",
+    "method": "UsageWithParams",
+    "paramsStruct": "api.MasterTimeoutSpecParams",
+    "paramsSource": {
+      "argument": 1,
+      "field": ""
+    },
+    "evidence": "DefaultXpackService.UsageWithParams GET /_xpack/usage"
+  }
+]

@@ -230,3 +230,51 @@ func TestUnitSearchableSnapshotsRepositoryStatsNetworkError(t *testing.T) {
 	_, err := svc.RepositoryStats(context.Background(), "repo1")
 	assert.Error(t, err)
 }
+
+type customSearchableSnapshots struct{ SearchableSnapshotsService }
+
+func TestSearchableSnapshotsSpecExtensionAdapters(t *testing.T) {
+	svc := NewSearchableSnapshotsService(nil, testLogger())
+	if _, err := AsSearchableSnapshotsServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("searchable_snapshots default: %v", err)
+	}
+	if _, err := AsSearchableSnapshotsServiceSpecExtensions(nil); err == nil {
+		t.Error("searchable_snapshots nil: want error")
+	}
+	var typedNil SearchableSnapshotsService = (*DefaultSearchableSnapshotsService)(nil)
+	if _, err := AsSearchableSnapshotsServiceSpecExtensions(typedNil); err == nil {
+		t.Error("searchable_snapshots typed-nil: want error")
+	}
+	if _, err := AsSearchableSnapshotsServiceSpecExtensions(customSearchableSnapshots{svc}); err == nil {
+		t.Error("searchable_snapshots custom: want error")
+	}
+}
+
+func TestUnitSearchableSnapshotsB9Transport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewSearchableSnapshotsService(restyClient(srv), testLogger())
+	ext, err := AsSearchableSnapshotsServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+
+	_, err = svc.Mount(ctx, "repo1", "snap1", map[string]any{"index": "idx"}, &SearchableSnapshotsMountParams{MasterTimeout: "m1", Storage: "s1"})
+	assert.NoError(t, err)
+	assert.Equal(t, "POST", got.method)
+	assert.Equal(t, "/_snapshot/repo1/snap1/_mount", got.path)
+	assert.Equal(t, "m1", got.query["master_timeout"])
+	assert.Equal(t, "s1", got.query["storage"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.ClearCacheWithParams(ctx, []string{"idx"}, &SearchableSnapshotsClearCacheSpecParams{AllowNoIndices: ptrBool(true)})
+	assert.NoError(t, err)
+	assert.Equal(t, "/idx/_searchable_snapshots/cache/clear", got.path)
+	assert.Equal(t, "idx", got.query["index"])
+	assert.Equal(t, "true", got.query["allow_no_indices"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.ClearCacheWithParams(ctx, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "/_searchable_snapshots/cache/clear", got.path)
+	assert.NotContains(t, got.query, "index")
+}

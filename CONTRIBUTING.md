@@ -89,13 +89,13 @@ Do **not** add new runtime dependencies without justification. `encoding/json`, 
 
 | Branch | Target |
 |---|---|
-| `release-branch.v9` | Elasticsearch 3.x (active development) |
+| `v9` | Elasticsearch 3.x (active development) |
 | `release-branch.v2` | Elasticsearch 2.x (maintenance only) |
 
-**Always branch from `release-branch.v9`:**
+**Always branch from `v9`:**
 
 ```bash
-git checkout release-branch.v9 && git pull origin release-branch.v9
+git checkout v9 && git pull origin v9
 git checkout -b feature/my-feature
 # or
 git checkout -b fix/my-fix
@@ -534,9 +534,49 @@ The recipe is the same for any new Elasticsearch endpoint. Example: adding `indi
     - **Integration tests** in `api/{group}_service_integration_test.go` (with `//go:build integration`): exercise the real Elasticsearch endpoint via `newIntegrationClient()`. These are how we catch API drift when the docs lie. Register `t.Cleanup` to delete the index/resource you create.
 
 8. **Regenerate mocks** if mock generation is still wired up for this interface:
-    ```bash
-    go generate ./...
-    ```
+   ```bash
+   go generate ./...
+   ```
+
+### Registering the endpoint with the spec audit
+
+Every new endpoint must be registered in `internal/speccheck/bindings.json`,
+which is hand-reviewed input — the registry itself is generated and must never
+be edited by hand:
+
+```bash
+go generate ./internal/speccheck        # regenerate registry_generated.go and types_generated.go
+go run ./internal/speccheck -spec "$SPEC_DIR"        # audit one pinned spec tree
+go run ./internal/speccheck -spec "$SPEC_DIR" -inventory
+```
+
+A binding records the service interface (including an extension interface when
+appropriate), the method, the params carrier and where it comes from, any
+positional query arguments, and the path selectors. The audit validates each
+binding against the api package with reflection and live `ToMap()` calls, so a
+deleted field, a removed wire key, or an unreachable path selector fails.
+
+Guidelines:
+
+- **No blanket suppressions.** Missing endpoints are listed individually in
+  `internal/speccheck/baseline.go` with an exact reason, stability, visibility,
+  and a tracking anchor; wildcards and namespace-wide ignores are rejected.
+  Adding a new public endpoint without registering it fails the audit.
+- **Additive extension interfaces only.** When an existing method lacks a query
+  carrier or a path selector, do not change the service interface. Add a
+  `<Group>ServiceSpecExtensions` interface plus an `As<Group>ServiceSpecExtensions`
+  adapter, implement it on the default service, and register the extension
+  method. Extensions are opt-in, the old method delegates with nil params, and
+  custom implementations that do not support the extension get a descriptive
+  error instead of a panic.
+- **Embedding and serialization.** New params fields may be promoted through
+  embedded containers (as with the Cat common params); the generator derives
+  field lists from the AST and the integrity tests compare them with reflection.
+- **API field/transport checklist:** add the field with the correct type
+  (`*bool`, `*int`, `string`, `[]string`, named enum), serialize it in `ToMap()`
+  with the exact wire name, keep pointer values so explicit `false`/`0` are
+  preserved, and add a table-driven HTTP unit test for every new selector or
+  positional query claim.
 
 ## How to Add a New Query or Aggregation
 
@@ -915,7 +955,7 @@ Starts Delve on port 4000. Connect via VS Code:
 
 ## Pull Request Checklist
 
-- [ ] Branch is based on `release-branch.v9`
+- [ ] Branch is based on `v9`
 - [ ] One feature or fix per PR
 - [ ] New code is in the correct package (see Architecture Overview)
 - [ ] Code is formatted: `go fmt ./...`

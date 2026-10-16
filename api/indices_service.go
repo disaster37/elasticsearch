@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	json "github.com/goccy/go-json"
 
@@ -257,6 +258,9 @@ func (s *DefaultIndicesService) ClearCache(ctx context.Context, indices []string
 	r := s.client.R().SetContext(ctx)
 	for k, v := range params.ToMap() {
 		r.SetQueryParam(k, v)
+	}
+	if len(indices) > 0 {
+		r.SetQueryParam("index", strings.Join(indices, ","))
 	}
 	resp, err := r.Post(path)
 	if err != nil {

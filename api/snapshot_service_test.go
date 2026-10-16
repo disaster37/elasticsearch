@@ -373,8 +373,8 @@ func TestUnitSnapshotGetAll(t *testing.T) {
 	defer srv.Close()
 	svc := NewSnapshotService(restyClient(srv), testLogger())
 	_, err := svc.Get(context.Background(), &SnapshotGetRequest{Repository: "repo1"})
-	require.NoError(t, err)
-	assert.Equal(t, "/_snapshot/repo1", gotPath)
+	assert.NoError(t, err)
+	assert.Equal(t, "/_snapshot/repo1/_all", gotPath)
 }
 
 func TestUnitSnapshotGetValidation(t *testing.T) {
@@ -640,4 +640,115 @@ func TestUnitSnapshotCleanupRepositoryNetworkError(t *testing.T) {
 	svc := NewSnapshotService(deadClient(), testLogger())
 	_, err := svc.CleanupRepository(context.Background(), "repo", &SnapshotCleanupRepositoryParams{})
 	assert.Error(t, err)
+}
+
+func TestUnitSnapshotB6CarrierTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewSnapshotService(restyClient(srv), testLogger())
+	ctx := context.Background()
+	body := map[string]any{"type": "fs"}
+	prob := 0.02
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"create_repository", func() error {
+			_, err := svc.CreateRepository(ctx, "repo1", body, &SnapshotCreateRepositoryParams{MasterTimeout: "m1"})
+			return err
+		}, "PUT", "/_snapshot/repo1", map[string]string{"master_timeout": "m1"}},
+		{"get_repository", func() error {
+			_, err := svc.GetRepository(ctx, []string{"repo1"}, &SnapshotGetRepositoryParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/_snapshot/repo1", map[string]string{"master_timeout": "m1"}},
+		{"delete_repository", func() error {
+			_, err := svc.DeleteRepository(ctx, []string{"repo1"}, &SnapshotDeleteRepositoryParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_snapshot/repo1", map[string]string{"master_timeout": "m1"}},
+		{"verify_repository", func() error {
+			_, err := svc.VerifyRepository(ctx, "repo1", &SnapshotVerifyRepositoryParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/_snapshot/repo1/_verify", map[string]string{"master_timeout": "m1"}},
+		{"cleanup_repository", func() error {
+			_, err := svc.CleanupRepository(ctx, "repo1", &SnapshotCleanupRepositoryParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/_snapshot/repo1/_cleanup", map[string]string{"master_timeout": "m1"}},
+		{"repository_analyze", func() error {
+			_, err := svc.RepositoryAnalyze(ctx, "repo1", &SnapshotRepositoryAnalyzeParams{
+				EarlyReadNodeCount: ptrInt(1), ReadNodeCount: ptrInt(2),
+				RarelyAbortWrites: ptrBool(true), RareActionProbability: &prob,
+			})
+			return err
+		}, "POST", "/_snapshot/repo1/_analyze", map[string]string{
+			"early_read_node_count": "1", "read_node_count": "2", "rarely_abort_writes": "true", "rare_action_probability": "0.02",
+		}},
+		{"create", func() error {
+			_, err := svc.Create(ctx, &SnapshotCreateRequest{Repository: "repo1", Snapshot: "snap1", Params: &SnapshotCreateParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/_snapshot/repo1/snap1", map[string]string{"master_timeout": "m1"}},
+		{"restore", func() error {
+			_, err := svc.Restore(ctx, &SnapshotRestoreRequest{Repository: "repo1", Snapshot: "snap1", Params: &SnapshotRestoreParams{MasterTimeout: "m1"}})
+			return err
+		}, "POST", "/_snapshot/repo1/snap1/_restore", map[string]string{"master_timeout": "m1"}},
+		{"status", func() error {
+			_, err := svc.Status(ctx, &SnapshotStatusRequest{Repository: "repo1", Snapshots: []string{"snap1"}, Params: &SnapshotStatusParams{MasterTimeout: "m1"}})
+			return err
+		}, "GET", "/_snapshot/repo1/snap1/_status", map[string]string{"master_timeout": "m1"}},
+		{"clone", func() error {
+			_, err := svc.Clone(ctx, &SnapshotCloneRequest{Repository: "repo1", Snapshot: "snap1", TargetSnapshot: "snap2", Params: &MasterTimeoutSpecParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/_snapshot/repo1/snap1/_clone/snap2", map[string]string{"master_timeout": "m1"}},
+		{"delete", func() error {
+			_, err := svc.Delete(ctx, &SnapshotDeleteRequest{Repository: "repo1", Snapshot: "snap1", Params: &SnapshotDeleteSpecParams{MasterTimeout: "m1", WaitForCompletion: ptrBool(false)}})
+			return err
+		}, "DELETE", "/_snapshot/repo1/snap1", map[string]string{"master_timeout": "m1", "wait_for_completion": "false"}},
+		{"delete_list", func() error {
+			_, err := svc.Delete(ctx, &SnapshotDeleteRequest{Repository: "repo1", Snapshot: "snap1,snap2"})
+			return err
+		}, "DELETE", "/_snapshot/repo1/snap1,snap2", map[string]string{}},
+		{"get_paging", func() error {
+			_, err := svc.Get(ctx, &SnapshotGetRequest{Repository: "repo1", Snapshots: []string{"snap1"}, Params: &SnapshotGetParams{
+				After: "a1", FromSortValue: "f1", MasterTimeout: "m1", Offset: ptrInt(5), Order: SortOrderDesc,
+				Size: ptrInt(10), SlmPolicyFilter: "p1", Sort: SnapshotSortName, Verbose: ptrBool(true), IndexNames: ptrBool(false),
+			}})
+			return err
+		}, "GET", "/_snapshot/repo1/snap1", map[string]string{
+			"after": "a1", "from_sort_value": "f1", "master_timeout": "m1", "offset": "5", "order": "desc",
+			"size": "10", "slm_policy_filter": "p1", "sort": "name", "verbose": "true", "index_names": "false",
+		}},
+		{"get_all", func() error {
+			_, err := svc.Get(ctx, &SnapshotGetRequest{Repository: "repo1"})
+			return err
+		}, "GET", "/_snapshot/repo1/_all", map[string]string{}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}
+
+func TestUnitSnapshotRepositoryAnalyzeProbabilityZero(t *testing.T) {
+	var gotQuery map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotQuery = queryMap(r)
+		jsonResponse(w, 200, `{}`)
+	}))
+	defer srv.Close()
+	svc := NewSnapshotService(restyClient(srv), testLogger())
+	zero := 0.0
+	_, err := svc.RepositoryAnalyze(context.Background(), "repo1", &SnapshotRepositoryAnalyzeParams{RareActionProbability: &zero, BlobCount: ptrInt(0)})
+	assert.NoError(t, err)
+	assert.Equal(t, "0", gotQuery["rare_action_probability"])
+	assert.Equal(t, "0", gotQuery["blob_count"])
 }

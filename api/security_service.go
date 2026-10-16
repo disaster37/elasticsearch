@@ -65,6 +65,7 @@ type SecurityGetAPIKeyParams struct {
 	Username              string
 	Owner                 *bool
 	ActiveOnly            *bool
+	WithLimitedBy         *bool
 	WithLimitedPrivileges *bool
 	WithProfileUid        *bool
 }
@@ -89,6 +90,7 @@ func (p *SecurityGetAPIKeyParams) ToMap() map[string]string {
 	}
 	setBoolParam(m, "owner", p.Owner)
 	setBoolParam(m, "active_only", p.ActiveOnly)
+	setBoolParam(m, "with_limited_by", p.WithLimitedBy)
 	setBoolParam(m, "with_limited_privileges", p.WithLimitedPrivileges)
 	setBoolParam(m, "with_profile_uid", p.WithProfileUid)
 	return mergeParams(m, p.Common)

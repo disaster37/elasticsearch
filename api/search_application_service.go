@@ -16,6 +16,7 @@ import (
 type SearchApplicationListParams struct {
 	Common *CommonParams
 	From   *int
+	Q      string
 	Size   *int
 }
 
@@ -27,6 +28,9 @@ func (p *SearchApplicationListParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	if p.From != nil {
 		m["from"] = intStr(*p.From)
+	}
+	if p.Q != "" {
+		m["q"] = p.Q
 	}
 	if p.Size != nil {
 		m["size"] = intStr(*p.Size)

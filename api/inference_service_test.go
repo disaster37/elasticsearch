@@ -178,7 +178,7 @@ func TestUnitInferenceUpdate(t *testing.T) {
 	svc := NewInferenceService(restyClient(srv), testLogger())
 	resp, err := svc.Update(context.Background(), "i1", map[string]any{"task_settings": map[string]any{}})
 	require.NoError(t, err)
-	assert.Equal(t, "POST", gotMethod)
+	assert.Equal(t, "PUT", gotMethod)
 	assert.Equal(t, "/_inference/i1/_update", gotPath)
 	assert.Contains(t, gotBody, "task_settings")
 	assert.True(t, resp.Acknowledged)
@@ -315,5 +315,46 @@ func TestUnitInferenceRerankError(t *testing.T) {
 func TestUnitInferenceRerankNetworkError(t *testing.T) {
 	svc := NewInferenceService(deadClient(), testLogger())
 	_, err := svc.Rerank(context.Background(), "i1", map[string]any{"x": 1})
+	assert.Error(t, err)
+}
+
+type customInference struct{ InferenceService }
+
+func TestInferenceSpecExtensionAdapters(t *testing.T) {
+	svc := NewInferenceService(nil, testLogger())
+	if _, err := AsInferenceServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("inference default: %v", err)
+	}
+	if _, err := AsInferenceServiceSpecExtensions(nil); err == nil {
+		t.Error("inference nil: want error")
+	}
+	var typedNil InferenceService = (*DefaultInferenceService)(nil)
+	if _, err := AsInferenceServiceSpecExtensions(typedNil); err == nil {
+		t.Error("inference typed-nil: want error")
+	}
+	if _, err := AsInferenceServiceSpecExtensions(customInference{svc}); err == nil {
+		t.Error("inference custom: want error")
+	}
+}
+
+func TestUnitInferenceB10UpdateWithRequest(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewInferenceService(restyClient(srv), testLogger())
+	ext, err := AsInferenceServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+
+	_, err = ext.UpdateWithRequest(ctx, &InferenceUpdateSpecRequest{InferenceId: "i1", Body: map[string]any{}})
+	assert.NoError(t, err)
+	assert.Equal(t, "PUT", got.method)
+	assert.Equal(t, "/_inference/i1/_update", got.path)
+
+	*got = capturedSpecRequest{}
+	_, err = ext.UpdateWithRequest(ctx, &InferenceUpdateSpecRequest{TaskType: "text_embedding", InferenceId: "i1", Body: map[string]any{}})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_inference/text_embedding/i1/_update", got.path)
+
+	_, err = ext.UpdateWithRequest(ctx, &InferenceUpdateSpecRequest{})
 	assert.Error(t, err)
 }

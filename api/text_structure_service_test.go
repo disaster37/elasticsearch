@@ -23,7 +23,7 @@ func TestUnitTextStructureFindStructure(t *testing.T) {
 	defer srv.Close()
 	svc := NewTextStructureService(restyClient(srv), testLogger())
 	resp, err := svc.FindStructure(context.Background(), map[string]any{"text": "sample"}, &TextStructureFindParams{
-		Format:       "ndjson",
+		Format:        "ndjson",
 		Charset:       "UTF-8",
 		HasHeaderRow:  ptrBool(true),
 		LinesToSample: ptrInt(10),
@@ -182,4 +182,16 @@ func TestUnitTextStructureTestGrokPatternNetworkError(t *testing.T) {
 	svc := NewTextStructureService(deadClient(), testLogger())
 	_, err := svc.TestGrokPattern(context.Background(), map[string]any{"x": 1}, nil)
 	assert.Error(t, err)
+}
+
+func TestUnitTextStructureFindParamsToMap(t *testing.T) {
+	p := &TextStructureFindParams{
+		DocumentsToSample: ptrInt(500),
+		EcsCompatibility:  "v1",
+		Timeout:           "25s",
+	}
+	m := p.ToMap()
+	assert.Equal(t, "500", m["documents_to_sample"])
+	assert.Equal(t, "v1", m["ecs_compatibility"])
+	assert.Equal(t, "25s", m["timeout"])
 }

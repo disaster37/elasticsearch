@@ -75,8 +75,8 @@ func TestUnitIngestPutPipeline(t *testing.T) {
 	defer srv.Close()
 	svc := NewIngestService(restyClient(srv), testLogger())
 	resp, err := svc.PutPipeline(context.Background(), &IngestPutPipelineRequest{
-		Id:   "my-pipeline",
-		Body: map[string]any{"description": "d", "processors": []map[string]any{{"set": map[string]any{"field": "f", "value": "v"}}}},
+		Id:     "my-pipeline",
+		Body:   map[string]any{"description": "d", "processors": []map[string]any{{"set": map[string]any{"field": "f", "value": "v"}}}},
 		Params: &IngestPutPipelineParams{IfVersion: ptrInt(2), Timeout: "10s"},
 	})
 	require.NoError(t, err)
@@ -164,8 +164,8 @@ func TestUnitIngestSimulate(t *testing.T) {
 	defer srv.Close()
 	svc := NewIngestService(restyClient(srv), testLogger())
 	resp, err := svc.Simulate(context.Background(), &IngestSimulatePipelineRequest{
-		Id:   "my-pipeline",
-		Body: map[string]any{"docs": []map[string]any{{"_source": map[string]any{"f": "v"}}}},
+		Id:     "my-pipeline",
+		Body:   map[string]any{"docs": []map[string]any{{"_source": map[string]any{"f": "v"}}}},
 		Params: &IngestSimulatePipelineParams{Verbose: ptrBool(true)},
 	})
 	require.NoError(t, err)
@@ -242,4 +242,44 @@ func TestUnitIngestProcessorGrokNetworkError(t *testing.T) {
 	svc := NewIngestService(deadClient(), testLogger())
 	_, err := svc.ProcessorGrok(context.Background())
 	assert.Error(t, err)
+}
+
+func TestUnitIngestB8MasterTimeout(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewIngestService(restyClient(srv), testLogger())
+	ctx := context.Background()
+	body := map[string]any{"processors": []any{}}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"get_pipeline", func() error {
+			_, err := svc.GetPipeline(ctx, []string{"p1"}, &IngestGetPipelineParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/_ingest/pipeline/p1", map[string]string{"master_timeout": "m1"}},
+		{"delete_pipeline", func() error {
+			_, err := svc.DeletePipeline(ctx, "p1", &IngestDeletePipelineParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_ingest/pipeline/p1", map[string]string{"master_timeout": "m1"}},
+		{"put_pipeline", func() error {
+			_, err := svc.PutPipeline(ctx, &IngestPutPipelineRequest{Id: "p1", Body: body, Params: &IngestPutPipelineParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/_ingest/pipeline/p1", map[string]string{"master_timeout": "m1"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
 }

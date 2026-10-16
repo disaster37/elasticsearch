@@ -32,9 +32,14 @@
 //	}
 //
 // Config.Addresses accepts a list of node URLs; requests are distributed across
-// them in round-robin order, and with RetryCount > 0 a failed request is
-// retried against the next address. The maximum number of addresses is 1000
-// (maxAddresses); exceeding this limit returns an error.
+// them in round-robin order. Configuring more than one address automatically
+// enables retry and failover: RetryCount defaults to the number of addresses
+// and the default retry conditions (network errors, 429, and 5xx except 501)
+// are applied, so every node is tried before a request gives up. Explicit
+// RetryCount/RetryConditions values always win. There is currently no opt-out
+// field for multi-address configurations; use a single address for strict
+// no-retry semantics. The maximum number of addresses is 1000 (maxAddresses);
+// exceeding this limit returns an error.
 //
 // # Authentication
 //

@@ -230,7 +230,7 @@ func TestUnitAsyncSearchSubmitParamsSerialization(t *testing.T) {
 			AllowPartialSearchResults: ptrBool(false),
 			Analyzer:                  "standard",
 			AnalyzeWildcard:           ptrBool(true),
-			BatchedReduceSize:          ptrInt(64),
+			BatchedReduceSize:         ptrInt(64),
 			DefaultOperator:           DefaultOperatorAnd,
 			Df:                        "field",
 			ExpandWildcards:           ExpandWildcardOpen,
@@ -248,8 +248,8 @@ func TestUnitAsyncSearchSubmitParamsSerialization(t *testing.T) {
 			Size:                      ptrInt(20),
 			Sort:                      []string{"a", "b"},
 			Source:                    "true",
-			SourceExcludes:             []string{"ex"},
-			SourceIncludes:             []string{"in"},
+			SourceExcludes:            []string{"ex"},
+			SourceIncludes:            []string{"in"},
 			Stats:                     []string{"s"},
 			StoredFields:              []string{"f"},
 			SuggestField:              "sf",
@@ -312,4 +312,25 @@ func TestUnitAsyncSearchGetParamsNil(t *testing.T) {
 	resp, err := svc.Get(context.Background(), "id", nil)
 	require.NoError(t, err)
 	assert.Equal(t, "x", resp.Id)
+}
+
+func TestUnitAsyncSearchSubmitB7Carrier(t *testing.T) {
+	var gotQuery map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotQuery = queryMap(r)
+		jsonResponse(w, 200, `{"id":"a1","is_running":true,"is_partial":false}`)
+	}))
+	defer srv.Close()
+	svc := NewAsyncSearchService(restyClient(srv), testLogger())
+	_, err := svc.Submit(context.Background(), &AsyncSearchSubmitRequest{Indices: []string{"idx"}, Params: &AsyncSearchSubmitParams{
+		RestTotalHitsAsInt: ptrBool(true), SeqNoPrimaryTerm: ptrBool(true), Version: ptrBool(true),
+		CcsMinimizeRoundtrips: ptrBool(false), MaxConcurrentShardRequests: ptrInt(5), DocvalueFields: []string{"f1", "f2"},
+	}})
+	assert.NoError(t, err)
+	assert.Equal(t, "true", gotQuery["rest_total_hits_as_int"])
+	assert.Equal(t, "true", gotQuery["seq_no_primary_term"])
+	assert.Equal(t, "true", gotQuery["version"])
+	assert.Equal(t, "false", gotQuery["ccs_minimize_roundtrips"])
+	assert.Equal(t, "5", gotQuery["max_concurrent_shard_requests"])
+	assert.Equal(t, "f1,f2", gotQuery["docvalue_fields"])
 }

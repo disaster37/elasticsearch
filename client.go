@@ -20,8 +20,9 @@ import (
 //   - 429 Too Many Requests
 //   - 5xx server error status codes (excluding 501 Not Implemented)
 //
-// These conditions are automatically applied when RetryCount > 0. Use this
-// function to build custom retry logic that includes the defaults.
+// These conditions are automatically applied by [New] when RetryCount > 0
+// and no custom conditions are supplied. Use this function to build custom
+// retry logic that includes the defaults.
 func DefaultRetryConditions() []resty.RetryConditionFunc {
 	return []resty.RetryConditionFunc{
 		func(res *resty.Response, err error) bool {
@@ -197,9 +198,15 @@ type Client interface {
 // Config holds configuration for the Elasticsearch client.
 type Config struct {
 	// Addresses is a list of Elasticsearch node URLs to connect to. Requests
-	// are distributed across the addresses in round-robin order. When
-	// RetryCount > 0, a request that fails against one address is retried
-	// against the next address (see DefaultRetryConditions).
+	// are distributed across the addresses in round-robin order.
+	//
+	// Configuring more than one address automatically enables retry and
+	// failover: when RetryCount is left at its zero value it is set to the
+	// number of addresses (each attempt targets the next address, so every
+	// node is tried at least once), and the default retry conditions are
+	// installed when no custom conditions are supplied. There is currently no
+	// opt-out field for multi-address configurations — configure a single
+	// address for strict no-retry semantics.
 	//
 	// The maximum number of addresses is maxAddresses (1000). Exceeding this
 	// limit returns an error from New.
@@ -257,7 +264,19 @@ type Config struct {
 	DisableHTTP2 bool
 
 	// RetryCount is the maximum number of retry attempts for failed requests.
-	// Default is 0 (no retries).
+	//
+	// The default is 0 (no retries) when a single address is configured.
+	// When more than one address is configured, New automatically sets
+	// RetryCount to the number of addresses so a failing request fails over
+	// to the next node: with N addresses, N retries allow up to N+1 attempts
+	// and every address is tried before the request gives up. An explicitly
+	// set RetryCount > 0 is never overwritten.
+	//
+	// Whenever RetryCount > 0 and no custom RetryConditions are supplied, the
+	// default conditions from DefaultRetryConditions are installed.
+	//
+	// There is currently no opt-out field for multi-address configurations —
+	// configure a single address for strict no-retry semantics.
 	RetryCount int
 
 	// RetryWaitTime is the minimum wait time between retry attempts.
@@ -269,7 +288,13 @@ type Config struct {
 	RetryMaxWaitTime time.Duration
 
 	// RetryConditions are custom functions that determine if a request should
-	// be retried.
+	// be retried. Caller-provided conditions are used as-is and are never
+	// replaced or extended by the defaults.
+	//
+	// When RetryCount > 0 (explicitly set, or auto-enabled because multiple
+	// addresses are configured) and RetryConditions is empty,
+	// DefaultRetryConditions is applied automatically: network errors, 429
+	// Too Many Requests, and 5xx errors except 501.
 	RetryConditions []resty.RetryConditionFunc
 }
 
@@ -340,6 +365,24 @@ func New(cfg *Config, logger *logrus.Entry) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Multi-address failover is enabled by default: when several nodes are
+	// configured and the caller left RetryCount at its zero value, retry up to
+	// len(parsedAddrs) times. The pool advances one address per attempt, so N
+	// retries yield up to N+1 attempts and every address is tried at least
+	// once before the request gives up. An explicit RetryCount > 0 always wins.
+	if len(parsedAddrs) > 1 && cfg.RetryCount == 0 {
+		cfg.RetryCount = len(parsedAddrs)
+	}
+
+	// Retries need conditions: when retries are enabled (explicitly or by the
+	// multi-address default above) and the caller supplied none, install the
+	// documented defaults (network errors, 429, 5xx except 501). Caller
+	// conditions are never replaced.
+	if cfg.RetryCount > 0 && len(cfg.RetryConditions) == 0 {
+		cfg.RetryConditions = DefaultRetryConditions()
+	}
+
 	pool := newConnectionPool(parsedAddrs)
 
 	// SetBaseURL makes RestyClient().BaseURL reflect the first address and
@@ -480,10 +523,10 @@ func New(cfg *Config, logger *logrus.Entry) (Client, error) {
 		if cfg.RetryMaxWaitTime > 0 {
 			c.SetRetryMaxWaitTime(cfg.RetryMaxWaitTime)
 		}
-		if len(cfg.RetryConditions) > 0 {
-			for _, condition := range cfg.RetryConditions {
-				c.AddRetryCondition(condition)
-			}
+		// cfg.RetryConditions is guaranteed non-empty here: the block above
+		// installs DefaultRetryConditions when none were supplied.
+		for _, condition := range cfg.RetryConditions {
+			c.AddRetryCondition(condition)
 		}
 	}
 

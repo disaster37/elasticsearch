@@ -75,3 +75,21 @@ func TestUnitHealthReportGetNetworkError(t *testing.T) {
 	_, err := svc.Get(context.Background(), "shards", nil)
 	assert.Error(t, err)
 }
+
+func TestUnitHealthReportB8Timeout(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewHealthReportService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	_, err := svc.Get(ctx, "", &HealthReportParams{Timeout: "t1"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_health_report", got.path)
+	assert.Equal(t, "t1", got.query["timeout"])
+
+	*got = capturedSpecRequest{}
+	_, err = svc.Get(ctx, "shards_capacity", &HealthReportParams{Timeout: "t2"})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_health_report/shards_capacity", got.path)
+	assert.Equal(t, "t2", got.query["timeout"])
+}

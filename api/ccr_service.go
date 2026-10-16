@@ -12,6 +12,7 @@ import (
 // CcrFollowParams are the query parameters for CCR follow.
 type CcrFollowParams struct {
 	Common              *CommonParams
+	MasterTimeout       string
 	WaitForActiveShards string
 }
 
@@ -21,6 +22,9 @@ func (p *CcrFollowParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.WaitForActiveShards != "" {
 		m["wait_for_active_shards"] = p.WaitForActiveShards
 	}

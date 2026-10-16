@@ -760,3 +760,55 @@ func TestUnitMlInferTrainedModelNetworkError(t *testing.T) {
 	_, err := svc.InferTrainedModel(context.Background(), "m1", map[string]any{"x": 1}, &MlInferTrainedModelParams{})
 	assert.Error(t, err)
 }
+
+type customMl struct{ MlService }
+
+func TestMlSpecExtensionAdapters(t *testing.T) {
+	svc := NewMlService(nil, testLogger())
+	if _, err := AsMlServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("ml default: %v", err)
+	}
+	if _, err := AsMlServiceSpecExtensions(nil); err == nil {
+		t.Error("ml nil: want error")
+	}
+	var typedNil MlService = (*DefaultMlService)(nil)
+	if _, err := AsMlServiceSpecExtensions(typedNil); err == nil {
+		t.Error("ml typed-nil: want error")
+	}
+	if _, err := AsMlServiceSpecExtensions(customMl{svc}); err == nil {
+		t.Error("ml custom: want error")
+	}
+}
+
+func TestUnitMlB9Transport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewMlService(restyClient(srv), testLogger())
+	ext, err := AsMlServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+	body := map[string]any{"job_id": "j1"}
+
+	_, err = svc.DeleteJob(ctx, "j1", &MlDeleteJobParams{DeleteUserAnnotations: ptrBool(false)})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_ml/anomaly_detectors/j1", got.path)
+	assert.Equal(t, "false", got.query["delete_user_annotations"])
+
+	*got = capturedSpecRequest{}
+	_, err = svc.ResetJob(ctx, "j1", &MlResetJobParams{DeleteUserAnnotations: ptrBool(true)})
+	assert.NoError(t, err)
+	assert.Equal(t, "true", got.query["delete_user_annotations"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.PutJobWithRequest(ctx, &MlPutJobSpecRequest{JobID: "j1", Body: body, Params: &MlPutSpecParams{IgnoreUnavailable: ptrBool(true)}})
+	assert.NoError(t, err)
+	assert.Equal(t, "PUT", got.method)
+	assert.Equal(t, "/_ml/anomaly_detectors/j1", got.path)
+	assert.Equal(t, "true", got.query["ignore_unavailable"])
+
+	*got = capturedSpecRequest{}
+	_, err = ext.PutDatafeedWithRequest(ctx, &MlPutDatafeedSpecRequest{DatafeedID: "d1", Body: body, Params: &MlPutSpecParams{ExpandWildcards: ExpandWildcardOpen}})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_ml/datafeeds/d1", got.path)
+	assert.Equal(t, "open", got.query["expand_wildcards"])
+}

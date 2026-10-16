@@ -454,3 +454,39 @@ func TestUnitWatcherStatsNetworkError(t *testing.T) {
 	_, err := svc.Stats(context.Background(), []string{"_all"}, &WatcherStatsParams{})
 	assert.Error(t, err)
 }
+
+func TestUnitWatcherB10Paths(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewWatcherService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"ack_named", func() error { _, err := svc.AckWatch(ctx, "w1", "action1"); return err }, "PUT", "/_watcher/watch/w1/_ack/action1", nil},
+		{"ack_no_action", func() error { _, err := svc.AckWatch(ctx, "w1", ""); return err }, "PUT", "/_watcher/watch/w1/_ack", nil},
+		{"activate", func() error { _, err := svc.ActivateWatch(ctx, "w1"); return err }, "PUT", "/_watcher/watch/w1/_activate", nil},
+		{"deactivate", func() error { _, err := svc.DeactivateWatch(ctx, "w1"); return err }, "PUT", "/_watcher/watch/w1/_deactivate", nil},
+		{"put_version", func() error {
+			v := int64(3)
+			_, err := svc.PutWatch(ctx, "w1", map[string]any{}, &WatcherPutWatchParams{Version: &v})
+			return err
+		}, "PUT", "/_watcher/watch/w1", map[string]string{"version": "3"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}

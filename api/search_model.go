@@ -38,9 +38,11 @@ type SearchParams struct {
 	DocvalueFields             []string
 	ExpandWildcards            ExpandWildcards
 	Explain                    *bool
+	ForceSyntheticSource       *bool
 	From                       *int
 	IgnoreThrottled            *bool
 	IgnoreUnavailable          *bool
+	IncludeNamedQueriesScore   *bool
 	Lenient                    *bool
 	MaxConcurrentShardRequests *int
 	MinCompatibleShardNode     string
@@ -99,11 +101,13 @@ func (p *SearchParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setBoolParam(m, "explain", p.Explain)
+	setBoolParam(m, "force_synthetic_source", p.ForceSyntheticSource)
 	if p.From != nil {
 		m["from"] = intStr(*p.From)
 	}
 	setBoolParam(m, "ignore_throttled", p.IgnoreThrottled)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	setBoolParam(m, "include_named_queries_score", p.IncludeNamedQueriesScore)
 	setBoolParam(m, "lenient", p.Lenient)
 	if p.MaxConcurrentShardRequests != nil {
 		m["max_concurrent_shard_requests"] = intStr(*p.MaxConcurrentShardRequests)
@@ -289,6 +293,7 @@ type SearchTemplateParams struct {
 	Common                *CommonParams
 	AllowNoIndices        *bool
 	CcsMinimizeRoundtrips *bool
+	ExpandWildcards       ExpandWildcards
 	Explain               *bool
 	IgnoreThrottled       *bool
 	IgnoreUnavailable     *bool
@@ -309,6 +314,9 @@ func (p *SearchTemplateParams) ToMap() map[string]string {
 	m := make(map[string]string)
 	setBoolParam(m, "allow_no_indices", p.AllowNoIndices)
 	setBoolParam(m, "ccs_minimize_roundtrips", p.CcsMinimizeRoundtrips)
+	if p.ExpandWildcards != "" {
+		m["expand_wildcards"] = string(p.ExpandWildcards)
+	}
 	setBoolParam(m, "explain", p.Explain)
 	setBoolParam(m, "ignore_throttled", p.IgnoreThrottled)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
@@ -576,6 +584,7 @@ type SearchShardsParams struct {
 	ExpandWildcards   ExpandWildcards
 	IgnoreUnavailable *bool
 	Local             *bool
+	MasterTimeout     string
 	Preference        string
 	Routing           string
 }
@@ -592,6 +601,9 @@ func (p *SearchShardsParams) ToMap() map[string]string {
 	}
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
 	setBoolParam(m, "local", p.Local)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Preference != "" {
 		m["preference"] = p.Preference
 	}
@@ -610,12 +622,15 @@ type FieldCapsRequest struct {
 
 // FieldCapsParams are the query parameters for the field_caps endpoint.
 type FieldCapsParams struct {
-	Common            *CommonParams
-	AllowNoIndices    *bool
-	ExpandWildcards   ExpandWildcards
-	Fields            []string
-	IgnoreUnavailable *bool
-	IncludeUnmapped   *bool
+	Common             *CommonParams
+	AllowNoIndices     *bool
+	ExpandWildcards    ExpandWildcards
+	Fields             []string
+	Filters            []string
+	IgnoreUnavailable  *bool
+	IncludeEmptyFields *bool
+	IncludeUnmapped    *bool
+	Types              []string
 }
 
 // ToMap converts FieldCapsParams to a query-parameter map.
@@ -629,8 +644,11 @@ func (p *FieldCapsParams) ToMap() map[string]string {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}
 	setListParam(m, "fields", p.Fields)
+	setListParam(m, "filters", p.Filters)
 	setBoolParam(m, "ignore_unavailable", p.IgnoreUnavailable)
+	setBoolParam(m, "include_empty_fields", p.IncludeEmptyFields)
 	setBoolParam(m, "include_unmapped", p.IncludeUnmapped)
+	setListParam(m, "types", p.Types)
 	return mergeParams(m, p.Common)
 }
 
@@ -645,13 +663,14 @@ func (r *OpenPITRequest) Validate() error { return validationError(validate.Stru
 
 // OpenPITParams are the query parameters for the open_point_in_time endpoint.
 type OpenPITParams struct {
-	Common            *CommonParams
-	AllowNoIndices    *bool
-	ExpandWildcards   ExpandWildcards
-	IgnoreUnavailable *bool
-	KeepAlive         string `validate:"required"`
-	Preference        string
-	Routing           string
+	Common                    *CommonParams
+	AllowNoIndices            *bool
+	AllowPartialSearchResults *bool
+	ExpandWildcards           ExpandWildcards
+	IgnoreUnavailable         *bool
+	KeepAlive                 string `validate:"required"`
+	Preference                string
+	Routing                   string
 }
 
 // ToMap converts OpenPITParams to a query-parameter map.
@@ -661,6 +680,7 @@ func (p *OpenPITParams) ToMap() map[string]string {
 	}
 	m := make(map[string]string)
 	setBoolParam(m, "allow_no_indices", p.AllowNoIndices)
+	setBoolParam(m, "allow_partial_search_results", p.AllowPartialSearchResults)
 	if p.ExpandWildcards != "" {
 		m["expand_wildcards"] = string(p.ExpandWildcards)
 	}

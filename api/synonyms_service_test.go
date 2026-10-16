@@ -175,7 +175,7 @@ func TestUnitSynonymsGetSynonymRule(t *testing.T) {
 	resp, err := svc.GetSynonymRule(context.Background(), "s1", "r1")
 	require.NoError(t, err)
 	assert.Equal(t, "GET", gotMethod)
-	assert.Equal(t, "/_synonyms/s1/_rule/r1", gotPath)
+	assert.Equal(t, "/_synonyms/s1/r1", gotPath)
 	assert.Equal(t, "r1", resp.ID)
 	assert.Equal(t, "a,b,c", resp.Synonyms)
 }
@@ -219,7 +219,7 @@ func TestUnitSynonymsPutSynonymRule(t *testing.T) {
 	resp, err := svc.PutSynonymRule(context.Background(), "s1", "r1", map[string]any{"synonyms": "a,b"})
 	require.NoError(t, err)
 	assert.Equal(t, "PUT", gotMethod)
-	assert.Equal(t, "/_synonyms/s1/_rule/r1", gotPath)
+	assert.Equal(t, "/_synonyms/s1/r1", gotPath)
 	assert.Contains(t, gotBody, "synonyms")
 	assert.True(t, resp.Acknowledged)
 }
@@ -262,7 +262,7 @@ func TestUnitSynonymsDeleteSynonymRule(t *testing.T) {
 	resp, err := svc.DeleteSynonymRule(context.Background(), "s1", "r1")
 	require.NoError(t, err)
 	assert.Equal(t, "DELETE", gotMethod)
-	assert.Equal(t, "/_synonyms/s1/_rule/r1", gotPath)
+	assert.Equal(t, "/_synonyms/s1/r1", gotPath)
 	assert.True(t, resp.Acknowledged)
 }
 
@@ -290,4 +290,33 @@ func TestUnitSynonymsDeleteSynonymRuleNetworkError(t *testing.T) {
 	svc := NewSynonymsService(deadClient(), testLogger())
 	_, err := svc.DeleteSynonymRule(context.Background(), "s1", "r1")
 	assert.Error(t, err)
+}
+
+func TestUnitSynonymsB10Rules(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewSynonymsService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+	}{
+		{"get", func() error { _, err := svc.GetSynonymRule(ctx, "set1", "rule1"); return err }, "GET", "/_synonyms/set1/rule1"},
+		{"put", func() error {
+			_, err := svc.PutSynonymRule(ctx, "set1", "rule1", map[string]any{"synonyms": "a,b"})
+			return err
+		}, "PUT", "/_synonyms/set1/rule1"},
+		{"delete", func() error { _, err := svc.DeleteSynonymRule(ctx, "set2", "rule2"); return err }, "DELETE", "/_synonyms/set2/rule2"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+		})
+	}
 }

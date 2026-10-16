@@ -2,8 +2,9 @@ package api
 
 // ScriptGetParams are the query parameters for GET /_scripts/{id}.
 type ScriptGetParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts ScriptGetParams to a query-parameter map.
@@ -12,6 +13,9 @@ func (p *ScriptGetParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -20,9 +24,10 @@ func (p *ScriptGetParams) ToMap() map[string]string {
 
 // ScriptPutRequest is the request for PUT|POST /_scripts/{id}.
 type ScriptPutRequest struct {
-	Id     string `validate:"required"`
-	Body   any    `validate:"required"`
-	Params *ScriptPutParams
+	Id      string `validate:"required"`
+	Context string
+	Body    any `validate:"required"`
+	Params  *ScriptPutParams
 }
 
 // Validate validates the ScriptPutRequest.
@@ -30,9 +35,10 @@ func (r *ScriptPutRequest) Validate() error { return validationError(validate.St
 
 // ScriptPutParams are the query parameters for PUT /_scripts/{id}.
 type ScriptPutParams struct {
-	Common  *CommonParams
-	Context string
-	Timeout string
+	Common        *CommonParams
+	Context       string
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts ScriptPutParams to a query-parameter map.
@@ -44,6 +50,9 @@ func (p *ScriptPutParams) ToMap() map[string]string {
 	if p.Context != "" {
 		m["context"] = p.Context
 	}
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}
@@ -52,8 +61,9 @@ func (p *ScriptPutParams) ToMap() map[string]string {
 
 // ScriptDeleteParams are the query parameters for DELETE /_scripts/{id}.
 type ScriptDeleteParams struct {
-	Common  *CommonParams
-	Timeout string
+	Common        *CommonParams
+	MasterTimeout string
+	Timeout       string
 }
 
 // ToMap converts ScriptDeleteParams to a query-parameter map.
@@ -62,6 +72,9 @@ func (p *ScriptDeleteParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	if p.MasterTimeout != "" {
+		m["master_timeout"] = p.MasterTimeout
+	}
 	if p.Timeout != "" {
 		m["timeout"] = p.Timeout
 	}

@@ -70,9 +70,10 @@ func (p *MlGetJobsParams) ToMap() map[string]string {
 
 // MlDeleteJobParams are the query parameters for delete job.
 type MlDeleteJobParams struct {
-	Common            *CommonParams
-	Force             *bool
-	WaitForCompletion *bool
+	Common                *CommonParams
+	DeleteUserAnnotations *bool
+	Force                 *bool
+	WaitForCompletion     *bool
 }
 
 // ToMap converts MlDeleteJobParams to a query-parameter map.
@@ -81,6 +82,7 @@ func (p *MlDeleteJobParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "delete_user_annotations", p.DeleteUserAnnotations)
 	setBoolParam(m, "force", p.Force)
 	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
@@ -128,8 +130,9 @@ func (p *MlCloseJobParams) ToMap() map[string]string {
 
 // MlResetJobParams are the query parameters for reset job.
 type MlResetJobParams struct {
-	Common            *CommonParams
-	WaitForCompletion *bool
+	Common                *CommonParams
+	DeleteUserAnnotations *bool
+	WaitForCompletion     *bool
 }
 
 // ToMap converts MlResetJobParams to a query-parameter map.
@@ -138,6 +141,7 @@ func (p *MlResetJobParams) ToMap() map[string]string {
 		return nil
 	}
 	m := make(map[string]string)
+	setBoolParam(m, "delete_user_annotations", p.DeleteUserAnnotations)
 	setBoolParam(m, "wait_for_completion", p.WaitForCompletion)
 	return mergeParams(m, p.Common)
 }

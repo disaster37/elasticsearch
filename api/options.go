@@ -74,7 +74,7 @@ func normalizeBody(body any) (any, error) {
 func isNilValue(v any) bool {
 	rv := reflect.ValueOf(v)
 	switch rv.Kind() {
-	case reflect.Ptr, reflect.Interface:
+	case reflect.Pointer, reflect.Interface:
 		return rv.IsNil()
 	}
 	return false
@@ -149,3 +149,61 @@ func pathFromIndices(indices []string) string {
 
 // ensure querydsl is referenced (used by normalizeBody via bodyProvider).
 var _ = querydsl.NewSearchRequest
+
+// SecurityHasPrivilegesSpecRequest is the opt-in request for
+// security.has_privileges. Body is required; User is optional and selects the
+// per-user route.
+type SecurityHasPrivilegesSpecRequest struct {
+	User string
+	Body any
+}
+
+// Validate ensures a request body is present.
+func (r *SecurityHasPrivilegesSpecRequest) Validate() error {
+	if r == nil {
+		return fmt.Errorf("validation: request is required")
+	}
+	if r.Body == nil {
+		return fmt.Errorf("validation: body is required")
+	}
+	return nil
+}
+
+// TextStructureFindFieldSpecRequest is the opt-in request for the correctly
+// routed text_structure.find_field_structure endpoint. Index and Field are
+// emitted as query values.
+type TextStructureFindFieldSpecRequest struct {
+	Index  string
+	Field  string
+	Params *TextStructureFindParams
+}
+
+// Validate requires both the index and field selectors.
+func (r *TextStructureFindFieldSpecRequest) Validate() error {
+	if r == nil {
+		return fmt.Errorf("validation: request is required")
+	}
+	if r.Index == "" || r.Field == "" {
+		return fmt.Errorf("validation: index and field are required")
+	}
+	return nil
+}
+
+// TextStructureFindMessageSpecRequest is the opt-in request for the correctly
+// routed text_structure.find_message_structure endpoint. Messages is emitted
+// as the required JSON body.
+type TextStructureFindMessageSpecRequest struct {
+	Messages []string
+	Params   *TextStructureFindParams
+}
+
+// Validate requires at least one message.
+func (r *TextStructureFindMessageSpecRequest) Validate() error {
+	if r == nil {
+		return fmt.Errorf("validation: request is required")
+	}
+	if len(r.Messages) == 0 {
+		return fmt.Errorf("validation: messages is required")
+	}
+	return nil
+}

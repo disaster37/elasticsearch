@@ -1339,3 +1339,260 @@ func TestUnitIndicesResolveClusterEmpty(t *testing.T) {
 	_, err := svc.ResolveCluster(context.Background(), nil, &IndicesResolveClusterParams{})
 	assert.Error(t, err)
 }
+
+func TestUnitIndicesB3MasterTimeoutTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewIndicesService(restyClient(srv), testLogger())
+	ctx := context.Background()
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"shrink", func() error {
+			_, err := svc.Shrink(ctx, &ShrinkRequest{Source: "src", Target: "tgt", Params: &ShrinkParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/src/_shrink/tgt", map[string]string{"master_timeout": "m1"}},
+		{"split", func() error {
+			_, err := svc.Split(ctx, &SplitRequest{Source: "src", Target: "tgt", Params: &SplitParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/src/_split/tgt", map[string]string{"master_timeout": "m1"}},
+		{"clone", func() error {
+			_, err := svc.Clone(ctx, &CloneRequest{Source: "src", Target: "tgt", Params: &CloneParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/src/_clone/tgt", map[string]string{"master_timeout": "m1"}},
+		{"open", func() error {
+			_, err := svc.Open(ctx, []string{"idx"}, &IndicesOpenParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/idx/_open", map[string]string{"master_timeout": "m1"}},
+		{"close", func() error {
+			_, err := svc.Close(ctx, []string{"idx"}, &IndicesCloseParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/idx/_close", map[string]string{"master_timeout": "m1"}},
+		{"put_alias", func() error {
+			_, err := svc.PutAlias(ctx, &PutAliasRequest{Index: "idx", Alias: "al", Params: &AliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"delete_alias", func() error {
+			_, err := svc.DeleteAlias(ctx, &DeleteAliasRequest{Indices: []string{"idx"}, Names: []string{"al"}, Params: &AliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "DELETE", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"get_alias", func() error {
+			_, err := svc.GetAlias(ctx, &GetAliasRequest{Indices: []string{"idx"}, Names: []string{"al"}, Params: &GetAliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "GET", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"exists_alias", func() error {
+			_, err := svc.ExistsAlias(ctx, &ExistsAliasRequest{Indices: []string{"idx"}, Names: []string{"al"}, Params: &GetAliasParams{MasterTimeout: "m1"}})
+			return err
+		}, "HEAD", "/idx/_alias/al", map[string]string{"master_timeout": "m1"}},
+		{"simulate_index_template", func() error {
+			_, err := svc.SimulateIndexTemplate(ctx, &SimulateIndexTemplateRequest{Name: "tpl", Params: &SimulateIndexTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(true)}})
+			return err
+		}, "POST", "/_index_template/_simulate_index/tpl", map[string]string{"master_timeout": "m1", "include_defaults": "true"}},
+		{"simulate_template", func() error {
+			_, err := svc.SimulateTemplate(ctx, &SimulateTemplateRequest{Name: "tpl", Params: &SimulateTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(false)}})
+			return err
+		}, "POST", "/_index_template/_simulate/tpl", map[string]string{"master_timeout": "m1", "include_defaults": "false"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}
+
+type customIndices struct{ IndicesService }
+
+func TestIndicesSpecExtensionAdapters(t *testing.T) {
+	svc := NewIndicesService(nil, testLogger())
+	if _, err := AsIndicesServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("indices default: %v", err)
+	}
+	if _, err := AsIndicesServiceSpecExtensions(nil); err == nil {
+		t.Error("indices nil: want error")
+	}
+	var typedNil IndicesService = (*DefaultIndicesService)(nil)
+	if _, err := AsIndicesServiceSpecExtensions(typedNil); err == nil {
+		t.Error("indices typed-nil: want error")
+	}
+	if _, err := AsIndicesServiceSpecExtensions(customIndices{svc}); err == nil {
+		t.Error("indices custom: want error")
+	}
+}
+
+func TestUnitIndicesB4CarrierTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewIndicesService(restyClient(srv), testLogger())
+	ext, err := AsIndicesServiceSpecExtensions(svc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := context.Background()
+	body := map[string]any{"settings": map[string]any{}}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"add_block", func() error {
+			_, err := svc.AddBlock(ctx, &AddBlockRequest{Indices: []string{"idx"}, Block: "write", Params: &AddBlockParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/idx/_block/write", map[string]string{"master_timeout": "m1"}},
+		{"clear_cache", func() error {
+			_, err := svc.ClearCache(ctx, []string{"idx"}, &IndicesClearCacheParams{Request: ptrBool(true)})
+			return err
+		}, "POST", "/idx/_cache/clear", map[string]string{"index": "idx", "request": "true"}},
+		{"create", func() error {
+			_, err := svc.Create(ctx, "idx", body, &IndicesCreateParams{MasterTimeout: "m1", Timeout: "t1"})
+			return err
+		}, "PUT", "/idx", map[string]string{"master_timeout": "m1", "timeout": "t1"}},
+		{"create_data_stream", func() error {
+			_, err := svc.CreateDataStream(ctx, "ds", nil, &IndicesCreateDataStreamParams{MasterTimeout: "m1"})
+			return err
+		}, "PUT", "/_data_stream/ds", map[string]string{"master_timeout": "m1"}},
+		{"delete", func() error {
+			_, err := svc.Delete(ctx, []string{"idx"}, &IndicesDeleteParams{MasterTimeout: "m1", Timeout: "t1"})
+			return err
+		}, "DELETE", "/idx", map[string]string{"master_timeout": "m1", "timeout": "t1"}},
+		{"delete_data_stream", func() error {
+			_, err := svc.DeleteDataStream(ctx, []string{"ds"}, &IndicesDeleteDataStreamParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_data_stream/ds", map[string]string{"master_timeout": "m1"}},
+		{"delete_index_template", func() error {
+			_, err := svc.DeleteIndexTemplate(ctx, "tpl", &IndicesDeleteIndexTemplateParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_index_template/tpl", map[string]string{"master_timeout": "m1"}},
+		{"delete_template", func() error {
+			_, err := svc.DeleteTemplate(ctx, "tpl", &IndicesDeleteTemplateParams{MasterTimeout: "m1"})
+			return err
+		}, "DELETE", "/_template/tpl", map[string]string{"master_timeout": "m1"}},
+		{"exists_template", func() error {
+			_, err := ext.ExistsTemplateWithParams(ctx, "tpl", &IndicesGetTemplateParams{MasterTimeout: "m1"})
+			return err
+		}, "HEAD", "/_template/tpl", map[string]string{"master_timeout": "m1"}},
+		{"exists_index_template", func() error {
+			_, err := ext.ExistsIndexTemplateWithParams(ctx, "tpl", &IndicesGetIndexTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(true)})
+			return err
+		}, "HEAD", "/_index_template/tpl", map[string]string{"master_timeout": "m1", "include_defaults": "true"}},
+		{"get", func() error {
+			_, err := svc.Get(ctx, []string{"idx"}, &IndicesGetParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/idx", map[string]string{"master_timeout": "m1"}},
+		{"get_data_stream", func() error {
+			_, err := svc.GetDataStream(ctx, []string{"ds"}, &IndicesGetDataStreamParams{MasterTimeout: "m1", Verbose: ptrBool(true)})
+			return err
+		}, "GET", "/_data_stream/ds", map[string]string{"master_timeout": "m1", "verbose": "true"}},
+		{"get_index_template", func() error {
+			_, err := svc.GetIndexTemplate(ctx, []string{"tpl"}, &IndicesGetIndexTemplateParams{MasterTimeout: "m1", IncludeDefaults: ptrBool(true)})
+			return err
+		}, "GET", "/_index_template/tpl", map[string]string{"master_timeout": "m1", "include_defaults": "true"}},
+		{"get_mapping", func() error {
+			_, err := svc.GetMapping(ctx, []string{"idx"}, &IndicesGetMappingParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/idx/_mapping", map[string]string{"master_timeout": "m1"}},
+		{"get_settings", func() error {
+			_, err := svc.GetSettings(ctx, &GetSettingsRequest{Indices: []string{"idx"}, Names: []string{"n1"}, Params: &GetSettingsParams{MasterTimeout: "m1"}})
+			return err
+		}, "GET", "/idx/_settings/n1", map[string]string{"master_timeout": "m1"}},
+		{"get_template", func() error {
+			_, err := svc.GetTemplate(ctx, []string{"tpl"}, &IndicesGetTemplateParams{MasterTimeout: "m1"})
+			return err
+		}, "GET", "/_template/tpl", map[string]string{"master_timeout": "m1"}},
+		{"migrate_to_data_stream", func() error {
+			_, err := ext.MigrateToDataStreamWithParams(ctx, "ds", &MasterTimeoutAndTimeoutSpecParams{MasterTimeout: "m1", Timeout: "t1"})
+			return err
+		}, "POST", "/_data_stream/_migrate/ds", map[string]string{"master_timeout": "m1", "timeout": "t1"}},
+		{"promote_data_stream", func() error {
+			_, err := ext.PromoteDataStreamWithParams(ctx, "ds", &MasterTimeoutSpecParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/_data_stream/_promote/ds", map[string]string{"master_timeout": "m1"}},
+		{"put_index_template", func() error {
+			_, err := svc.PutIndexTemplate(ctx, &PutIndexTemplateRequest{Name: "tpl", Body: body, Params: &PutIndexTemplateParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/_index_template/tpl", map[string]string{"master_timeout": "m1"}},
+		{"put_mapping", func() error {
+			_, err := svc.PutMapping(ctx, &PutMappingRequest{Indices: []string{"idx"}, Body: body, Params: &PutMappingParams{MasterTimeout: "m1"}})
+			return err
+		}, "PUT", "/idx/_mapping", map[string]string{"master_timeout": "m1"}},
+		{"put_settings", func() error {
+			_, err := svc.PutSettings(ctx, []string{"idx"}, body, &IndicesPutSettingsParams{MasterTimeout: "m1", Reopen: ptrBool(true)})
+			return err
+		}, "PUT", "/idx/_settings", map[string]string{"master_timeout": "m1", "reopen": "true"}},
+		{"put_template", func() error {
+			_, err := svc.PutTemplate(ctx, &PutTemplateRequest{Name: "tpl", Body: body, Params: &PutTemplateParams{MasterTimeout: "m1", Cause: "c1"}})
+			return err
+		}, "PUT", "/_template/tpl", map[string]string{"master_timeout": "m1", "cause": "c1"}},
+		{"reload_search_analyzers", func() error {
+			_, err := svc.ReloadSearchAnalyzers(ctx, []string{"idx"}, &IndicesReloadAnalyzersParams{Resource: "r1"})
+			return err
+		}, "POST", "/idx/_reload_search_analyzers", map[string]string{"resource": "r1"}},
+		{"resolve_cluster", func() error {
+			_, err := svc.ResolveCluster(ctx, []string{"name"}, &IndicesResolveClusterParams{IgnoreThrottled: ptrBool(true), Timeout: "t1"})
+			return err
+		}, "GET", "/_resolve/cluster/name", map[string]string{"ignore_throttled": "true", "timeout": "t1"}},
+		{"rollover", func() error {
+			_, err := svc.Rollover(ctx, &RolloverRequest{Alias: "al", NewIndex: "n1", Body: body, Params: &RolloverParams{MasterTimeout: "m1", Lazy: ptrBool(true)}})
+			return err
+		}, "POST", "/al/_rollover/n1", map[string]string{"master_timeout": "m1", "lazy": "true"}},
+		{"update_aliases", func() error {
+			_, err := svc.UpdateAliases(ctx, body, &IndicesUpdateAliasesParams{MasterTimeout: "m1"})
+			return err
+		}, "POST", "/_aliases", map[string]string{"master_timeout": "m1"}},
+		{"forcemerge", func() error {
+			_, err := ext.ForceMergeWithRequest(ctx, &IndicesForceMergeRequest{Indices: []string{"idx"}, Params: &IndicesForceMergeParams{WaitForCompletion: ptrBool(false)}})
+			return err
+		}, "POST", "/idx/_forcemerge", map[string]string{"wait_for_completion": "false"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}
+
+func TestUnitIndicesForceMergeSpecResponse(t *testing.T) {
+	// Synchronous response retains shard data.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		jsonResponse(w, 200, `{"_shards":{"total":3,"successful":3,"failed":0},"total":3}`)
+	}))
+	ext, err := AsIndicesServiceSpecExtensions(NewIndicesService(restyClient(srv), testLogger()))
+	assert.NoError(t, err)
+	resp, err := ext.ForceMergeWithRequest(context.Background(), &IndicesForceMergeRequest{Indices: []string{"idx"}})
+	assert.NoError(t, err)
+	if assert.NotNil(t, resp.Shards) {
+		assert.Equal(t, 3, resp.Shards.Total)
+	}
+	assert.Empty(t, resp.Task)
+	srv.Close()
+
+	// Asynchronous response retains the task id.
+	srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		jsonResponse(w, 200, `{"task":"abc:12"}`)
+	}))
+	defer srv.Close()
+	ext, err = AsIndicesServiceSpecExtensions(NewIndicesService(restyClient(srv), testLogger()))
+	assert.NoError(t, err)
+	resp, err = ext.ForceMergeWithRequest(context.Background(), &IndicesForceMergeRequest{Indices: []string{"idx"}, Params: &IndicesForceMergeParams{WaitForCompletion: ptrBool(false)}})
+	assert.NoError(t, err)
+	assert.Equal(t, "abc:12", resp.Task)
+}

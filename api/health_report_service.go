@@ -14,6 +14,7 @@ type HealthReportParams struct {
 	Common  *CommonParams
 	Size    *int
 	Time    string
+	Timeout string
 	Verbose *bool
 }
 
@@ -28,6 +29,9 @@ func (p *HealthReportParams) ToMap() map[string]string {
 	}
 	if p.Time != "" {
 		m["time"] = p.Time
+	}
+	if p.Timeout != "" {
+		m["timeout"] = p.Timeout
 	}
 	setBoolParam(m, "verbose", p.Verbose)
 	return mergeParams(m, p.Common)

@@ -155,7 +155,7 @@ func TestUnitDocumentNetworkError(t *testing.T) {
 
 func TestUnitDocumentCreate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/test-index/_doc/1/_create", r.URL.Path)
+		assert.Equal(t, "/test-index/_create/1", r.URL.Path)
 		assert.Equal(t, "PUT", r.Method)
 		jsonResponse(w, 201, `{"_index":"test-index","_id":"1","_version":1,"result":"created","_shards":{"total":1,"successful":1,"failed":0}}`)
 	}))
@@ -785,4 +785,105 @@ func TestUnitDocumentTermsEnumNetworkError(t *testing.T) {
 		Body:  map[string]any{"field": "f"},
 	})
 	assert.Error(t, err)
+}
+
+type customDocument struct{ DocumentService }
+
+func TestDocumentSpecExtensionAdapters(t *testing.T) {
+	svc := NewDocumentService(nil, testLogger())
+	if _, err := AsDocumentServiceSpecExtensions(svc); err != nil {
+		t.Fatalf("document default: %v", err)
+	}
+	if _, err := AsDocumentServiceSpecExtensions(nil); err == nil {
+		t.Error("document nil: want error")
+	}
+	var typedNil DocumentService = (*DefaultDocumentService)(nil)
+	if _, err := AsDocumentServiceSpecExtensions(typedNil); err == nil {
+		t.Error("document typed-nil: want error")
+	}
+	if _, err := AsDocumentServiceSpecExtensions(customDocument{svc}); err == nil {
+		t.Error("document custom: want error")
+	}
+}
+
+func TestUnitDocumentB7CarrierTransport(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewDocumentService(restyClient(srv), testLogger())
+	ctx := context.Background()
+	body := map[string]any{"field": "value"}
+
+	cases := []struct {
+		name   string
+		call   func() error
+		method string
+		path   string
+		query  map[string]string
+	}{
+		{"index", func() error {
+			_, err := svc.Index(ctx, &IndexRequest{Index: "idx", Id: "1", Body: body, Params: &IndexParams{Routing: "r1", RequireDataStream: ptrBool(true), IncludeSourceOnError: ptrBool(false)}})
+			return err
+		}, "PUT", "/idx/_doc/1", map[string]string{"routing": "r1", "require_data_stream": "true", "include_source_on_error": "false"}},
+		{"create", func() error {
+			_, err := svc.Create(ctx, &CreateRequest{Index: "idx", Id: "1", Body: body, Params: &CreateParams{Routing: "r1"}})
+			return err
+		}, "PUT", "/idx/_create/1", map[string]string{"routing": "r1"}},
+		{"bulk", func() error {
+			_, err := svc.Bulk(ctx, &BulkRequest{Index: "idx", Body: "{\"index\":{}}\n", Params: &BulkParams{RequireDataStream: ptrBool(true), IncludeSourceOnError: ptrBool(true)}})
+			return err
+		}, "POST", "/idx/_bulk", map[string]string{"require_data_stream": "true", "include_source_on_error": "true"}},
+		{"update", func() error {
+			_, err := svc.Update(ctx, &UpdateRequest{Index: "idx", Id: "1", Body: body, Params: &UpdateParams{IncludeSourceOnError: ptrBool(true)}})
+			return err
+		}, "POST", "/idx/_update/1", map[string]string{"include_source_on_error": "true"}},
+		{"delete", func() error {
+			_, err := svc.Delete(ctx, &DeleteRequest{Index: "idx", Id: "1", Params: &DeleteParams{WaitForActiveShards: "1"}})
+			return err
+		}, "DELETE", "/idx/_doc/1", map[string]string{"wait_for_active_shards": "1"}},
+		{"delete_by_query", func() error {
+			_, err := svc.DeleteByQuery(ctx, &DeleteByQueryRequest{Indices: []string{"idx"}, Body: body, Params: &DeleteByQueryParams{AllowNoIndices: ptrBool(true)}})
+			return err
+		}, "POST", "/idx/_delete_by_query", map[string]string{"allow_no_indices": "true"}},
+		{"update_by_query", func() error {
+			_, err := svc.UpdateByQuery(ctx, &UpdateByQueryRequest{Indices: []string{"idx"}, Body: body, Params: &UpdateByQueryParams{AllowNoIndices: ptrBool(true)}})
+			return err
+		}, "POST", "/idx/_update_by_query", map[string]string{"allow_no_indices": "true"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			*got = capturedSpecRequest{}
+			assert.NoError(t, tc.call())
+			assert.Equal(t, tc.method, got.method)
+			assert.Equal(t, tc.path, got.path)
+			for k, v := range tc.query {
+				assert.Equal(t, v, got.query[k], "query %s", k)
+			}
+		})
+	}
+}
+
+func TestUnitMtermvectorsSpecExtension(t *testing.T) {
+	srv, got := captureSpecServer(t)
+	defer srv.Close()
+	svc := NewDocumentService(restyClient(srv), testLogger())
+	ext, err := AsDocumentServiceSpecExtensions(svc)
+	assert.NoError(t, err)
+	ctx := context.Background()
+
+	// Index path with ids.
+	_, err = ext.MultiTermVectorsWithRequest(ctx, &MtermvectorsSpecRequest{Index: "idx", Params: &MtermvectorsSpecParams{Ids: []string{"1", "2"}}})
+	assert.NoError(t, err)
+	assert.Equal(t, "/idx/_mtermvectors", got.path)
+	assert.Equal(t, "1,2", got.query["ids"])
+
+	// Root path with nil body and nil params.
+	*got = capturedSpecRequest{}
+	_, err = ext.MultiTermVectorsWithRequest(ctx, &MtermvectorsSpecRequest{})
+	assert.NoError(t, err)
+	assert.Equal(t, "/_mtermvectors", got.path)
+	assert.NotContains(t, got.query, "ids")
+
+	// Existing MtermvectorsParams alias must not gain ids.
+	assert.NotContains(t, (&TermVectorsParams{}).ToMap(), "ids")
+	assert.NotContains(t, (&MtermvectorsParams{}).ToMap(), "ids")
 }

@@ -122,3 +122,27 @@ func TestUnitDanglingIndicesDeleteNetworkError(t *testing.T) {
 	_, err := svc.Delete(context.Background(), "uuid-1", nil)
 	assert.Error(t, err)
 }
+
+func TestUnitDanglingIndicesB3Timeouts(t *testing.T) {
+	var gotQuery map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotQuery = queryMap(r)
+		jsonResponse(w, 200, `{"acknowledged":true}`)
+	}))
+	defer srv.Close()
+	svc := NewDanglingIndicesService(restyClient(srv), testLogger())
+	_, err := svc.Import(context.Background(), "uuid-1", &DanglingIndicesImportParams{
+		AcceptDataLoss: ptrBool(false),
+		MasterTimeout:  "m1",
+		Timeout:        "t1",
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "false", gotQuery["accept_data_loss"])
+	assert.Equal(t, "m1", gotQuery["master_timeout"])
+	assert.Equal(t, "t1", gotQuery["timeout"])
+
+	_, err = svc.Delete(context.Background(), "uuid-2", &DanglingIndicesImportParams{MasterTimeout: "m2", Timeout: "t2"})
+	require.NoError(t, err)
+	assert.Equal(t, "m2", gotQuery["master_timeout"])
+	assert.Equal(t, "t2", gotQuery["timeout"])
+}
